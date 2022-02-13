@@ -1,0 +1,35 @@
+#+TITLE: Project Description
+
+* A Framework and a Language for Abstract Board Games
+
+As a part of ongoing research into general game-playing systems, this project
+proposes developing a software framework for describing and playing abstract
+board games. The framework will have three main components: a well-defined game
+description language, a game-playing agent, and a learning module, each
+described in more detail below.
+
+** The Game Description Language
+The game description language expresses the rules of the abstract board games,
+such as piece movements and terminal conditions. The language needs to be
+expressive enough to describe popular chess-like games, including western and
+Chinese chess, yet, at the same time, simple enough to allow for a fast
+interpretation. The game descriptions compile into runnable Python/C++ code.
+This component will extend the students' knowledge of compiler techniques.
+
+** The Game-Playing Agent
+The game-playing agent will be Alpha-Zero-like, using a Monte-Carlo tree search
+and a deep neural network to control the think-a-head search process. The search
+will call the compiled game description to provide the game-specific logic. This
+component will extend the students' knowledge of artificial intelligence,
+particularly of informed search methods.
+
+** THe learning module
+The third and last component allows the game agent to autonomously learn game
+strategies via self-play, using deep neural networks and reinforcement learning.
+
+** Deliverables
+The project will have three main deliverables:
+- a working software prototype
+- a BSc thesis report,
+- a conference paper, describing the framework and comparing its effectiveness
+  (e.g., expressibility and efficiency) with similar existing frameworks.
