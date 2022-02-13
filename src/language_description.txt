@@ -1,0 +1,9 @@
+sentence:      word* EOI
+word:          unary_word (binary_op unary_word)*
+unary_word:    core_word unary_op | core_word
+core_word:     "(" sentence ")" | letter
+unary_op:      "*" | "?" | "+"
+binary_op:     "|"
+letter:        "[" int "," int "," predicate "]"
+int:           CLASS OF INTEGERS
+predicate:     CLASS OF STRINGS WITHOUT INTEGERS
