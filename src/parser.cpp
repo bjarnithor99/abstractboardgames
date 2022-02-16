@@ -29,52 +29,75 @@ bool Parser::match_if(Token token) {
     }
 }
 
-void Parser::parse() {
-    parse_sentence();
+SentenceNode *Parser::parse() {
+    SentenceNode *sentenceNode = parse_sentence();
+    return sentenceNode;
 }
 
-void Parser::parse_sentence() {
+SentenceNode *Parser::parse_sentence() {
+    SentenceNode *sentenceNode = new SentenceNode();
     while (tokenTuple.token != Token::EOI) {
         if (tokenTuple.token == Token::RParen)
             break;
-        parse_word();
+        sentenceNode->add_word_node(parse_word());
     }
+    return sentenceNode;
 }
 
-void Parser::parse_word() {
-    parse_unary_word();
-    if (match_if(Token::OpOr)) {
-        parse_word();
+WordNode *Parser::parse_word() {
+    Node *expr = parse_unary_word();
+    while (match_if(Token::OpOr)) {
+        Node *rhs = parse_unary_word();
+        expr = new BinaryOpNode(BinaryOperator::OpOr, expr, rhs);
     }
+    return new WordNode(expr);
 }
 
-void Parser::parse_unary_word() {
-    parse_core_word();
-    if (match_if(Token::OpStar)) {}
+UnaryWordNode *Parser::parse_unary_word() {
+    Node *childNode = parse_core_word();
+    if (match_if(Token::OpStar)) {
+        childNode = new UnaryOpNode(UnaryOperator::OpStar, childNode);
+    }
     else if (match_if(Token::OpQuestion)) {
+        childNode = new UnaryOpNode(UnaryOperator::OpQuestion, childNode);
     }
     else if (match_if(Token::OpPlus)) {
+        childNode = new UnaryOpNode(UnaryOperator::OpPlus, childNode);
     }
+    return new UnaryWordNode(childNode);
 }
 
-void Parser::parse_core_word() {
+CoreWordNode *Parser::parse_core_word() {
+    Node *childNode;
     if (match_if(Token::LParen)) {
-        parse_sentence();
+        childNode = parse_sentence();
         match(Token::RParen);
     }
     else {
-        parse_letter();
+        childNode = parse_letter();
     }
+    return new CoreWordNode(childNode);
 }
 
-void Parser::parse_letter() {
+LetterNode *Parser::parse_letter() {
     match(Token::LSquare);
-    match(Token::Number);
+    int dx = parse_number();
     match(Token::Comma);
-    match(Token::Number);
+    int dy = parse_number();
     match(Token::Comma);
-    match(Token::Predicate);
+    std::string predicate = parse_predicate();
     match(Token::RSquare);
+    return new LetterNode(dx, dy, predicate);
 }
-    while (match_if(Token::OpOr)) {
-        parse_unary_word();
+
+int Parser::parse_number() {
+    std::string lexeme = tokenTuple.lexeme;
+    match(Token::Number);
+    return std::stoi(lexeme);
+}
+
+std::string Parser::parse_predicate() {
+    std::string lexeme = tokenTuple.lexeme;
+    match(Token::Predicate);
+    return lexeme;
+}

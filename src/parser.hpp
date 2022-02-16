@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include "ast.hpp"
 #include "lexer.hpp"
 #include <fstream>
 #include <sstream>
@@ -14,7 +15,7 @@ class Parser
 {
   public:
     Parser(std::ifstream *filestream);
-    void parse();
+    SentenceNode *parse();
 
   private:
     std::ifstream *filestream;
@@ -22,9 +23,11 @@ class Parser
     TokenTuple tokenTuple;
     void match(Token token);
     bool match_if(Token token);
-    void parse_sentence();
-    void parse_word();
-    void parse_unary_word();
-    void parse_core_word();
-    void parse_letter();
+    SentenceNode *parse_sentence();
+    WordNode *parse_word();
+    UnaryWordNode *parse_unary_word();
+    CoreWordNode *parse_core_word();
+    LetterNode *parse_letter();
+    int parse_number();
+    std::string parse_predicate();
 };
