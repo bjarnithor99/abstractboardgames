@@ -29,54 +29,49 @@ bool Parser::match_if(Token token) {
     }
 }
 
-SentenceNode *Parser::parse() {
-    SentenceNode *sentenceNode = parse_sentence();
+Node *Parser::parse() {
+    Node *sentenceNode = parse_sentence();
+    match(Token::EOI);
     return sentenceNode;
 }
 
-SentenceNode *Parser::parse_sentence() {
-    SentenceNode *sentenceNode = new SentenceNode();
-    while (tokenTuple.token != Token::EOI) {
-        if (tokenTuple.token == Token::RParen)
-            break;
-        sentenceNode->add_word_node(parse_word());
-    }
-    return sentenceNode;
-}
-
-Node *Parser::parse_word() {
-    Node *expr = parse_unary_word();
+Node *Parser::parse_sentence() {
+    Node *node = parse_word();
     while (match_if(Token::OpOr)) {
-        Node *rhs = parse_unary_word();
-        expr = new BinaryOpNode(BinaryOperator::OpOr, expr, rhs);
+        Node *rhs = parse_word();
+        node = new BinaryOpNode(BinaryOperator::OpOr, node, rhs);
     }
-    return expr;
+    return node;
 }
 
-Node *Parser::parse_unary_word() {
-    Node *childNode = parse_core_word();
-    if (match_if(Token::OpStar)) {
-        childNode = new UnaryOpNode(UnaryOperator::OpStar, childNode);
-    }
-    else if (match_if(Token::OpQuestion)) {
-        childNode = new UnaryOpNode(UnaryOperator::OpQuestion, childNode);
-    }
-    else if (match_if(Token::OpPlus)) {
-        childNode = new UnaryOpNode(UnaryOperator::OpPlus, childNode);
-    }
-    return childNode;
+WordsNode *Parser::parse_word() {
+    WordsNode *wordsNode = new WordsNode();
+    do {
+        Node *node = parse_core_word();
+        if (match_if(Token::OpStar)) {
+            node = new UnaryOpNode(UnaryOperator::OpStar, node);
+        }
+        else if (match_if(Token::OpQuestion)) {
+            node = new UnaryOpNode(UnaryOperator::OpQuestion, node);
+        }
+        else if (match_if(Token::OpPlus)) {
+            node = new UnaryOpNode(UnaryOperator::OpPlus, node);
+        }
+        wordsNode->add_word_node(node);
+    } while (tokenTuple.token == Token::LParen || tokenTuple.token == Token::LSquare);
+    return wordsNode;
 }
 
 Node *Parser::parse_core_word() {
-    Node *childNode;
+    Node *node;
     if (match_if(Token::LParen)) {
-        childNode = parse_sentence();
+        node = parse_sentence();
         match(Token::RParen);
     }
     else {
-        childNode = parse_letter();
+        node = parse_letter();
     }
-    return childNode;
+    return node;
 }
 
 LetterNode *Parser::parse_letter() {

@@ -15,7 +15,7 @@ class Parser
 {
   public:
     Parser(std::ifstream *filestream);
-    SentenceNode *parse();
+    Node *parse();
 
   private:
     std::ifstream *filestream;
@@ -23,8 +23,8 @@ class Parser
     TokenTuple tokenTuple;
     void match(Token token);
     bool match_if(Token token);
-    SentenceNode *parse_sentence();
-    Node *parse_word();
+    Node *parse_sentence();
+    WordsNode *parse_word();
     Node *parse_unary_word();
     Node *parse_core_word();
     LetterNode *parse_letter();
