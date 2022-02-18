@@ -4,10 +4,7 @@
  */
 #pragma once
 
-class SentenceNode;
-class WordNode;
-class UnaryWordNode;
-class CoreWordNode;
+class WordsNode;
 class LetterNode;
 class BinaryOpNode;
 class UnaryOpNode;
@@ -16,10 +13,7 @@ class Visitor
 {
   public:
     virtual ~Visitor(){};
-    virtual void visitSentenceNode(SentenceNode *sentenceNode) = 0;
-    virtual void visitWordNode(WordNode *WordNode) = 0;
-    virtual void visitUnaryWordNode(UnaryWordNode *unaryWordNode) = 0;
-    virtual void visitCoreWordNode(CoreWordNode *coreWordNode) = 0;
+    virtual void visitWordsNode(WordsNode *wordsNode) = 0;
     virtual void visitLetterNode(LetterNode *letterNode) = 0;
     virtual void visitBinaryOpNode(BinaryOpNode *binaryOpNode) = 0;
     virtual void visitUnaryOpNode(UnaryOpNode *unaryOpNode) = 0;

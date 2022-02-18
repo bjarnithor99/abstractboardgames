@@ -44,16 +44,16 @@ SentenceNode *Parser::parse_sentence() {
     return sentenceNode;
 }
 
-WordNode *Parser::parse_word() {
+Node *Parser::parse_word() {
     Node *expr = parse_unary_word();
     while (match_if(Token::OpOr)) {
         Node *rhs = parse_unary_word();
         expr = new BinaryOpNode(BinaryOperator::OpOr, expr, rhs);
     }
-    return new WordNode(expr);
+    return expr;
 }
 
-UnaryWordNode *Parser::parse_unary_word() {
+Node *Parser::parse_unary_word() {
     Node *childNode = parse_core_word();
     if (match_if(Token::OpStar)) {
         childNode = new UnaryOpNode(UnaryOperator::OpStar, childNode);
@@ -64,10 +64,10 @@ UnaryWordNode *Parser::parse_unary_word() {
     else if (match_if(Token::OpPlus)) {
         childNode = new UnaryOpNode(UnaryOperator::OpPlus, childNode);
     }
-    return new UnaryWordNode(childNode);
+    return childNode;
 }
 
-CoreWordNode *Parser::parse_core_word() {
+Node *Parser::parse_core_word() {
     Node *childNode;
     if (match_if(Token::LParen)) {
         childNode = parse_sentence();
@@ -76,7 +76,7 @@ CoreWordNode *Parser::parse_core_word() {
     else {
         childNode = parse_letter();
     }
-    return new CoreWordNode(childNode);
+    return childNode;
 }
 
 LetterNode *Parser::parse_letter() {

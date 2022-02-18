@@ -10,40 +10,16 @@ void LetterNode::accept(Visitor *visitor) {
     visitor->visitLetterNode(this);
 }
 
-CoreWordNode::CoreWordNode(Node *childNode) : childNode(childNode) {}
-CoreWordNode::~CoreWordNode() {
-    delete childNode;
-}
-void CoreWordNode::accept(Visitor *visitor) {
-    visitor->visitCoreWordNode(this);
-}
-
-UnaryWordNode::UnaryWordNode(Node *childNode) : childNode(childNode) {}
-UnaryWordNode::~UnaryWordNode() {
-    delete childNode;
-}
-void UnaryWordNode::accept(Visitor *visitor) {
-    visitor->visitUnaryWordNode(this);
-}
-
-WordNode::WordNode(Node *childNode) : childNode(childNode) {}
-WordNode::~WordNode() {
-    delete childNode;
-}
-void WordNode::accept(Visitor *visitor) {
-    visitor->visitWordNode(this);
-}
-
-SentenceNode::SentenceNode() {}
-SentenceNode::~SentenceNode() {
-    for (WordNode *wordNode : wordNodes) {
+WordsNode::WordsNode() {}
+WordsNode::~WordsNode() {
+    for (Node *wordNode : wordNodes) {
         delete wordNode;
     }
 }
-void SentenceNode::accept(Visitor *visitor) {
-    visitor->visitSentenceNode(this);
+void WordsNode::accept(Visitor *visitor) {
+    visitor->visitWordsNode(this);
 }
-void SentenceNode::add_word_node(WordNode *wordNode) {
+void WordsNode::add_word_node(Node *wordNode) {
     wordNodes.push_back(wordNode);
 }
 

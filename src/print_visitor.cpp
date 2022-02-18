@@ -42,33 +42,12 @@ std::ostream &operator<<(std::ostream &os, const BinaryOperator &binaryOperator)
 
 PrintVisitor::PrintVisitor() : depth(0) {}
 
-void PrintVisitor::visitSentenceNode(SentenceNode *sentenceNode) {
-    std::cout << indent() << "SentenceNode" << std::endl;
+void PrintVisitor::visitWordsNode(WordsNode *wordsNode) {
+    std::cout << indent() << "WordsNode" << std::endl;
     depth++;
-    for (WordNode *wordNode : sentenceNode->wordNodes) {
+    for (Node *wordNode : wordsNode->wordNodes) {
         wordNode->accept(this);
     }
-    depth--;
-}
-
-void PrintVisitor::visitWordNode(WordNode *wordNode) {
-    std::cout << indent() << "WordNode" << std::endl;
-    depth++;
-    wordNode->childNode->accept(this);
-    depth--;
-}
-
-void PrintVisitor::visitUnaryWordNode(UnaryWordNode *unaryWordNode) {
-    std::cout << indent() << "UnaryWordNode" << std::endl;
-    depth++;
-    unaryWordNode->childNode->accept(this);
-    depth--;
-}
-
-void PrintVisitor::visitCoreWordNode(CoreWordNode *coreWordNode) {
-    std::cout << indent() << "CoreWordNode" << std::endl;
-    depth++;
-    coreWordNode->childNode->accept(this);
     depth--;
 }
 

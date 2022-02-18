@@ -24,9 +24,9 @@ class Parser
     void match(Token token);
     bool match_if(Token token);
     SentenceNode *parse_sentence();
-    WordNode *parse_word();
-    UnaryWordNode *parse_unary_word();
-    CoreWordNode *parse_core_word();
+    Node *parse_word();
+    Node *parse_unary_word();
+    Node *parse_core_word();
     LetterNode *parse_letter();
     int parse_number();
     std::string parse_predicate();

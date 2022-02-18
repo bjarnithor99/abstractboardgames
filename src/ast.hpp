@@ -41,41 +41,14 @@ class LetterNode : public Node
     std::string predicate;
 };
 
-class CoreWordNode : public Node
+class WordsNode : public Node
 {
   public:
-    CoreWordNode(Node *childNode);
-    ~CoreWordNode();
+    WordsNode();
+    ~WordsNode();
     void accept(Visitor *visitor) override;
-    Node *childNode;
-};
-
-class UnaryWordNode : public Node
-{
-  public:
-    UnaryWordNode(Node *childNode);
-    ~UnaryWordNode();
-    void accept(Visitor *visitor) override;
-    Node *childNode;
-};
-
-class WordNode : public Node
-{
-  public:
-    WordNode(Node *childNode);
-    ~WordNode();
-    void accept(Visitor *visitor) override;
-    Node *childNode;
-};
-
-class SentenceNode : public Node
-{
-  public:
-    SentenceNode();
-    ~SentenceNode();
-    void accept(Visitor *visitor) override;
-    void add_word_node(WordNode *wordNode);
-    std::vector<WordNode *> wordNodes;
+    void add_word_node(Node *wordNode);
+    std::vector<Node *> wordNodes;
 };
 
 class UnaryOpNode : public Node

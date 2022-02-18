@@ -16,10 +16,7 @@ class PrintVisitor : public Visitor
 {
   public:
     PrintVisitor();
-    void visitSentenceNode(SentenceNode *sentenceNode) override;
-    void visitWordNode(WordNode *WordNode) override;
-    void visitUnaryWordNode(UnaryWordNode *unaryWordNode) override;
-    void visitCoreWordNode(CoreWordNode *coreWordNode) override;
+    void visitWordsNode(WordsNode *wordsNode) override;
     void visitLetterNode(LetterNode *letterNode) override;
     void visitBinaryOpNode(BinaryOpNode *binaryOpNode) override;
     void visitUnaryOpNode(UnaryOpNode *unaryOpNode) override;
