@@ -11,7 +11,6 @@
 
 enum class UnaryOperator
 {
-    None,
     OpStar,
     OpQuestion,
     OpPlus,
@@ -19,7 +18,6 @@ enum class UnaryOperator
 
 enum class BinaryOperator
 {
-    None,
     OpOr,
 };
 

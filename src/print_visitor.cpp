@@ -6,9 +6,6 @@
 
 std::ostream &operator<<(std::ostream &os, const UnaryOperator &unaryOperator) {
     switch (unaryOperator) {
-    case UnaryOperator::None:
-        os << "None";
-        break;
     case UnaryOperator::OpStar:
         os << "*";
         break;
@@ -27,9 +24,6 @@ std::ostream &operator<<(std::ostream &os, const UnaryOperator &unaryOperator) {
 
 std::ostream &operator<<(std::ostream &os, const BinaryOperator &binaryOperator) {
     switch (binaryOperator) {
-    case BinaryOperator::None:
-        os << "None";
-        break;
     case BinaryOperator::OpOr:
         os << "|";
         break;
