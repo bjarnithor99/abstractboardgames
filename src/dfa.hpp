@@ -13,6 +13,7 @@ class DFAInput
     DFAInput(int dx, int dy, std::string predicate);
     ~DFAInput();
     bool operator<(const DFAInput &rhs) const;
+    bool operator==(const DFAInput &rhs) const;
 
     int dx;
     int dy;

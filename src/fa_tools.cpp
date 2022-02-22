@@ -90,3 +90,131 @@ DFAState *FATools::nfaToDfa(NFAState *nfa_initial_state) {
     }
     return nfa_set_to_dfa[nfa_initial_state_closure];
 }
+
+std::set<DFAState *> FATools::getParents(DFAState *child, std::set<DFAState *> *all_states, DFAInput input) {
+    std::set<DFAState *> parents;
+    for (DFAState *state : *all_states) {
+        for (auto &p : state->transition) {
+            if (p.second == child && p.first == input) {
+                parents.insert(state);
+            }
+        }
+    }
+    return parents;
+}
+
+std::set<DFAState *> FATools::getParents(std::set<DFAState *> children, std::set<DFAState *> *all_states,
+                                         DFAInput input) {
+    std::set<DFAState *> all_parents;
+    for (DFAState *child : children) {
+        std::set<DFAState *> merged;
+        std::set<DFAState *> parents = getParents(child, all_states, input);
+        std::merge(all_parents.begin(), all_parents.end(), parents.begin(), parents.end(),
+                   std::inserter(merged, merged.end()));
+        all_parents = merged;
+    }
+    return all_parents;
+}
+
+DFAState *FATools::minimizeDfa(DFAState *initial_state) {
+    std::set<DFAState *> all_states;
+    std::set<DFAState *> final_states;
+    std::set<DFAState *> non_final_states;
+    std::set<DFAInput> alphabet;
+    all_states.insert(initial_state);
+    if (initial_state->is_accepting)
+        final_states.insert(initial_state);
+    else
+        non_final_states.insert(initial_state);
+    std::queue<DFAState *> q;
+    q.push(initial_state);
+    while (!q.empty()) {
+        DFAState *at_state = q.front();
+        q.pop();
+        for (auto &p : at_state->transition) {
+            alphabet.insert(p.first);
+            DFAState *next_state = p.second;
+            if (all_states.find(next_state) == all_states.end()) {
+                q.push(next_state);
+                all_states.insert(next_state);
+                if (next_state->is_accepting)
+                    final_states.insert(next_state);
+                else
+                    non_final_states.insert(next_state);
+            }
+        }
+    }
+
+    // https://en.wikipedia.org/wiki/DFA_minimization#Hopcroft's_algorithm
+    std::set<std::set<DFAState *>> P{final_states, non_final_states};
+    std::set<std::set<DFAState *>> W{final_states, non_final_states};
+    while (!W.empty()) {
+        std::set<DFAState *> A = *(W.begin());
+        W.erase(W.begin());
+        for (DFAInput input : alphabet) {
+            std::set<DFAState *> X = getParents(A, &all_states, input);
+            std::set<std::set<DFAState *>> newP;
+            for (const std::set<DFAState *> &Y : P) {
+                std::set<DFAState *> x_and_y;
+                std::set_intersection(X.begin(), X.end(), Y.begin(), Y.end(), std::inserter(x_and_y, x_and_y.end()));
+                if (x_and_y.empty()) {
+                    newP.insert(Y);
+                    continue;
+                }
+                std::set<DFAState *> y_minus_x;
+                std::set_difference(Y.begin(), Y.end(), X.begin(), X.end(), std::inserter(y_minus_x, y_minus_x.end()));
+                if (y_minus_x.empty()) {
+                    newP.insert(Y);
+                    continue;
+                }
+                newP.insert(x_and_y);
+                newP.insert(y_minus_x);
+                if (W.find(Y) != W.end()) {
+                    W.erase(Y);
+                    W.insert(x_and_y);
+                    W.insert(y_minus_x);
+                }
+                else {
+                    if (x_and_y.size() <= y_minus_x.size()) {
+                        W.insert(x_and_y);
+                    }
+                    else {
+                        W.insert(y_minus_x);
+                    }
+                }
+            }
+            P = newP;
+        }
+    }
+
+    // Construct DFA from P
+    std::map<std::set<DFAState *>, DFAState *> construction_map;
+    DFAState *min_dfa_initial_state = nullptr;
+    for (const std::set<DFAState *> &state_set : P) {
+        construction_map[state_set] = new DFAState();
+        if (!min_dfa_initial_state && state_set.find(initial_state) != state_set.end()) {
+            min_dfa_initial_state = construction_map[state_set];
+        }
+        for (DFAState *state : state_set) {
+            if (final_states.find(state) != final_states.end()) {
+                construction_map[state_set]->is_accepting = true;
+                break;
+            }
+        }
+    }
+    for (const std::set<DFAState *> &state_set : P) {
+        DFAState *at_state = *(state_set.begin());
+        for (auto &p : at_state->transition) {
+            DFAInput input = p.first;
+            DFAState *next_state = p.second;
+            for (const std::set<DFAState *> &possible_next_set : P) {
+                if (possible_next_set.find(next_state) != possible_next_set.end()) {
+                    construction_map[state_set]->add_transition(construction_map[possible_next_set], input);
+                    break;
+                }
+            }
+        }
+    }
+
+    return min_dfa_initial_state;
+}

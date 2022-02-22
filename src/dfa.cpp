@@ -19,6 +19,9 @@ bool DFAInput::operator<(const DFAInput &rhs) const {
         return true;
     return this->predicate > rhs.predicate;
 }
+bool DFAInput::operator==(const DFAInput &rhs) const {
+    return this->dx == rhs.dx && this->dy == rhs.dy && this->predicate == rhs.predicate;
+}
 
 DFAState::DFAState() : is_accepting(false) {}
 void DFAState::add_transition(DFAState *dst, DFAInput input) {
