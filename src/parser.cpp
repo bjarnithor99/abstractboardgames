@@ -93,6 +93,6 @@ int Parser::parse_number() {
 
 std::string Parser::parse_predicate() {
     std::string lexeme = tokenTuple.lexeme;
-    match(Token::Predicate);
+    match(Token::String);
     return lexeme;
 }

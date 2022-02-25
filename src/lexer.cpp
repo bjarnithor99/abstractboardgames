@@ -24,6 +24,9 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     case Token::OpOr:
         os << "Token::OpOr";
         break;
+    case Token::OpAssign:
+        os << "Token::OpAssign";
+        break;
     case Token::LParen:
         os << "Token::LParen";
         break;
@@ -39,11 +42,29 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     case Token::Comma:
         os << "Token::Comma";
         break;
+    case Token::Hashtag:
+        os << "Token::Hashtag";
+        break;
+    case Token::Players:
+        os << "Token::Players";
+        break;
+    case Token::Pieces:
+        os << "Token::Pieces";
+        break;
+    case Token::BoardSize:
+        os << "Token::BoardSize";
+        break;
+    case Token::Board:
+        os << "Token::Board";
+        break;
+    case Token::Rule:
+        os << "Token::Rule";
+        break;
     case Token::Number:
         os << "Token::Number";
         break;
-    case Token::Predicate:
-        os << "Token::Predicate";
+    case Token::String:
+        os << "Token::String";
         break;
     default:
         os << "Not implemented";
@@ -71,6 +92,10 @@ Lexer::Lexer(std::ifstream *filestream) : filestream(filestream), location(0, 0)
     }
     read_next_char();
 }
+std::map<std::string, Token> Lexer::reserved_keywords = {
+    {"players", Token::Players}, {"pieces", Token::Pieces}, {"board_size", Token::BoardSize},
+    {"board", Token::Board},     {"rule", Token::Rule},
+};
 
 TokenTuple Lexer::next() {
     // Remove white-spaces, if any, before matching next token.
@@ -85,22 +110,6 @@ TokenTuple Lexer::next() {
     TokenTuple ret;
     if (ch == '\0') {
         ret = TokenTuple(Token::EOI, "", loc);
-        read_next_char();
-    }
-    else if (ch == '(') {
-        ret = TokenTuple(Token::LParen, "(", loc);
-        read_next_char();
-    }
-    else if (ch == ')') {
-        ret = TokenTuple(Token::RParen, ")", loc);
-        read_next_char();
-    }
-    else if (ch == '[') {
-        ret = TokenTuple(Token::LSquare, "[", loc);
-        read_next_char();
-    }
-    else if (ch == ']') {
-        ret = TokenTuple(Token::RSquare, "]", loc);
         read_next_char();
     }
     else if (ch == '*') {
@@ -119,8 +128,32 @@ TokenTuple Lexer::next() {
         ret = TokenTuple(Token::OpOr, "|", loc);
         read_next_char();
     }
+    else if (ch == '=') {
+        ret = TokenTuple(Token::OpAssign, "=", loc);
+        read_next_char();
+    }
+    else if (ch == '(') {
+        ret = TokenTuple(Token::LParen, "(", loc);
+        read_next_char();
+    }
+    else if (ch == ')') {
+        ret = TokenTuple(Token::RParen, ")", loc);
+        read_next_char();
+    }
+    else if (ch == '[') {
+        ret = TokenTuple(Token::LSquare, "[", loc);
+        read_next_char();
+    }
+    else if (ch == ']') {
+        ret = TokenTuple(Token::RSquare, "]", loc);
+        read_next_char();
+    }
     else if (ch == ',') {
         ret = TokenTuple(Token::Comma, ",", loc);
+        read_next_char();
+    }
+    else if (ch == '#') {
+        ret = TokenTuple(Token::Hashtag, "#", loc);
         read_next_char();
     }
     else if (isdigit(ch) || ch == '-') {
@@ -133,13 +166,18 @@ TokenTuple Lexer::next() {
         ret = TokenTuple(Token::Number, number, loc);
     }
     else if (isalpha(ch)) {
-        std::string predicate(1, ch);
+        std::string str(1, ch);
         read_next_char();
-        while (isalpha(ch)) {
-            predicate += ch;
+        while (isalnum(ch) || ch == '-' || ch == '_') {
+            str += ch;
             read_next_char();
         }
-        ret = TokenTuple(Token::Predicate, predicate, loc);
+        if (reserved_keywords.find(str) != reserved_keywords.end()) {
+            ret = TokenTuple(reserved_keywords[str], str, loc);
+        }
+        else {
+            ret = TokenTuple(Token::String, str, loc);
+        }
     }
     else {
         ret = TokenTuple(Token::Unknown, std::string(1, ch), loc);

@@ -6,6 +6,7 @@
 
 #include <cctype>
 #include <fstream>
+#include <map>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -20,6 +21,7 @@ enum class Token
     OpQuestion,
     OpPlus,
     OpOr,
+    OpAssign,
 
     // Punctuation marks
     LParen,
@@ -28,9 +30,17 @@ enum class Token
     RSquare,
     Comma,
 
+    // Declaration marks
+    Hashtag,
+    Players,
+    Pieces,
+    BoardSize,
+    Board,
+    Rule,
+
     // Units
     Number,
-    Predicate,
+    String,
 };
 
 std::ostream &operator<<(std::ostream &os, const Token &t);
@@ -60,6 +70,7 @@ class Lexer
     TokenTuple next();
 
   private:
+    static std::map<std::string, Token> reserved_keywords;
     std::ifstream *filestream;
     char ch;
     Location location;

@@ -1,7 +1,26 @@
-sentence:      word (binary_op word)* EOI
+// Game declaration syntax
+game:          ("#" (player_list | piece_list | board_size | board | rule))*
+
+// Player declaration syntax
+player_list:   "players" "=" player ("," player)*
+player:        string
+
+// Piece declaration syntax
+piece_list:    "pieces" "=" piece ("," piece)*
+piece:         string
+
+// Board declaration syntax
+board_size:    "board_size" "=" int "," int
+board:         "board" "=" piece ("," piece)*
+
+// Rule syntax
+rule:         "rule" piece =" sentence
+sentence:      word ("|" word)*
 word:          (core_word unary_op | core_word)+
 core_word:     "(" sentence ")" | letter
 unary_op:      "*" | "?" | "+"
-letter:        "[" int "," int "," predicate "]"
+letter:        "[" int "," int "," string "]"
+
+// Common
 int:           CLASS OF INTEGERS
-predicate:     CLASS OF STRINGS WITHOUT INTEGERS
+string:        CLASS OF STRINGS WITHOUT INTEGERS
