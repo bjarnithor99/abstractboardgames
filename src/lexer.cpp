@@ -86,7 +86,7 @@ TokenTuple::TokenTuple() {}
 TokenTuple::TokenTuple(Token token, std::string lexeme, Location location)
     : token(token), lexeme(lexeme), location(location) {}
 
-Lexer::Lexer(std::ifstream *filestream) : filestream(filestream), location(0, 0) {
+Lexer::Lexer(std::ifstream *filestream) : filestream(filestream), location(1, 0) {
     if (!filestream->is_open()) {
         throw std::runtime_error("File not open");
     }
