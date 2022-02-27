@@ -1,5 +1,9 @@
 // Game declaration syntax
-game:          ("#" (player_list | piece_list | board_size | board | rule))*
+game:          "#" player_list
+               "#" piece_list
+               ("#" rule)*
+               "#" board_size
+               "#" board
 
 // Player declaration syntax
 player_list:   "players" "=" player ("," player)*
