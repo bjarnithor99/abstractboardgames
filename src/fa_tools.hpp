@@ -4,8 +4,10 @@
  */
 #pragma once
 
+#include "ast.hpp"
 #include "dfa.hpp"
 #include "nfa.hpp"
+#include "nfa_visitor.hpp"
 #include <algorithm>
 #include <queue>
 #include <set>
@@ -20,4 +22,5 @@ DFAState *nfaToDfa(NFAState *nfa_initial_state); // namespace FATools
 std::set<DFAState *> getParents(DFAState *child, std::set<DFAState *> *all_states, DFAInput input);
 std::set<DFAState *> getParents(std::set<DFAState *> children, std::set<DFAState *> *all_states, DFAInput input);
 DFAState *minimizeDfa(DFAState *initial_state);
+DFAState *getMinimizedDfa(Node *node);
 } // namespace FATools

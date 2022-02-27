@@ -218,3 +218,12 @@ DFAState *FATools::minimizeDfa(DFAState *initial_state) {
 
     return min_dfa_initial_state;
 }
+
+DFAState *FATools::getMinimizedDfa(Node *node) {
+    NFAVisitor nfaVisitor = NFAVisitor();
+    node->accept(&nfaVisitor);
+    NFAState *nfa_initial_state = nfaVisitor.getNFA();
+    DFAState *dfa_initial_state = nfaToDfa(nfa_initial_state);
+    DFAState *min_dfa_initial_state = minimizeDfa(dfa_initial_state);
+    return min_dfa_initial_state;
+}
