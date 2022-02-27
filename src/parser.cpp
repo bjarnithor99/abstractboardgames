@@ -79,19 +79,34 @@ void Parser::parse_pieces_list() {
     }
     match(Token::Pieces);
     match(Token::OpAssign);
-    std::string piece = parse_string();
-    pieces[piece] = nullptr;
+    parse_piece();
     while (match_if(Token::Comma)) {
-        Location loc = tokenTuple.location;
-        piece = parse_string();
-        if (pieces.find(piece) != pieces.end()) {
+        parse_piece();
+    }
+}
+
+void Parser::parse_piece() {
+    Location loc = tokenTuple.location;
+    std::string piece = parse_string();
+    if (pieces.find(piece) != pieces.end()) {
+        std::ostringstream oss;
+        oss << "Duplicate piece " << piece << " in piece declaration in " << loc << ".";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+    std::string player;
+    if (match_if(Token::LParen)) {
+        loc = tokenTuple.location;
+        player = parse_string();
+        if (players.find(player) == players.end()) {
             std::ostringstream oss;
-            oss << "Duplicate piece " << piece << " in piece declaration in " << loc << ".";
+            oss << "Unrecognized player " << player << " in piece declaration in " << loc << ".";
             std::string error_msg = oss.str();
             throw std::runtime_error(error_msg);
         }
-        pieces[piece] = nullptr;
+        match(Token::RParen);
     }
+    pieces[piece] = {player, nullptr};
 }
 
 void Parser::parse_board_size() {
@@ -169,7 +184,7 @@ void Parser::parse_rule() {
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    if (pieces[piece] != nullptr) {
+    if (pieces[piece].second != nullptr) {
         std::ostringstream oss;
         oss << "Redeclaration of rule for piece " << piece << " in rule declaration in " << loc << ".";
         std::string error_msg = oss.str();
@@ -177,7 +192,7 @@ void Parser::parse_rule() {
     }
     match(Token::OpAssign);
     Node *node = parse_sentence();
-    pieces[piece] = FATools::getMinimizedDfa(node);
+    pieces[piece].second = FATools::getMinimizedDfa(node);
 }
 
 Node *Parser::parse_sentence() {

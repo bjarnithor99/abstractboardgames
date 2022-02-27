@@ -7,11 +7,12 @@ player:        string
 
 // Piece declaration syntax
 piece_list:    "pieces" "=" piece ("," piece)*
-piece:         string
+piece:         string ("(" player ")")?
 
 // Board declaration syntax
 board_size:    "board_size" "=" int "," int
-board:         "board" "=" piece ("," piece)*
+board:         "board" "=" board_piece ("," board_piece)*
+board_piece:   string
 
 // Rule syntax
 rule:         "rule" piece =" sentence

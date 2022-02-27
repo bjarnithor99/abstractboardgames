@@ -23,13 +23,14 @@ class Parser
     Lexer lexer;
     TokenTuple tokenTuple;
     std::set<std::string> players;
-    std::map<std::string, DFAState *> pieces;
+    std::map<std::string, std::pair<std::string, DFAState *>> pieces;
     std::pair<int, int> board_size;
     std::vector<std::vector<std::string>> board;
     void match(Token token);
     bool match_if(Token token);
     void parse_player_list();
     void parse_pieces_list();
+    void parse_piece();
     void parse_board_size();
     void parse_board();
     void parse_rule();
