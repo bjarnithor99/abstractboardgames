@@ -6,6 +6,7 @@
 
 #include "ast.hpp"
 #include "dfa.hpp"
+#include "environment.hpp"
 #include "fa_tools.hpp"
 #include "lexer.hpp"
 #include <set>
@@ -17,6 +18,7 @@ class Parser
   public:
     Parser(std::ifstream *filestream);
     void parse();
+    Environment *get_environment();
 
   private:
     std::ifstream *filestream;
@@ -24,8 +26,7 @@ class Parser
     TokenTuple tokenTuple;
     std::set<std::string> players;
     std::map<std::string, std::pair<std::string, DFAState *>> pieces;
-    std::pair<int, int> board_size;
-    std::vector<std::vector<std::string>> board;
+    Environment *environment;
     void match(Token token);
     bool match_if(Token token);
     void parse_player_list();

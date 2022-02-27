@@ -5,7 +5,27 @@
 #include "parser.hpp"
 
 Parser::Parser(std::ifstream *filestream)
-    : filestream(filestream), lexer(filestream), tokenTuple(lexer.next()), board_size({-1, -1}) {}
+    : filestream(filestream), lexer(filestream), tokenTuple(lexer.next()), environment(nullptr) {}
+
+void Parser::parse() {
+    while (match_if(Token::Hashtag)) {
+        if (tokenTuple.token == Token::Players)
+            parse_player_list();
+        else if (tokenTuple.token == Token::Pieces)
+            parse_pieces_list();
+        else if (tokenTuple.token == Token::BoardSize)
+            parse_board_size();
+        else if (tokenTuple.token == Token::Board)
+            parse_board();
+        else
+            parse_rule();
+    }
+    match(Token::EOI);
+}
+
+Environment *Parser::get_environment() {
+    return environment;
+}
 
 void Parser::match(Token token) {
     if (tokenTuple.token == token) {
@@ -28,22 +48,6 @@ bool Parser::match_if(Token token) {
     else {
         return false;
     }
-}
-
-void Parser::parse() {
-    while (match_if(Token::Hashtag)) {
-        if (tokenTuple.token == Token::Players)
-            parse_player_list();
-        else if (tokenTuple.token == Token::Pieces)
-            parse_pieces_list();
-        else if (tokenTuple.token == Token::BoardSize)
-            parse_board_size();
-        else if (tokenTuple.token == Token::Board)
-            parse_board();
-        else
-            parse_rule();
-    }
-    match(Token::EOI);
 }
 
 void Parser::parse_player_list() {
@@ -94,7 +98,7 @@ void Parser::parse_piece() {
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    std::string player;
+    std::string player = "";
     if (match_if(Token::LParen)) {
         loc = tokenTuple.location;
         player = parse_string();
@@ -110,7 +114,7 @@ void Parser::parse_piece() {
 }
 
 void Parser::parse_board_size() {
-    if (board_size != std::make_pair(-1, -1)) {
+    if (environment != nullptr) {
         std::ostringstream oss;
         oss << "Redeclaration of board size in " << tokenTuple.location << ".";
         std::string error_msg = oss.str();
@@ -127,31 +131,43 @@ void Parser::parse_board_size() {
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    board_size = {x, y};
+    environment = new Environment(x, y);
 }
 
 void Parser::parse_board() {
-    if (!board.empty()) {
+    if (environment == nullptr) {
+        throw std::runtime_error("Board size must be declared before board.");
+    }
+    if (!environment->board.empty()) {
         std::ostringstream oss;
         oss << "Redeclaration of board in " << tokenTuple.location << ".";
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    if (board_size == std::make_pair(-1, -1)) {
-        throw std::runtime_error("Board size must be defined before board.");
-    }
-    board.resize(board_size.first, std::vector<std::string>(board_size.second));
+    environment->board.resize(environment->board_size_x, std::vector<Cell>(environment->board_size_y, Cell()));
     match(Token::Board);
     match(Token::OpAssign);
     Location loc = tokenTuple.location;
     std::string piece = parse_string();
-    board[0][0] = piece;
     if (pieces.find(piece) == pieces.end()) {
         std::ostringstream oss;
         oss << "Unrecognized piece " << piece << " in board declaration in " << loc << ".";
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
+    if (pieces[piece].second == nullptr && pieces[piece].first != "") {
+        std::ostringstream oss;
+        oss << "Rule for piece " << piece << " must be declared before board declaration.";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+    int board_size_x = environment->board_size_x;
+    int board_size_y = environment->board_size_y;
+    int cur_x = 0, cur_y = 0;
+    environment->board[cur_x][cur_y] =
+        Cell(cur_y, board_size_x - 1 - cur_x, piece, pieces[piece].first, pieces[piece].second);
+    cur_x += ((cur_y + 1) / board_size_y);
+    cur_y = (cur_y + 1) % board_size_y;
     int piece_count = 1;
     while (match_if(Token::Comma)) {
         loc = tokenTuple.location;
@@ -162,12 +178,21 @@ void Parser::parse_board() {
             std::string error_msg = oss.str();
             throw std::runtime_error(error_msg);
         }
-        board[piece_count / board_size.first][piece_count % board_size.second] = piece;
+        if (pieces[piece].second == nullptr && pieces[piece].first != "") {
+            std::ostringstream oss;
+            oss << "Rule for piece " << piece << " must be declared before board declaration.";
+            std::string error_msg = oss.str();
+            throw std::runtime_error(error_msg);
+        }
+        environment->board[cur_x][cur_y] =
+            Cell(cur_y, board_size_x - 1 - cur_x, piece, pieces[piece].first, pieces[piece].second);
+        cur_x += ((cur_y + 1) / board_size_y);
+        cur_y = (cur_y + 1) % board_size_y;
         piece_count++;
     }
-    if (piece_count != board_size.first * board_size.second) {
+    if (piece_count != board_size_x * board_size_y) {
         std::ostringstream oss;
-        oss << "Invalid board declaration. Expected " << board_size.first * board_size.second << " pieces but got "
+        oss << "Invalid board declaration. Expected " << board_size_x * board_size_y << " pieces but got "
             << piece_count << ".";
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
