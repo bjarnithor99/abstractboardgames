@@ -1,0 +1,29 @@
+Players := {white, white};
+
+Ray(dx,dy) := (dx,dy,empty)*(dx,dy,enemy)|(dx,dy,empty)+;
+Rook := Ray(1,0) | Ray(0,1) | Ray(-1,0) | Ray(0,-1);
+Bishop := Ray(1,1) | Ray(-1,1) | Ray(1,-1) | Ray(-1,-1);
+Queen := Rook | Bishop;
+
+Step(dx,dy) := (dx,dy,empty) | (dx,dy,enemy);
+TMove(xSign, ySign) := Step(xSign1, ySign2) | Step(xSign2, ySign1);
+Knight := TMove(0,-) | TMove(-,-) | TMove(0,0) | TMove(-,0);
+
+WhitePawn := ((0,1,empty)(0,1,empty)?) | (-1,1,enemy) | (1,1,enemy);
+BlackPawn := ((0,-1,empty)(0,-1,empty)?) | (-1,-1,enemy) | (1,-1,enemy);
+
+King := Step(1,0) | Step(1,1) | Step(0,1) | Step(1,-1) |
+        Step(-1,0) | Step(-1,-1) | Step(0,-1) | Step(-1,1);
+
+
+BoardSize := {8, 8};
+Board := {
+    Rook(black), Knight(black), Bishop(black), Queen(black), King(black), Bishop(black), Knight(black), Rook(black),
+    BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black),
+    None, None, None, None, None, None, None, None,
+    None, None, None, None, None, None, None, None,
+    None, None, None, None, None, None, None, None,
+    None, None, None, None, None, None, None, None,
+    WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white),
+    Rook(white), Knight(white), Bishop(white), Queen(white), King(white), Bishop(white), Knight(white), Rook(white)
+};
