@@ -9,6 +9,9 @@ Cell::Cell(int x, int y, std::string piece, std::string player, DFAState *state)
     : x(x), y(y), piece(piece), player(player), state(state) {}
 Cell::~Cell() {}
 
+Step::Step(int x, int y) : x(x), y(y) {}
+Step::~Step() {}
+
 Environment::Environment(int board_size_x, int board_size_y) : board_size_x(board_size_x), board_size_y(board_size_y) {}
 Environment::~Environment() {}
 
@@ -40,7 +43,7 @@ void Environment::generate_moves(std::string player) {
         for (int j = 0; j < board_size_y; j++) {
             if (board[i][j].player == player) {
                 candidate_move.clear();
-                candidate_move.push_back({i, j});
+                candidate_move.push_back(Step(i, j));
                 generate_moves(board[i][j].state, i, j);
             }
         }
@@ -58,7 +61,7 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
             continue;
         if (!verify_predicate(input.predicate, next_x, next_y))
             continue;
-        candidate_move.push_back({next_x, next_y});
+        candidate_move.push_back(Step(next_x, next_y));
         generate_moves(p.second, next_x, next_y);
         candidate_move.pop_back();
     }

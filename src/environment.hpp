@@ -19,6 +19,15 @@ class Cell
     DFAState *state;
 };
 
+class Step
+{
+  public:
+    Step(int x, int y);
+    ~Step();
+    int x;
+    int y;
+};
+
 class Environment
 {
   public:
@@ -27,7 +36,7 @@ class Environment
     int board_size_x;
     int board_size_y;
     std::vector<std::vector<Cell>> board;
-    std::vector<std::vector<std::pair<int, int>>> found_moves;
+    std::vector<std::vector<Step>> found_moves;
     bool contains_cell(int x, int y);
     int set_cell(int x, int y, Cell *cell);
     Cell *get_cell(int x, int y);
@@ -37,6 +46,6 @@ class Environment
   private:
     std::string current_player;
     void generate_moves(DFAState *state, int x, int y);
-    std::vector<std::pair<int, int>> candidate_move;
+    std::vector<Step> candidate_move;
     bool verify_predicate(std::string predicate, int x, int y);
 };
