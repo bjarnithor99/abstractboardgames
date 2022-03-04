@@ -1,7 +1,7 @@
 #include "environment.hpp"
 
 #define COUTRESET "\033[0m"
-#define COUTBLACK "\033[1m\033[30m"
+#define COUTRED "\033[1m\033[31m"
 #define COUTBLUE "\033[1m\033[34m"
 
 Cell::Cell() {}
@@ -83,11 +83,11 @@ void Environment::print() {
             if (j != 0)
                 std::cout << " ";
             if (board[i][j].player == "white")
-                std::cout << COUTBLUE << board[i][j].piece << COUTRESET;
+                std::cout << COUTBLUE << std::setw(8) << board[i][j].piece << COUTRESET;
             else if (board[i][j].player == "black")
-                std::cout << COUTBLACK << board[i][j].piece << COUTRESET;
+                std::cout << COUTRED << std::setw(8) << board[i][j].piece << COUTRESET;
             else
-                std::cout << board[i][j].piece;
+                std::cout << std::setw(8) << board[i][j].piece;
         }
         std::cout << "\n";
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dfa.hpp"
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
