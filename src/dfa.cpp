@@ -4,7 +4,8 @@
  */
 #include "dfa.hpp"
 
-DFAInput::DFAInput(int dx, int dy, std::string predicate) : dx(dx), dy(dy), predicate(predicate) {}
+DFAInput::DFAInput(int dx, int dy, std::string predicate, std::string side_effect)
+    : dx(dx), dy(dy), predicate(predicate), side_effect(side_effect) {}
 DFAInput::~DFAInput() {}
 bool DFAInput::operator<(const DFAInput &rhs) const {
     if (this->dx < rhs.dx)
@@ -17,7 +18,11 @@ bool DFAInput::operator<(const DFAInput &rhs) const {
         return false;
     if (this->predicate < rhs.predicate)
         return true;
-    return this->predicate > rhs.predicate;
+    if (this->predicate > rhs.predicate)
+        return false;
+    if (this->side_effect < rhs.side_effect)
+        return true;
+    return this->side_effect > rhs.side_effect;
 }
 bool DFAInput::operator==(const DFAInput &rhs) const {
     return this->dx == rhs.dx && this->dy == rhs.dy && this->predicate == rhs.predicate;

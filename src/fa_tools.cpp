@@ -84,8 +84,8 @@ DFAState *FATools::nfaToDfa(NFAState *nfa_initial_state) {
                 nfa_set_to_dfa[next_nfa_set]->is_accepting = nfaSetContainsAcceptingState(next_nfa_set);
                 q.push(next_nfa_set);
             }
-            nfa_set_to_dfa[at_nfa_set]->add_transition(nfa_set_to_dfa[next_nfa_set],
-                                                       DFAInput(input.dx, input.dy, input.predicate));
+            nfa_set_to_dfa[at_nfa_set]->add_transition(
+                nfa_set_to_dfa[next_nfa_set], DFAInput(input.dx, input.dy, input.predicate, input.side_effect));
         }
     }
     return nfa_set_to_dfa[nfa_initial_state_closure];

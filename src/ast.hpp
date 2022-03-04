@@ -31,12 +31,13 @@ class Node
 class LetterNode : public Node
 {
   public:
-    LetterNode(int dx, int dy, std::string predicate);
+    LetterNode(int dx, int dy, std::string predicate, std::string side_effect);
     ~LetterNode();
     void accept(Visitor *visitor) override;
     int dx;
     int dy;
     std::string predicate;
+    std::string side_effect;
 };
 
 class WordsNode : public Node

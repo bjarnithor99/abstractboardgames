@@ -28,6 +28,8 @@ enum class Token
     RParen,
     LSquare,
     RSquare,
+    LCurly,
+    RCurly,
     Comma,
 
     // Declaration marks

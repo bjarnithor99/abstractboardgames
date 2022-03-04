@@ -47,7 +47,8 @@ void PrintVisitor::visitWordsNode(WordsNode *wordsNode) {
 
 void PrintVisitor::visitLetterNode(LetterNode *letterNode) {
     std::cout << indent() << "LetterNode (" << letterNode->dx << ", " << letterNode->dy << ", " << letterNode->predicate
-              << ")" << std::endl;
+              << ")"
+              << " {" << letterNode->side_effect << "}" << std::endl;
 }
 
 void PrintVisitor::visitBinaryOpNode(BinaryOpNode *binaryOpNode) {

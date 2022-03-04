@@ -5,7 +5,8 @@
 #include "nfa.hpp"
 
 NFAInput::NFAInput() : dx(0), dy(0), predicate("none"), is_epsilon(true) {}
-NFAInput::NFAInput(int dx, int dy, std::string predicate) : dx(dx), dy(dy), predicate(predicate), is_epsilon(false) {}
+NFAInput::NFAInput(int dx, int dy, std::string predicate, std::string side_effect)
+    : dx(dx), dy(dy), predicate(predicate), side_effect(side_effect), is_epsilon(false) {}
 NFAInput::~NFAInput() {}
 bool NFAInput::operator<(const NFAInput &rhs) const {
     if (this->dx < rhs.dx)
@@ -18,7 +19,11 @@ bool NFAInput::operator<(const NFAInput &rhs) const {
         return false;
     if (this->predicate < rhs.predicate)
         return true;
-    return this->predicate > rhs.predicate;
+    if (this->predicate > rhs.predicate)
+        return false;
+    if (this->side_effect < rhs.side_effect)
+        return true;
+    return this->side_effect > rhs.side_effect;
 }
 
 NFAState::NFAState() : is_accepting(false) {}

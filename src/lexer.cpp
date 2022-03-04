@@ -39,6 +39,12 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     case Token::RSquare:
         os << "Token::RSquare";
         break;
+    case Token::LCurly:
+        os << "Token::LCurly";
+        break;
+    case Token::RCurly:
+        os << "Token::RCurly";
+        break;
     case Token::Comma:
         os << "Token::Comma";
         break;
@@ -146,6 +152,30 @@ TokenTuple Lexer::next() {
     }
     else if (ch == ']') {
         ret = TokenTuple(Token::RSquare, "]", loc);
+        read_next_char();
+    }
+    else if (ch == '{') {
+        ret = TokenTuple(Token::LCurly, "[", loc);
+        read_next_char();
+    }
+    else if (ch == '}') {
+        ret = TokenTuple(Token::RCurly, "]", loc);
+        read_next_char();
+    }
+    else if (ch == '*') {
+        ret = TokenTuple(Token::OpStar, "*", loc);
+        read_next_char();
+    }
+    else if (ch == '?') {
+        ret = TokenTuple(Token::OpQuestion, "?", loc);
+        read_next_char();
+    }
+    else if (ch == '+') {
+        ret = TokenTuple(Token::OpPlus, "+", loc);
+        read_next_char();
+    }
+    else if (ch == '|') {
+        ret = TokenTuple(Token::OpOr, "|", loc);
         read_next_char();
     }
     else if (ch == ',') {

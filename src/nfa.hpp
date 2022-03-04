@@ -12,13 +12,14 @@ class NFAInput
 {
   public:
     NFAInput();
-    NFAInput(int dx, int dy, std::string predicate);
+    NFAInput(int dx, int dy, std::string predicate, std::string side_effect);
     ~NFAInput();
     bool operator<(const NFAInput &rhs) const;
 
     int dx;
     int dy;
     std::string predicate;
+    std::string side_effect;
     bool is_epsilon;
 };
 

@@ -10,7 +10,7 @@
 class DFAInput
 {
   public:
-    DFAInput(int dx, int dy, std::string predicate);
+    DFAInput(int dx, int dy, std::string predicate, std::string side_effect);
     ~DFAInput();
     bool operator<(const DFAInput &rhs) const;
     bool operator==(const DFAInput &rhs) const;
@@ -18,6 +18,7 @@ class DFAInput
     int dx;
     int dy;
     std::string predicate;
+    std::string side_effect;
 };
 
 class DFAState

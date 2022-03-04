@@ -24,7 +24,7 @@ sentence:      word ("|" word)*
 word:          (core_word unary_op | core_word)+
 core_word:     "(" sentence ")" | letter
 unary_op:      "*" | "?" | "+"
-letter:        "[" int "," int "," string "]"
+letter:        "[" int "," int "," string "]" ("{" string "}")?
 
 // Common
 int:           CLASS OF INTEGERS

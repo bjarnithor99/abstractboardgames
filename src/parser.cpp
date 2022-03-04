@@ -267,7 +267,14 @@ LetterNode *Parser::parse_letter() {
     match(Token::Comma);
     std::string predicate = parse_string();
     match(Token::RSquare);
-    return new LetterNode(dx, dy, predicate);
+
+    std::string side_effect = "";
+    if (match_if(Token::LCurly)) {
+        side_effect = parse_string();
+        match(Token::RCurly);
+    }
+
+    return new LetterNode(dx, dy, predicate, side_effect);
 }
 
 int Parser::parse_int() {
