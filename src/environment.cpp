@@ -52,8 +52,8 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
         found_moves.push_back(candidate_move);
     for (auto &p : state->transition) {
         const DFAInput &input = p.first;
-        int next_x = x - input.dx;
-        int next_y = y + input.dy;
+        int next_x = x - input.dy;
+        int next_y = y + input.dx;
         if (!contains_cell(next_x, next_y))
             continue;
         if (!verify_predicate(input.predicate, next_x, next_y))
