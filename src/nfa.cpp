@@ -4,7 +4,7 @@
  */
 #include "nfa.hpp"
 
-NFAInput::NFAInput() : is_epsilon(true) {}
+NFAInput::NFAInput() : dx(0), dy(0), predicate("none"), is_epsilon(true) {}
 NFAInput::NFAInput(int dx, int dy, std::string predicate) : dx(dx), dy(dy), predicate(predicate), is_epsilon(false) {}
 NFAInput::~NFAInput() {}
 bool NFAInput::operator<(const NFAInput &rhs) const {
