@@ -9,12 +9,7 @@ NFAWrapper::NFAWrapper(NFAState *initial_state, NFAState *final_state)
 NFAWrapper::~NFAWrapper() {}
 
 NFAVisitor::NFAVisitor() {}
-NFAVisitor::~NFAVisitor() {
-    while (!nfa_stack.empty()) {
-        delete nfa_stack.top();
-        nfa_stack.pop();
-    }
-}
+NFAVisitor::~NFAVisitor() {}
 
 void NFAVisitor::visitWordsNode(WordsNode *wordsNode) {
     int toConcat = 0;
@@ -23,9 +18,9 @@ void NFAVisitor::visitWordsNode(WordsNode *wordsNode) {
         wordNode->accept(this);
     }
     while (toConcat >= 2) {
-        NFAWrapper *nfa_wrapper_rhs = nfa_stack.top();
+        std::unique_ptr<NFAWrapper> nfa_wrapper_rhs = std::move(nfa_stack.top());
         nfa_stack.pop();
-        NFAWrapper *nfa_wrapper_lhs = nfa_stack.top();
+        std::unique_ptr<NFAWrapper> nfa_wrapper_lhs = std::move(nfa_stack.top());
         nfa_stack.pop();
 
         // To concatenate two NFAs A and B:
@@ -34,11 +29,9 @@ void NFAVisitor::visitWordsNode(WordsNode *wordsNode) {
         // 2) The final state is A is no longer an accepting state.
         nfa_wrapper_lhs->final_state->is_accepting = false;
 
-        nfa_stack.push(new NFAWrapper(nfa_wrapper_lhs->initial_state, nfa_wrapper_rhs->final_state));
+        nfa_stack.push(std::make_unique<NFAWrapper>(nfa_wrapper_lhs->initial_state, nfa_wrapper_rhs->final_state));
 
         toConcat--;
-        delete nfa_wrapper_lhs;
-        delete nfa_wrapper_rhs;
     }
 }
 
@@ -48,16 +41,16 @@ void NFAVisitor::visitLetterNode(LetterNode *letterNode) {
     initial_state->add_transition(
         final_state, NFAInput(letterNode->dx, letterNode->dy, letterNode->predicate, letterNode->side_effect));
     final_state->is_accepting = true;
-    nfa_stack.push(new NFAWrapper(initial_state, final_state));
+    nfa_stack.push(std::make_unique<NFAWrapper>(initial_state, final_state));
 }
 
 void NFAVisitor::visitBinaryOpNode(BinaryOpNode *binaryOpNode) {
     binaryOpNode->childNodeLHS->accept(this);
     binaryOpNode->childNodeRHS->accept(this);
 
-    NFAWrapper *nfa_wrapper_rhs = nfa_stack.top();
+    std::unique_ptr<NFAWrapper> nfa_wrapper_rhs = std::move(nfa_stack.top());
     nfa_stack.pop();
-    NFAWrapper *nfa_wrapper_lhs = nfa_stack.top();
+    std::unique_ptr<NFAWrapper> nfa_wrapper_lhs = std::move(nfa_stack.top());
     nfa_stack.pop();
 
     NFAState *initial_state = new NFAState();
@@ -80,16 +73,13 @@ void NFAVisitor::visitBinaryOpNode(BinaryOpNode *binaryOpNode) {
         final_state->is_accepting = true;
     }
 
-    nfa_stack.push(new NFAWrapper(initial_state, final_state));
-
-    delete nfa_wrapper_lhs;
-    delete nfa_wrapper_rhs;
+    nfa_stack.push(std::make_unique<NFAWrapper>(initial_state, final_state));
 }
 
 void NFAVisitor::visitUnaryOpNode(UnaryOpNode *unaryOpNode) {
     unaryOpNode->childNode->accept(this);
 
-    NFAWrapper *nfa_wrapper = nfa_stack.top();
+    std::unique_ptr<NFAWrapper> nfa_wrapper = std::move(nfa_stack.top());
     nfa_stack.pop();
 
     NFAState *initial_state = new NFAState();
@@ -131,9 +121,7 @@ void NFAVisitor::visitUnaryOpNode(UnaryOpNode *unaryOpNode) {
     // Instead the new final state is an accepting state.
     final_state->is_accepting = true;
 
-    nfa_stack.push(new NFAWrapper(initial_state, final_state));
-
-    delete nfa_wrapper;
+    nfa_stack.push(std::make_unique<NFAWrapper>(initial_state, final_state));
 }
 
 NFAState *NFAVisitor::getNFA() {

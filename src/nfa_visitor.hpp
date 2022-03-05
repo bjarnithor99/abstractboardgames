@@ -30,5 +30,5 @@ class NFAVisitor : public Visitor
     NFAState *getNFA();
 
   private:
-    std::stack<NFAWrapper *> nfa_stack;
+    std::stack<std::unique_ptr<NFAWrapper>> nfa_stack;
 };
