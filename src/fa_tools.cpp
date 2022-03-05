@@ -226,5 +226,6 @@ DFAState *FATools::getMinimizedDfa(Node *node) {
     DFAState *dfa_initial_state = nfaToDfa(nfa_initial_state);
     nfa_initial_state->destroy();
     DFAState *min_dfa_initial_state = minimizeDfa(dfa_initial_state);
+    dfa_initial_state->destroy();
     return min_dfa_initial_state;
 }

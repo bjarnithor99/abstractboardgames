@@ -5,6 +5,8 @@
 #pragma once
 
 #include <map>
+#include <queue>
+#include <set>
 #include <string>
 
 class DFAInput
@@ -25,7 +27,9 @@ class DFAState
 {
   public:
     DFAState();
+    ~DFAState();
     void add_transition(DFAState *dst, DFAInput input);
+    void destroy();
 
     bool is_accepting;
     std::map<DFAInput, DFAState *> transition;
