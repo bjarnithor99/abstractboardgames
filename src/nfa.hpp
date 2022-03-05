@@ -6,6 +6,8 @@
 
 #include <map>
 #include <memory>
+#include <queue>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -28,7 +30,9 @@ class NFAState
 {
   public:
     NFAState();
+    ~NFAState();
     void add_transition(NFAState *dst, NFAInput input);
+    void destroy();
 
     bool is_accepting;
     std::map<NFAInput, std::vector<NFAState *>> transitions;

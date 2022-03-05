@@ -27,6 +27,29 @@ bool NFAInput::operator<(const NFAInput &rhs) const {
 }
 
 NFAState::NFAState() : is_accepting(false) {}
+NFAState::~NFAState() {}
 void NFAState::add_transition(NFAState *dst, NFAInput input) {
     transitions[input].push_back(dst);
+}
+void NFAState::destroy() {
+    std::set<NFAState *> states;
+    std::queue<NFAState *> q;
+    states.insert(this);
+    q.push(this);
+    while (!q.empty()) {
+        NFAState *at = q.front();
+        q.pop();
+        for (auto &p : at->transitions) {
+            for (auto &next_state : p.second) {
+                if (states.find(next_state) == states.end()) {
+                    states.insert(next_state);
+                    q.push(next_state);
+                }
+            }
+        }
+    }
+    states.erase(this);
+    for (NFAState *state : states)
+        delete state;
+    delete this;
 }
