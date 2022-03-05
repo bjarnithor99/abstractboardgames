@@ -6,6 +6,7 @@
 
 Parser::Parser(std::ifstream *filestream)
     : filestream(filestream), lexer(filestream), tokenTuple(lexer.next()), environment(nullptr) {}
+Parser::~Parser() {}
 
 void Parser::parse() {
     while (match_if(Token::Hashtag)) {
@@ -216,39 +217,39 @@ void Parser::parse_rule() {
         throw std::runtime_error(error_msg);
     }
     match(Token::OpAssign);
-    Node *node = parse_sentence();
-    pieces[piece].second = FATools::getMinimizedDfa(node);
+    std::unique_ptr<Node> node = parse_sentence();
+    pieces[piece].second = FATools::getMinimizedDfa(node.get());
 }
 
-Node *Parser::parse_sentence() {
-    Node *node = parse_word();
+std::unique_ptr<Node> Parser::parse_sentence() {
+    std::unique_ptr<Node> node = parse_word();
     while (match_if(Token::OpOr)) {
-        Node *rhs = parse_word();
-        node = new BinaryOpNode(BinaryOperator::OpOr, node, rhs);
+        std::unique_ptr<Node> rhs = parse_word();
+        node = std::make_unique<BinaryOpNode>(BinaryOperator::OpOr, std::move(node), std::move(rhs));
     }
     return node;
 }
 
-WordsNode *Parser::parse_word() {
-    WordsNode *wordsNode = new WordsNode();
+std::unique_ptr<WordsNode> Parser::parse_word() {
+    std::unique_ptr<WordsNode> wordsNode = std::make_unique<WordsNode>();
     do {
-        Node *node = parse_core_word();
+        std::unique_ptr<Node> node = parse_core_word();
         if (match_if(Token::OpStar)) {
-            node = new UnaryOpNode(UnaryOperator::OpStar, node);
+            node = std::make_unique<UnaryOpNode>(UnaryOperator::OpStar, std::move(node));
         }
         else if (match_if(Token::OpQuestion)) {
-            node = new UnaryOpNode(UnaryOperator::OpQuestion, node);
+            node = std::make_unique<UnaryOpNode>(UnaryOperator::OpQuestion, std::move(node));
         }
         else if (match_if(Token::OpPlus)) {
-            node = new UnaryOpNode(UnaryOperator::OpPlus, node);
+            node = std::make_unique<UnaryOpNode>(UnaryOperator::OpPlus, std::move(node));
         }
-        wordsNode->add_word_node(node);
+        wordsNode->add_word_node(std::move(node));
     } while (tokenTuple.token == Token::LParen || tokenTuple.token == Token::LSquare);
     return wordsNode;
 }
 
-Node *Parser::parse_core_word() {
-    Node *node;
+std::unique_ptr<Node> Parser::parse_core_word() {
+    std::unique_ptr<Node> node;
     if (match_if(Token::LParen)) {
         node = parse_sentence();
         match(Token::RParen);
@@ -259,7 +260,7 @@ Node *Parser::parse_core_word() {
     return node;
 }
 
-LetterNode *Parser::parse_letter() {
+std::unique_ptr<LetterNode> Parser::parse_letter() {
     match(Token::LSquare);
     int dx = parse_int();
     match(Token::Comma);
@@ -274,7 +275,7 @@ LetterNode *Parser::parse_letter() {
         match(Token::RCurly);
     }
 
-    return new LetterNode(dx, dy, predicate, side_effect);
+    return std::make_unique<LetterNode>(dx, dy, predicate, side_effect);
 }
 
 int Parser::parse_int() {

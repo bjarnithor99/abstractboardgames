@@ -7,6 +7,7 @@
 #include "ast.hpp"
 #include "visitor.hpp"
 #include <iostream>
+#include <memory>
 #include <string>
 
 std::ostream &operator<<(std::ostream &os, const UnaryOperator &unaryOperator);

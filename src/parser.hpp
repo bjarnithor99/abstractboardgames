@@ -9,6 +9,7 @@
 #include "environment.hpp"
 #include "fa_tools.hpp"
 #include "lexer.hpp"
+#include <memory>
 #include <set>
 #include <sstream>
 #include <utility>
@@ -17,6 +18,7 @@ class Parser
 {
   public:
     Parser(std::ifstream *filestream);
+    ~Parser();
     void parse();
     Environment *get_environment();
 
@@ -35,11 +37,10 @@ class Parser
     void parse_board_size();
     void parse_board();
     void parse_rule();
-    Node *parse_sentence();
-    WordsNode *parse_word();
-    Node *parse_unary_word();
-    Node *parse_core_word();
-    LetterNode *parse_letter();
+    std::unique_ptr<Node> parse_sentence();
+    std::unique_ptr<WordsNode> parse_word();
+    std::unique_ptr<Node> parse_core_word();
+    std::unique_ptr<LetterNode> parse_letter();
     int parse_int();
     std::string parse_string();
 };

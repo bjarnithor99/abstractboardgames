@@ -39,7 +39,7 @@ PrintVisitor::PrintVisitor() : depth(0) {}
 void PrintVisitor::visitWordsNode(WordsNode *wordsNode) {
     std::cout << indent() << "WordsNode" << std::endl;
     depth++;
-    for (Node *wordNode : wordsNode->wordNodes) {
+    for (const std::unique_ptr<Node> &wordNode : wordsNode->wordNodes) {
         wordNode->accept(this);
     }
     depth--;

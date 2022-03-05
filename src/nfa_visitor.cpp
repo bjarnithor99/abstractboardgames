@@ -18,7 +18,7 @@ NFAVisitor::~NFAVisitor() {
 
 void NFAVisitor::visitWordsNode(WordsNode *wordsNode) {
     int toConcat = 0;
-    for (Node *wordNode : wordsNode->wordNodes) {
+    for (const std::unique_ptr<Node> &wordNode : wordsNode->wordNodes) {
         toConcat++;
         wordNode->accept(this);
     }
