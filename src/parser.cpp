@@ -24,8 +24,8 @@ void Parser::parse() {
     match(Token::EOI);
 }
 
-Environment *Parser::get_environment() {
-    return environment;
+std::unique_ptr<Environment> Parser::get_environment() {
+    return std::move(environment);
 }
 
 void Parser::match(Token token) {
@@ -132,7 +132,7 @@ void Parser::parse_board_size() {
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    environment = new Environment(x, y);
+    environment = std::make_unique<Environment>(x, y);
 }
 
 void Parser::parse_board() {

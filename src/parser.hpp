@@ -20,7 +20,7 @@ class Parser
     Parser(std::ifstream *filestream);
     ~Parser();
     void parse();
-    Environment *get_environment();
+    std::unique_ptr<Environment> get_environment();
 
   private:
     std::ifstream *filestream;
@@ -28,7 +28,7 @@ class Parser
     TokenTuple tokenTuple;
     std::set<std::string> players;
     std::map<std::string, std::pair<std::string, DFAState *>> pieces;
-    Environment *environment;
+    std::unique_ptr<Environment> environment;
     void match(Token token);
     bool match_if(Token token);
     void parse_player_list();
