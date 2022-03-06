@@ -34,3 +34,7 @@ class DFAState
     bool is_accepting;
     std::map<DFAInput, DFAState *> transition;
 };
+
+struct DFAStateDeleter {
+    void operator()(DFAState *state) const;
+};

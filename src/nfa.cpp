@@ -53,3 +53,7 @@ void NFAState::destroy() {
         delete state;
     delete this;
 }
+
+void NFAStateDeleter::operator()(NFAState *state) const {
+    state->destroy();
+}

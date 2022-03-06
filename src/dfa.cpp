@@ -54,3 +54,7 @@ void DFAState::destroy() {
         delete state;
     delete this;
 }
+
+void DFAStateDeleter::operator()(DFAState *state) const {
+    state->destroy();
+}

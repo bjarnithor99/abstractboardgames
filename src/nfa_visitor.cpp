@@ -124,6 +124,8 @@ void NFAVisitor::visitUnaryOpNode(UnaryOpNode *unaryOpNode) {
     nfa_stack.push(std::make_unique<NFAWrapper>(initial_state, final_state));
 }
 
-NFAState *NFAVisitor::getNFA() {
-    return nfa_stack.top()->initial_state;
+std::unique_ptr<NFAState, NFAStateDeleter> NFAVisitor::getNFA() {
+    std::unique_ptr<NFAState, NFAStateDeleter> nfa_initial_state(nfa_stack.top()->initial_state);
+    nfa_stack.pop();
+    return nfa_initial_state;
 }

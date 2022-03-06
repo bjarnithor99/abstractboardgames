@@ -166,7 +166,7 @@ void Parser::parse_board() {
     int board_size_y = environment->board_size_y;
     int cur_x = 0, cur_y = 0;
     environment->board[cur_x][cur_y] =
-        Cell(cur_y, board_size_x - 1 - cur_x, piece, pieces[piece].first, pieces[piece].second);
+        Cell(cur_y, board_size_x - 1 - cur_x, piece, pieces[piece].first, pieces[piece].second.get());
     cur_x += ((cur_y + 1) / board_size_y);
     cur_y = (cur_y + 1) % board_size_y;
     int piece_count = 1;
@@ -186,7 +186,7 @@ void Parser::parse_board() {
             throw std::runtime_error(error_msg);
         }
         environment->board[cur_x][cur_y] =
-            Cell(cur_y, board_size_x - 1 - cur_x, piece, pieces[piece].first, pieces[piece].second);
+            Cell(cur_y, board_size_x - 1 - cur_x, piece, pieces[piece].first, pieces[piece].second.get());
         cur_x += ((cur_y + 1) / board_size_y);
         cur_y = (cur_y + 1) % board_size_y;
         piece_count++;

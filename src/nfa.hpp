@@ -37,3 +37,7 @@ class NFAState
     bool is_accepting;
     std::map<NFAInput, std::vector<NFAState *>> transitions;
 };
+
+struct NFAStateDeleter {
+    void operator()(NFAState *state) const;
+};

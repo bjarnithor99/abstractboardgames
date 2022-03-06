@@ -27,7 +27,7 @@ class NFAVisitor : public Visitor
     void visitLetterNode(LetterNode *letterNode) override;
     void visitBinaryOpNode(BinaryOpNode *binaryOpNode) override;
     void visitUnaryOpNode(UnaryOpNode *unaryOpNode) override;
-    NFAState *getNFA();
+    std::unique_ptr<NFAState, NFAStateDeleter> getNFA();
 
   private:
     std::stack<std::unique_ptr<NFAWrapper>> nfa_stack;

@@ -27,7 +27,7 @@ class Parser
     Lexer lexer;
     TokenTuple tokenTuple;
     std::set<std::string> players;
-    std::map<std::string, std::pair<std::string, DFAState *>> pieces;
+    std::map<std::string, std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
     std::unique_ptr<Environment> environment;
     void match(Token token);
     bool match_if(Token token);
