@@ -48,8 +48,8 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     case Token::Comma:
         os << "Token::Comma";
         break;
-    case Token::Hashtag:
-        os << "Token::Hashtag";
+    case Token::Semicomma:
+        os << "Token::Semicomma";
         break;
     case Token::Players:
         os << "Token::Players";
@@ -182,8 +182,8 @@ TokenTuple Lexer::next() {
         ret = TokenTuple(Token::Comma, ",", loc);
         read_next_char();
     }
-    else if (ch == '#') {
-        ret = TokenTuple(Token::Hashtag, "#", loc);
+    else if (ch == ';') {
+        ret = TokenTuple(Token::Semicomma, ";", loc);
         read_next_char();
     }
     else if (isdigit(ch) || ch == '-') {

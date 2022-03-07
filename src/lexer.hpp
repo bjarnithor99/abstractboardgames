@@ -31,9 +31,9 @@ enum class Token
     LCurly,
     RCurly,
     Comma,
+    Semicomma,
 
     // Declaration marks
-    Hashtag,
     Players,
     Pieces,
     BoardSize,

@@ -9,17 +9,27 @@ Parser::Parser(std::ifstream *filestream)
 Parser::~Parser() {}
 
 void Parser::parse() {
-    while (match_if(Token::Hashtag)) {
-        if (tokenTuple.token == Token::Players)
+    while (tokenTuple.token != Token::EOI) {
+        if (tokenTuple.token == Token::Players) {
             parse_player_list();
-        else if (tokenTuple.token == Token::Pieces)
+            match(Token::Semicomma);
+        }
+        else if (tokenTuple.token == Token::Pieces) {
             parse_pieces_list();
-        else if (tokenTuple.token == Token::BoardSize)
-            parse_board_size();
-        else if (tokenTuple.token == Token::Board)
-            parse_board();
-        else
+            match(Token::Semicomma);
+        }
+        else if (tokenTuple.token == Token::Rule) {
             parse_rule();
+            match(Token::Semicomma);
+        }
+        else if (tokenTuple.token == Token::BoardSize) {
+            parse_board_size();
+            match(Token::Semicomma);
+        }
+        else {
+            parse_board();
+            match(Token::Semicomma);
+        }
     }
     match(Token::EOI);
 }
@@ -52,14 +62,14 @@ bool Parser::match_if(Token token) {
 }
 
 void Parser::parse_player_list() {
+    match(Token::Players);
+    match(Token::OpAssign);
     if (!players.empty()) {
         std::ostringstream oss;
         oss << "Redeclaration of players in " << tokenTuple.location;
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    match(Token::Players);
-    match(Token::OpAssign);
     std::string player = parse_string();
     players.insert(player);
     while (match_if(Token::Comma)) {
@@ -76,14 +86,14 @@ void Parser::parse_player_list() {
 }
 
 void Parser::parse_pieces_list() {
+    match(Token::Pieces);
+    match(Token::OpAssign);
     if (!pieces.empty()) {
         std::ostringstream oss;
         oss << "Redeclaration of pieces in " << tokenTuple.location;
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    match(Token::Pieces);
-    match(Token::OpAssign);
     parse_piece();
     while (match_if(Token::Comma)) {
         parse_piece();
@@ -115,14 +125,14 @@ void Parser::parse_piece() {
 }
 
 void Parser::parse_board_size() {
+    match(Token::BoardSize);
+    match(Token::OpAssign);
     if (environment != nullptr) {
         std::ostringstream oss;
         oss << "Redeclaration of board size in " << tokenTuple.location << ".";
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    match(Token::BoardSize);
-    match(Token::OpAssign);
     int x = parse_int();
     match(Token::Comma);
     int y = parse_int();
@@ -136,6 +146,8 @@ void Parser::parse_board_size() {
 }
 
 void Parser::parse_board() {
+    match(Token::Board);
+    match(Token::OpAssign);
     if (environment == nullptr) {
         throw std::runtime_error("Board size must be declared before board.");
     }
@@ -146,8 +158,6 @@ void Parser::parse_board() {
         throw std::runtime_error(error_msg);
     }
     environment->board.resize(environment->board_size_x, std::vector<Cell>(environment->board_size_y, Cell()));
-    match(Token::Board);
-    match(Token::OpAssign);
     Location loc = tokenTuple.location;
     std::string piece = parse_string();
     if (pieces.find(piece) == pieces.end()) {
