@@ -1,9 +1,10 @@
 // Game declaration syntax
-game:          "#" player_list
-               "#" piece_list
-               ("#" rule)*
-               "#" board_size
-               "#" board
+game:          player_list ";"
+game:          player_list ";"
+               piece_list ";"
+               (rule ";")*
+               board_size ";"
+               board ";"
 
 // Player declaration syntax
 player_list:   "players" "=" player ("," player)*
