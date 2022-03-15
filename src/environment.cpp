@@ -1,4 +1,15 @@
-#include "environment.hpp"
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ *  Copyright (C) 2022 Bjarni Dagur Thor Kárason <bjarni@bjarnithor.com>
+ */
+// This include statement is a hack. The Predicate class needs to access member
+// variables of the Environment class, so predicates.hpp includes
+// environment.hpp. However, the Environment class also needs to access member
+// functions of the Predicates class. To avoid circular includes, predicates.hpp
+// includes Environment, dfa.hpp and nfa.hpp (which store pointers to Predicate)
+// forward declare the Predicate class, and this compilation unit includes
+// predicates.hpp, effectively including environment.hpp as well.
+#include "predicates.hpp"
 
 #define COUTRESET "\033[0m"
 #define COUTRED "\033[1m\033[31m"
@@ -59,22 +70,11 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
         int next_y = y + input.dx;
         if (!contains_cell(next_x, next_y))
             continue;
-        if (!verify_predicate(input.predicate, next_x, next_y))
+        if (!(*input.predicate)(this, next_x, next_y))
             continue;
         candidate_move.push_back(Step(next_x, next_y, input.side_effect));
         generate_moves(p.second, next_x, next_y);
         candidate_move.pop_back();
-    }
-}
-
-bool Environment::verify_predicate(std::string predicate, int x, int y) {
-    if (predicate == "empty")
-        return board[x][y].piece == "empty";
-    else if (predicate == "opponent")
-        return board[x][y].player != "" && board[x][y].player != current_player;
-    else {
-        std::cout << "Unknown predicate " << predicate << std::endl;
-        return false;
     }
 }
 

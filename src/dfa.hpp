@@ -5,21 +5,24 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <queue>
 #include <set>
 #include <string>
 
+class Predicate;
+
 class DFAInput
 {
   public:
-    DFAInput(int dx, int dy, std::string predicate, std::string side_effect);
+    DFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::string side_effect);
     ~DFAInput();
     bool operator<(const DFAInput &rhs) const;
     bool operator==(const DFAInput &rhs) const;
 
     int dx;
     int dy;
-    std::string predicate;
+    std::shared_ptr<Predicate> predicate;
     std::string side_effect;
 };
 

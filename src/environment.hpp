@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ *  Copyright (C) 2022 Bjarni Dagur Thor Kárason <bjarni@bjarnithor.com>
+ */
 #pragma once
 
 #include "dfa.hpp"
@@ -37,6 +41,7 @@ class Environment
     int board_size_x;
     int board_size_y;
     std::vector<std::vector<Cell>> board;
+    std::string current_player;
     std::vector<std::vector<Step>> found_moves;
     bool contains_cell(int x, int y);
     int set_cell(int x, int y, Cell *cell);
@@ -45,8 +50,6 @@ class Environment
     void print();
 
   private:
-    std::string current_player;
     void generate_moves(DFAState *state, int x, int y);
     std::vector<Step> candidate_move;
-    bool verify_predicate(std::string predicate, int x, int y);
 };

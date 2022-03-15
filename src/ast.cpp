@@ -4,7 +4,7 @@
  */
 #include "ast.hpp"
 
-LetterNode::LetterNode(int dx, int dy, std::string predicate, std::string side_effect)
+LetterNode::LetterNode(int dx, int dy, std::shared_ptr<Predicate> predicate, std::string side_effect)
     : dx(dx), dy(dy), predicate(predicate), side_effect(side_effect) {}
 LetterNode::~LetterNode() {}
 void LetterNode::accept(Visitor *visitor) {

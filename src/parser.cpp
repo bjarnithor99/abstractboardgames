@@ -276,7 +276,7 @@ std::unique_ptr<LetterNode> Parser::parse_letter() {
     match(Token::Comma);
     int dy = parse_int();
     match(Token::Comma);
-    std::string predicate = parse_string();
+    std::string predicate_name = parse_string();
     match(Token::RSquare);
 
     std::string side_effect = "";
@@ -285,7 +285,7 @@ std::unique_ptr<LetterNode> Parser::parse_letter() {
         match(Token::RCurly);
     }
 
-    return std::make_unique<LetterNode>(dx, dy, predicate, side_effect);
+    return std::make_unique<LetterNode>(dx, dy, Predicates::get_predicate[predicate_name], side_effect);
 }
 
 int Parser::parse_int() {

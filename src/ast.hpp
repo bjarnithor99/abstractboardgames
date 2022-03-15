@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include "predicates.hpp"
 #include "visitor.hpp"
 #include <memory>
 #include <string>
@@ -31,12 +32,12 @@ class Node
 class LetterNode : public Node
 {
   public:
-    LetterNode(int dx, int dy, std::string predicate, std::string side_effect);
+    LetterNode(int dx, int dy, std::shared_ptr<Predicate> predicate, std::string side_effect);
     ~LetterNode();
     void accept(Visitor *visitor) override;
     int dx;
     int dy;
-    std::string predicate;
+    std::shared_ptr<Predicate> predicate;
     std::string side_effect;
 };
 

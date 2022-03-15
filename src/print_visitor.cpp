@@ -46,8 +46,8 @@ void PrintVisitor::visitWordsNode(WordsNode *wordsNode) {
 }
 
 void PrintVisitor::visitLetterNode(LetterNode *letterNode) {
-    std::cout << indent() << "LetterNode (" << letterNode->dx << ", " << letterNode->dy << ", " << letterNode->predicate
-              << ")"
+    std::cout << indent() << "LetterNode (" << letterNode->dx << ", " << letterNode->dy << ", "
+              << letterNode->predicate->get_name() << ")"
               << " {" << letterNode->side_effect << "}" << std::endl;
 }
 

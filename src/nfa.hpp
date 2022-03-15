@@ -11,17 +11,19 @@
 #include <string>
 #include <vector>
 
+class Predicate;
+
 class NFAInput
 {
   public:
     NFAInput();
-    NFAInput(int dx, int dy, std::string predicate, std::string side_effect);
+    NFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::string side_effect);
     ~NFAInput();
     bool operator<(const NFAInput &rhs) const;
 
     int dx;
     int dy;
-    std::string predicate;
+    std::shared_ptr<Predicate> predicate;
     std::string side_effect;
     bool is_epsilon;
 };
