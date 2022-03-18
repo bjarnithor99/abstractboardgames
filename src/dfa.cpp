@@ -4,7 +4,7 @@
  */
 #include "dfa.hpp"
 
-DFAInput::DFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::string side_effect)
+DFAInput::DFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::shared_ptr<SideEffect> side_effect)
     : dx(dx), dy(dy), predicate(predicate), side_effect(side_effect) {}
 DFAInput::~DFAInput() {}
 bool DFAInput::operator<(const DFAInput &rhs) const {

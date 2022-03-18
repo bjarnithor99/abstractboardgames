@@ -26,11 +26,11 @@ class Cell
 class Step
 {
   public:
-    Step(int x, int y, std::string side_effect);
+    Step(int x, int y, std::shared_ptr<SideEffect> side_effect);
     ~Step();
     int x;
     int y;
-    std::string side_effect;
+    std::shared_ptr<SideEffect> side_effect;
 };
 
 class Environment

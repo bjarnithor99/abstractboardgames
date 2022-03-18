@@ -5,6 +5,7 @@
 #pragma once
 
 #include "predicates.hpp"
+#include "side_effects.hpp"
 #include "visitor.hpp"
 #include <memory>
 #include <string>
@@ -32,13 +33,13 @@ class Node
 class LetterNode : public Node
 {
   public:
-    LetterNode(int dx, int dy, std::shared_ptr<Predicate> predicate, std::string side_effect);
+    LetterNode(int dx, int dy, std::shared_ptr<Predicate> predicate, std::shared_ptr<SideEffect> side_effect);
     ~LetterNode();
     void accept(Visitor *visitor) override;
     int dx;
     int dy;
     std::shared_ptr<Predicate> predicate;
-    std::string side_effect;
+    std::shared_ptr<SideEffect> side_effect;
 };
 
 class WordsNode : public Node

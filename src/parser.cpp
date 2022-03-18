@@ -280,13 +280,14 @@ std::unique_ptr<LetterNode> Parser::parse_letter() {
     std::string predicate_name = parse_string();
     match(Token::RSquare);
 
-    std::string side_effect = "";
+    std::string side_effect_name = "default";
     if (match_if(Token::LCurly)) {
-        side_effect = parse_string();
+        side_effect_name = parse_string();
         match(Token::RCurly);
     }
 
-    return std::make_unique<LetterNode>(dx, dy, Predicates::get_predicate[predicate_name], side_effect);
+    return std::make_unique<LetterNode>(dx, dy, Predicates::get_predicate[predicate_name],
+                                        SideEffects::get_side_effect[side_effect_name]);
 }
 
 int Parser::parse_int() {

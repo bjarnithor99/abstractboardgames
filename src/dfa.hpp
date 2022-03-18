@@ -11,11 +11,12 @@
 #include <string>
 
 class Predicate;
+class SideEffect;
 
 class DFAInput
 {
   public:
-    DFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::string side_effect);
+    DFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::shared_ptr<SideEffect> side_effect);
     ~DFAInput();
     bool operator<(const DFAInput &rhs) const;
     bool operator==(const DFAInput &rhs) const;
@@ -23,7 +24,7 @@ class DFAInput
     int dx;
     int dy;
     std::shared_ptr<Predicate> predicate;
-    std::string side_effect;
+    std::shared_ptr<SideEffect> side_effect;
 };
 
 class DFAState

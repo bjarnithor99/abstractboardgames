@@ -5,7 +5,7 @@
 #include "nfa.hpp"
 
 NFAInput::NFAInput() : dx(0), dy(0), predicate(nullptr), is_epsilon(true) {}
-NFAInput::NFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::string side_effect)
+NFAInput::NFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::shared_ptr<SideEffect> side_effect)
     : dx(dx), dy(dy), predicate(predicate), side_effect(side_effect), is_epsilon(false) {}
 NFAInput::~NFAInput() {}
 bool NFAInput::operator<(const NFAInput &rhs) const {

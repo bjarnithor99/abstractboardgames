@@ -10,6 +10,7 @@
 // forward declare the Predicate class, and this compilation unit includes
 // predicates.hpp, effectively including environment.hpp as well.
 #include "predicates.hpp"
+#include "side_effects.hpp"
 
 #define COUTRESET "\033[0m"
 #define COUTRED "\033[1m\033[31m"
@@ -20,7 +21,7 @@ Cell::Cell(int x, int y, std::string piece, std::string player, DFAState *state)
     : x(x), y(y), piece(piece), player(player), state(state) {}
 Cell::~Cell() {}
 
-Step::Step(int x, int y, std::string side_effect) : x(x), y(y), side_effect(side_effect) {}
+Step::Step(int x, int y, std::shared_ptr<SideEffect> side_effect) : x(x), y(y), side_effect(side_effect) {}
 Step::~Step() {}
 
 Environment::Environment(int board_size_x, int board_size_y) : board_size_x(board_size_x), board_size_y(board_size_y) {}
@@ -54,7 +55,7 @@ void Environment::generate_moves(std::string player) {
         for (int j = 0; j < board_size_y; j++) {
             if (board[i][j].player == player) {
                 candidate_move.clear();
-                candidate_move.push_back(Step(i, j, ""));
+                candidate_move.push_back(Step(i, j, SideEffects::get_side_effect["default"]));
                 generate_moves(board[i][j].state, i, j);
             }
         }
