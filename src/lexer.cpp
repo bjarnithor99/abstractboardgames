@@ -155,11 +155,11 @@ TokenTuple Lexer::next() {
         read_next_char();
     }
     else if (ch == '{') {
-        ret = TokenTuple(Token::LCurly, "[", loc);
+        ret = TokenTuple(Token::LCurly, "{", loc);
         read_next_char();
     }
     else if (ch == '}') {
-        ret = TokenTuple(Token::RCurly, "]", loc);
+        ret = TokenTuple(Token::RCurly, "}", loc);
         read_next_char();
     }
     else if (ch == '*') {
