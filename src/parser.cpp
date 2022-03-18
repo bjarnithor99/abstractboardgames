@@ -35,6 +35,7 @@ void Parser::parse() {
 }
 
 std::unique_ptr<Environment> Parser::get_environment() {
+    environment->pieces.merge(pieces);
     return std::move(environment);
 }
 

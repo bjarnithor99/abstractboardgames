@@ -41,6 +41,7 @@ class Environment
     int board_size_x;
     int board_size_y;
     std::vector<std::vector<Cell>> board;
+    std::map<std::string, std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
     std::string current_player;
     std::vector<std::vector<Step>> found_moves;
     bool contains_cell(int x, int y);
