@@ -1,29 +1,6 @@
-from sys import set_asyncgen_hooks
-from .Parser import Letter, Parser, lex
-from .StateMachineGenerator2 import Generator, NFAStateMachine, State
-from copy import deepcopy
+from .Types import *
+from ..Parser.ASTType import Letter
 
-
-class DFAStateMachine(NFAStateMachine):
-    def __str__(self) -> str:
-        returnStr = '\n'
-        toVisit = [self.start]; finals = []; visited = []
-        returnStr += 'Start '
-        while len(toVisit) > 0:
-            i = toVisit.pop()
-            if id(i) in visited:
-                continue
-            visited.append(id(i))
-            if i.final:
-                finals.append(i)
-            returnStr += str(id(i)) + ' has children:\n'
-            for transition in i.outTransitions:
-                toVisit.append(transition.end)
-                returnStr += f'\t self -> {transition.letter} -> {id(transition.end)}\n'
-        returnStr += f'The final states are: {[id(state) for state in finals]}\n'
-        for i, key in enumerate(visited):
-            returnStr = returnStr.replace(str(key), f'state:{str(i+1)}')
-        return returnStr
 
 class NfaToDfaConverter:
     def __init__(self, nfa: NFAStateMachine) -> None:
@@ -113,13 +90,3 @@ class NfaToDfaConverter:
 
             for nextState in [transition.end for transition in i.outTransitions]:
                 toVisit.append(nextState)
-
-
-
-if __name__ == "__main__":
-    tokens = lex('((2,1,empty)*(1,2,empty))+')
-    abs = Parser(tokens).parse()
-    nfa = Generator(abs).createStatMachine()
-    print(nfa)
-    dfa = NfaToDfaConverter(nfa).createDFA()
-    print(dfa)

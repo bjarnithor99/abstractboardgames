@@ -1,9 +1,9 @@
-from .Parser import QuestionMark,Union,Concatination,Star,Plus,Letter,SyntaxTree,SyntaxTreeNode,Parser,lex
-from .StateMachine2 import NFAStateMachine, State
+from ..Parser.ASTType import QuestionMark,Union,Concatination,Star,Plus,Letter,RegexTree,SyntaxTreeNode
+from .Types import *
 StateMachine = NFAStateMachine
 
 class Generator:
-    def __init__(self, ast: SyntaxTree) -> None:
+    def __init__(self, ast: RegexTree) -> None:
         self.ast = ast
 
     def createStatMachine(self) -> StateMachine:
@@ -71,6 +71,8 @@ class Generator:
         return sm
 
 if __name__ == "__main__":
+    lex = None
+    Parser = None
     tokens = lex('((1,0,empty)*(1,0,enemy)?) | ((0,1,empty)*(0,1,enemy)?)')
     print("--TOKENS--")
     print([token.value for token in tokens])
