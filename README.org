@@ -16,6 +16,8 @@ Chinese chess, yet, at the same time, simple enough to allow for a fast
 interpretation. The game descriptions compile into runnable Python/C++ code.
 This component will extend the students' knowledge of compiler techniques.
 
+For the current syntax of the language see [[file:./language_description.txt][language_description.txt]].
+
 ** The Game-Playing Agent
 The game-playing agent will be Alpha-Zero-like, using a Monte-Carlo tree search
 and a deep neural network to control the think-a-head search process. The search
@@ -23,7 +25,7 @@ will call the compiled game description to provide the game-specific logic. This
 component will extend the students' knowledge of artificial intelligence,
 particularly of informed search methods.
 
-** THe learning module
+** The learning module
 The third and last component allows the game agent to autonomously learn game
 strategies via self-play, using deep neural networks and reinforcement learning.
 

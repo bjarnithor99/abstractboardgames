@@ -1,9 +1,10 @@
 // Game declaration syntax
-game:          "#" player_list
-               "#" piece_list
-               ("#" rule)*
-               "#" board_size
-               "#" board
+game:          player_list ";"
+game:          player_list ";"
+               piece_list ";"
+               (rule ";")*
+               board_size ";"
+               board ";"
 
 // Player declaration syntax
 player_list:   "players" "=" player ("," player)*
@@ -24,7 +25,7 @@ sentence:      word ("|" word)*
 word:          (core_word unary_op | core_word)+
 core_word:     "(" sentence ")" | letter
 unary_op:      "*" | "?" | "+"
-letter:        "[" int "," int "," string "]"
+letter:        "[" int "," int "," string "]" ("{" string "}")?
 
 // Common
 int:           CLASS OF INTEGERS

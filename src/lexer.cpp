@@ -39,11 +39,17 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     case Token::RSquare:
         os << "Token::RSquare";
         break;
+    case Token::LCurly:
+        os << "Token::LCurly";
+        break;
+    case Token::RCurly:
+        os << "Token::RCurly";
+        break;
     case Token::Comma:
         os << "Token::Comma";
         break;
-    case Token::Hashtag:
-        os << "Token::Hashtag";
+    case Token::Semicomma:
+        os << "Token::Semicomma";
         break;
     case Token::Players:
         os << "Token::Players";
@@ -148,12 +154,36 @@ TokenTuple Lexer::next() {
         ret = TokenTuple(Token::RSquare, "]", loc);
         read_next_char();
     }
+    else if (ch == '{') {
+        ret = TokenTuple(Token::LCurly, "{", loc);
+        read_next_char();
+    }
+    else if (ch == '}') {
+        ret = TokenTuple(Token::RCurly, "}", loc);
+        read_next_char();
+    }
+    else if (ch == '*') {
+        ret = TokenTuple(Token::OpStar, "*", loc);
+        read_next_char();
+    }
+    else if (ch == '?') {
+        ret = TokenTuple(Token::OpQuestion, "?", loc);
+        read_next_char();
+    }
+    else if (ch == '+') {
+        ret = TokenTuple(Token::OpPlus, "+", loc);
+        read_next_char();
+    }
+    else if (ch == '|') {
+        ret = TokenTuple(Token::OpOr, "|", loc);
+        read_next_char();
+    }
     else if (ch == ',') {
         ret = TokenTuple(Token::Comma, ",", loc);
         read_next_char();
     }
-    else if (ch == '#') {
-        ret = TokenTuple(Token::Hashtag, "#", loc);
+    else if (ch == ';') {
+        ret = TokenTuple(Token::Semicomma, ";", loc);
         read_next_char();
     }
     else if (isdigit(ch) || ch == '-') {

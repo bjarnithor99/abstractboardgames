@@ -4,6 +4,8 @@
  */
 #pragma once
 
+#include "predicates.hpp"
+#include "side_effects.hpp"
 #include "visitor.hpp"
 #include <memory>
 #include <string>
@@ -31,12 +33,13 @@ class Node
 class LetterNode : public Node
 {
   public:
-    LetterNode(int dx, int dy, std::string predicate);
+    LetterNode(int dx, int dy, std::shared_ptr<Predicate> predicate, std::shared_ptr<SideEffect> side_effect);
     ~LetterNode();
     void accept(Visitor *visitor) override;
     int dx;
     int dy;
-    std::string predicate;
+    std::shared_ptr<Predicate> predicate;
+    std::shared_ptr<SideEffect> side_effect;
 };
 
 class WordsNode : public Node
@@ -45,27 +48,27 @@ class WordsNode : public Node
     WordsNode();
     ~WordsNode();
     void accept(Visitor *visitor) override;
-    void add_word_node(Node *wordNode);
-    std::vector<Node *> wordNodes;
+    void add_word_node(std::unique_ptr<Node> wordNode);
+    std::vector<std::unique_ptr<Node>> wordNodes;
 };
 
 class UnaryOpNode : public Node
 {
   public:
-    UnaryOpNode(UnaryOperator unaryOperator, Node *childNode);
+    UnaryOpNode(UnaryOperator unaryOperator, std::unique_ptr<Node> childNode);
     ~UnaryOpNode();
     void accept(Visitor *visitor) override;
     UnaryOperator unaryOperator;
-    Node *childNode;
+    std::unique_ptr<Node> childNode;
 };
 
 class BinaryOpNode : public Node
 {
   public:
-    BinaryOpNode(BinaryOperator binaryOperator, Node *childNodeLHS, Node *childNodeRHS);
+    BinaryOpNode(BinaryOperator binaryOperator, std::unique_ptr<Node> childNodeLHS, std::unique_ptr<Node> childNodeRHS);
     ~BinaryOpNode();
     void accept(Visitor *visitor) override;
     BinaryOperator binaryOperator;
-    Node *childNodeLHS;
-    Node *childNodeRHS;
+    std::unique_ptr<Node> childNodeLHS;
+    std::unique_ptr<Node> childNodeRHS;
 };

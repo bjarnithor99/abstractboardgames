@@ -67,10 +67,11 @@ std::set<NFAInput> FATools::getAllInputSymbolsForSet(std::set<NFAState *> states
     return input_symbols;
 }
 
-DFAState *FATools::nfaToDfa(NFAState *nfa_initial_state) {
+std::unique_ptr<DFAState, DFAStateDeleter> FATools::nfaToDfa(NFAState *nfa_initial_state) {
     std::map<std::set<NFAState *>, DFAState *> nfa_set_to_dfa;
     std::set<NFAState *> nfa_initial_state_closure = calculateEClosure(nfa_initial_state);
-    nfa_set_to_dfa[nfa_initial_state_closure] = new DFAState();
+    std::unique_ptr<DFAState, DFAStateDeleter> dfa_initial_state(new DFAState);
+    nfa_set_to_dfa[nfa_initial_state_closure] = dfa_initial_state.get();
     nfa_set_to_dfa[nfa_initial_state_closure]->is_accepting = nfaSetContainsAcceptingState(nfa_initial_state_closure);
     std::queue<std::set<NFAState *>> q;
     q.push(nfa_initial_state_closure);
@@ -84,11 +85,11 @@ DFAState *FATools::nfaToDfa(NFAState *nfa_initial_state) {
                 nfa_set_to_dfa[next_nfa_set]->is_accepting = nfaSetContainsAcceptingState(next_nfa_set);
                 q.push(next_nfa_set);
             }
-            nfa_set_to_dfa[at_nfa_set]->add_transition(nfa_set_to_dfa[next_nfa_set],
-                                                       DFAInput(input.dx, input.dy, input.predicate));
+            nfa_set_to_dfa[at_nfa_set]->add_transition(
+                nfa_set_to_dfa[next_nfa_set], DFAInput(input.dx, input.dy, input.predicate, input.side_effect));
         }
     }
-    return nfa_set_to_dfa[nfa_initial_state_closure];
+    return dfa_initial_state;
 }
 
 std::set<DFAState *> FATools::getParents(DFAState *child, std::set<DFAState *> *all_states, DFAInput input) {
@@ -116,7 +117,7 @@ std::set<DFAState *> FATools::getParents(std::set<DFAState *> children, std::set
     return all_parents;
 }
 
-DFAState *FATools::minimizeDfa(DFAState *initial_state) {
+std::unique_ptr<DFAState, DFAStateDeleter> FATools::minimizeDfa(DFAState *initial_state) {
     std::set<DFAState *> all_states;
     std::set<DFAState *> final_states;
     std::set<DFAState *> non_final_states;
@@ -216,14 +217,14 @@ DFAState *FATools::minimizeDfa(DFAState *initial_state) {
         }
     }
 
-    return min_dfa_initial_state;
+    return std::unique_ptr<DFAState, DFAStateDeleter>(min_dfa_initial_state);
 }
 
-DFAState *FATools::getMinimizedDfa(Node *node) {
+std::unique_ptr<DFAState, DFAStateDeleter> FATools::getMinimizedDfa(Node *node) {
     NFAVisitor nfaVisitor = NFAVisitor();
     node->accept(&nfaVisitor);
-    NFAState *nfa_initial_state = nfaVisitor.getNFA();
-    DFAState *dfa_initial_state = nfaToDfa(nfa_initial_state);
-    DFAState *min_dfa_initial_state = minimizeDfa(dfa_initial_state);
+    std::unique_ptr<NFAState, NFAStateDeleter> nfa_initial_state = nfaVisitor.getNFA();
+    std::unique_ptr<DFAState, DFAStateDeleter> dfa_initial_state = nfaToDfa(nfa_initial_state.get());
+    std::unique_ptr<DFAState, DFAStateDeleter> min_dfa_initial_state = minimizeDfa(dfa_initial_state.get());
     return min_dfa_initial_state;
 }

@@ -4,40 +4,33 @@
  */
 #include "ast.hpp"
 
-LetterNode::LetterNode(int dx, int dy, std::string predicate) : dx(dx), dy(dy), predicate(predicate) {}
+LetterNode::LetterNode(int dx, int dy, std::shared_ptr<Predicate> predicate, std::shared_ptr<SideEffect> side_effect)
+    : dx(dx), dy(dy), predicate(predicate), side_effect(side_effect) {}
 LetterNode::~LetterNode() {}
 void LetterNode::accept(Visitor *visitor) {
     visitor->visitLetterNode(this);
 }
 
 WordsNode::WordsNode() {}
-WordsNode::~WordsNode() {
-    for (Node *wordNode : wordNodes) {
-        delete wordNode;
-    }
-}
+WordsNode::~WordsNode() {}
 void WordsNode::accept(Visitor *visitor) {
     visitor->visitWordsNode(this);
 }
-void WordsNode::add_word_node(Node *wordNode) {
-    wordNodes.push_back(wordNode);
+void WordsNode::add_word_node(std::unique_ptr<Node> wordNode) {
+    wordNodes.push_back(std::move(wordNode));
 }
 
-UnaryOpNode::UnaryOpNode(UnaryOperator unaryOperator, Node *childNode)
-    : unaryOperator(unaryOperator), childNode(childNode) {}
-UnaryOpNode::~UnaryOpNode() {
-    delete childNode;
-}
+UnaryOpNode::UnaryOpNode(UnaryOperator unaryOperator, std::unique_ptr<Node> childNode)
+    : unaryOperator(unaryOperator), childNode(std::move(childNode)) {}
+UnaryOpNode::~UnaryOpNode() {}
 void UnaryOpNode::accept(Visitor *visitor) {
     visitor->visitUnaryOpNode(this);
 }
 
-BinaryOpNode::BinaryOpNode(BinaryOperator binaryOperator, Node *childNodeLHS, Node *childNodeRHS)
-    : binaryOperator(binaryOperator), childNodeLHS(childNodeLHS), childNodeRHS(childNodeRHS) {}
-BinaryOpNode::~BinaryOpNode() {
-    delete childNodeLHS;
-    delete childNodeRHS;
-}
+BinaryOpNode::BinaryOpNode(BinaryOperator binaryOperator, std::unique_ptr<Node> childNodeLHS,
+                           std::unique_ptr<Node> childNodeRHS)
+    : binaryOperator(binaryOperator), childNodeLHS(std::move(childNodeLHS)), childNodeRHS(std::move(childNodeRHS)) {}
+BinaryOpNode::~BinaryOpNode() {}
 void BinaryOpNode::accept(Visitor *visitor) {
     visitor->visitBinaryOpNode(this);
 }

@@ -1,13 +1,28 @@
-#include "environment.hpp"
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ *  Copyright (C) 2022 Bjarni Dagur Thor Kárason <bjarni@bjarnithor.com>
+ */
+// This include statement is a hack. The Predicate class needs to access member
+// variables of the Environment class, so predicates.hpp includes
+// environment.hpp. However, the Environment class also needs to access member
+// functions of the Predicates class. To avoid circular includes, predicates.hpp
+// includes Environment, dfa.hpp and nfa.hpp (which store pointers to Predicate)
+// forward declare the Predicate class, and this compilation unit includes
+// predicates.hpp, effectively including environment.hpp as well.
+#include "predicates.hpp"
+#include "side_effects.hpp"
 
 #define COUTRESET "\033[0m"
-#define COUTBLACK "\033[1m\033[30m"
+#define COUTRED "\033[1m\033[31m"
 #define COUTBLUE "\033[1m\033[34m"
 
 Cell::Cell() {}
 Cell::Cell(int x, int y, std::string piece, std::string player, DFAState *state)
     : x(x), y(y), piece(piece), player(player), state(state) {}
 Cell::~Cell() {}
+
+Step::Step(int x, int y, std::shared_ptr<SideEffect> side_effect) : x(x), y(y), side_effect(side_effect) {}
+Step::~Step() {}
 
 Environment::Environment(int board_size_x, int board_size_y) : board_size_x(board_size_x), board_size_y(board_size_y) {}
 Environment::~Environment() {}
@@ -40,7 +55,7 @@ void Environment::generate_moves(std::string player) {
         for (int j = 0; j < board_size_y; j++) {
             if (board[i][j].player == player) {
                 candidate_move.clear();
-                candidate_move.push_back({i, j});
+                candidate_move.push_back(Step(i, j, SideEffects::get_side_effect["default"]));
                 generate_moves(board[i][j].state, i, j);
             }
         }
@@ -52,26 +67,15 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
         found_moves.push_back(candidate_move);
     for (auto &p : state->transition) {
         const DFAInput &input = p.first;
-        int next_x = x - input.dx;
-        int next_y = y + input.dy;
+        int next_x = x - input.dy;
+        int next_y = y + input.dx;
         if (!contains_cell(next_x, next_y))
             continue;
-        if (!verify_predicate(input.predicate, next_x, next_y))
+        if (!(*input.predicate)(this, next_x, next_y))
             continue;
-        candidate_move.push_back({next_x, next_y});
+        candidate_move.push_back(Step(next_x, next_y, input.side_effect));
         generate_moves(p.second, next_x, next_y);
         candidate_move.pop_back();
-    }
-}
-
-bool Environment::verify_predicate(std::string predicate, int x, int y) {
-    if (predicate == "empty")
-        return board[x][y].piece == "empty";
-    else if (predicate == "opponent")
-        return board[x][y].player != "" && board[x][y].player != current_player;
-    else {
-        std::cout << "Unknown predicate " << predicate << std::endl;
-        return false;
     }
 }
 
@@ -83,11 +87,11 @@ void Environment::print() {
             if (j != 0)
                 std::cout << " ";
             if (board[i][j].player == "white")
-                std::cout << COUTBLUE << board[i][j].piece << COUTRESET;
+                std::cout << COUTBLUE << std::setw(8) << board[i][j].piece << COUTRESET;
             else if (board[i][j].player == "black")
-                std::cout << COUTBLACK << board[i][j].piece << COUTRESET;
+                std::cout << COUTRED << std::setw(8) << board[i][j].piece << COUTRESET;
             else
-                std::cout << board[i][j].piece;
+                std::cout << std::setw(8) << board[i][j].piece;
         }
         std::cout << "\n";
     }

@@ -28,10 +28,12 @@ enum class Token
     RParen,
     LSquare,
     RSquare,
+    LCurly,
+    RCurly,
     Comma,
+    Semicomma,
 
     // Declaration marks
-    Hashtag,
     Players,
     Pieces,
     BoardSize,

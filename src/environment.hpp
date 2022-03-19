@@ -1,6 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ *  Copyright (C) 2022 Bjarni Dagur Thor Kárason <bjarni@bjarnithor.com>
+ */
 #pragma once
 
 #include "dfa.hpp"
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -18,6 +23,16 @@ class Cell
     DFAState *state;
 };
 
+class Step
+{
+  public:
+    Step(int x, int y, std::shared_ptr<SideEffect> side_effect);
+    ~Step();
+    int x;
+    int y;
+    std::shared_ptr<SideEffect> side_effect;
+};
+
 class Environment
 {
   public:
@@ -26,7 +41,9 @@ class Environment
     int board_size_x;
     int board_size_y;
     std::vector<std::vector<Cell>> board;
-    std::vector<std::vector<std::pair<int, int>>> found_moves;
+    std::map<std::string, std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
+    std::string current_player;
+    std::vector<std::vector<Step>> found_moves;
     bool contains_cell(int x, int y);
     int set_cell(int x, int y, Cell *cell);
     Cell *get_cell(int x, int y);
@@ -34,8 +51,6 @@ class Environment
     void print();
 
   private:
-    std::string current_player;
     void generate_moves(DFAState *state, int x, int y);
-    std::vector<std::pair<int, int>> candidate_move;
-    bool verify_predicate(std::string predicate, int x, int y);
+    std::vector<Step> candidate_move;
 };

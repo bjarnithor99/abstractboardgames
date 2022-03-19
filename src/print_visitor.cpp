@@ -39,15 +39,16 @@ PrintVisitor::PrintVisitor() : depth(0) {}
 void PrintVisitor::visitWordsNode(WordsNode *wordsNode) {
     std::cout << indent() << "WordsNode" << std::endl;
     depth++;
-    for (Node *wordNode : wordsNode->wordNodes) {
+    for (const std::unique_ptr<Node> &wordNode : wordsNode->wordNodes) {
         wordNode->accept(this);
     }
     depth--;
 }
 
 void PrintVisitor::visitLetterNode(LetterNode *letterNode) {
-    std::cout << indent() << "LetterNode (" << letterNode->dx << ", " << letterNode->dy << ", " << letterNode->predicate
-              << ")" << std::endl;
+    std::cout << indent() << "LetterNode (" << letterNode->dx << ", " << letterNode->dy << ", "
+              << letterNode->predicate->get_name() << ")"
+              << " {" << letterNode->side_effect << "}" << std::endl;
 }
 
 void PrintVisitor::visitBinaryOpNode(BinaryOpNode *binaryOpNode) {
