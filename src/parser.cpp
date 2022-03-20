@@ -286,6 +286,22 @@ std::unique_ptr<LetterNode> Parser::parse_letter() {
         match(Token::RCurly);
     }
 
+    if (Predicates::get_predicate.find(predicate_name) == Predicates::get_predicate.end()) {
+        std::ostringstream oss;
+        oss << "Syntax error: predicate '" << predicate_name
+            << "'is not defined. Did you forget to add it to Predicates::get_predicate?";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+
+    if (SideEffects::get_side_effect.find(side_effect_name) == SideEffects::get_side_effect.end()) {
+        std::ostringstream oss;
+        oss << "Syntax error: side effect '" << side_effect_name
+            << "'is not defined. Did you forget to add it to SideEffects::get_side_effect?";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+
     return std::make_unique<LetterNode>(dx, dy, Predicates::get_predicate[predicate_name],
                                         SideEffects::get_side_effect[side_effect_name]);
 }
