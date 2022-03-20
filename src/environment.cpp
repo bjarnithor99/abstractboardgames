@@ -79,6 +79,17 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
     }
 }
 
+void Environment::execute_move(const std::vector<Step> &move) {
+    int n_steps = move.size();
+    for (int i = 1; i < n_steps; i++) {
+        int old_x = move[i - 1].x;
+        int old_y = move[i - 1].y;
+        int new_x = move[i].x;
+        int new_y = move[i].y;
+        (*(move[i].side_effect))(this, old_x, old_y, new_x, new_y);
+    }
+}
+
 void Environment::print() {
     for (int i = 0; i < board_size_x; i++) {
         if (i != 0)

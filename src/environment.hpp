@@ -48,6 +48,7 @@ class Environment
     int set_cell(int x, int y, Cell *cell);
     Cell *get_cell(int x, int y);
     void generate_moves(std::string player);
+    void execute_move(const std::vector<Step> &move);
     void print();
 
   private:
