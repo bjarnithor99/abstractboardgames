@@ -11,6 +11,7 @@
 // predicates.hpp, effectively including environment.hpp as well.
 #include "predicates.hpp"
 #include "side_effects.hpp"
+#include "terminal_conditions.hpp"
 
 #define COUTRESET "\033[0m"
 #define COUTRED "\033[1m\033[31m"
@@ -123,7 +124,7 @@ void Environment::prune_illegal_moves() {
     found_moves = legal_moves;
 }
 
-void Environment::execute_move(const std::vector<Step> &move) {
+bool Environment::execute_move(const std::vector<Step> &move) {
     int n_steps = move.size();
     for (int i = 1; i < n_steps; i++) {
         int old_x = move[i - 1].x;
@@ -132,6 +133,17 @@ void Environment::execute_move(const std::vector<Step> &move) {
         int new_y = move[i].y;
         (*(move[i].side_effect))(this, old_x, old_y, new_x, new_y);
     }
+    return check_terminal_conditions();
+}
+
+bool Environment::check_terminal_conditions() {
+    bool game_over = false;
+    for (auto &p : TerminalConditions::terminal_conditions) {
+        const std::shared_ptr<TerminalCondition> &terminal_condition = p.second;
+        if ((*terminal_condition)(this))
+            game_over = true;
+    }
+    return game_over;
 }
 
 void Environment::print() {

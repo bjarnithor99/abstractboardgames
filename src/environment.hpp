@@ -50,12 +50,13 @@ class Environment
     int set_cell(int x, int y, Cell *cell);
     Cell *get_cell(int x, int y);
     void generate_moves(std::string player);
-    bool verify_post_condition(DFAState *state, int x, int y);
-    void prune_illegal_moves();
-    void execute_move(const std::vector<Step> &move);
+    bool execute_move(const std::vector<Step> &move);
+    bool check_terminal_conditions();
     void print();
 
   private:
+    bool verify_post_condition(DFAState *state, int x, int y);
     void generate_moves(DFAState *state, int x, int y);
+    void prune_illegal_moves();
     std::vector<Step> candidate_move;
 };
