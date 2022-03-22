@@ -28,6 +28,8 @@ class Parser
     TokenTuple tokenTuple;
     std::set<std::string> players;
     std::map<std::string, std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
+    std::map<std::string, std::vector<std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>>>
+        post_conditions;
     std::unique_ptr<Environment> environment;
     void match(Token token);
     bool match_if(Token token);
@@ -37,6 +39,7 @@ class Parser
     void parse_board_size();
     void parse_board();
     void parse_rule();
+    void parse_post_condition();
     std::unique_ptr<Node> parse_sentence();
     std::unique_ptr<WordsNode> parse_word();
     std::unique_ptr<Node> parse_core_word();

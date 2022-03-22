@@ -66,6 +66,9 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     case Token::Rule:
         os << "Token::Rule";
         break;
+    case Token::PostCondition:
+        os << "Token::PostCondition";
+        break;
     case Token::Number:
         os << "Token::Number";
         break;
@@ -100,7 +103,7 @@ Lexer::Lexer(std::ifstream *filestream) : filestream(filestream), location(1, 0)
 }
 std::map<std::string, Token> Lexer::reserved_keywords = {
     {"players", Token::Players}, {"pieces", Token::Pieces}, {"board_size", Token::BoardSize},
-    {"board", Token::Board},     {"rule", Token::Rule},
+    {"board", Token::Board},     {"rule", Token::Rule},     {"post", Token::PostCondition},
 };
 
 TokenTuple Lexer::next() {

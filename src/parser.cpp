@@ -22,6 +22,10 @@ void Parser::parse() {
             parse_rule();
             match(Token::Semicomma);
         }
+        else if (tokenTuple.token == Token::PostCondition) {
+            parse_post_condition();
+            match(Token::Semicomma);
+        }
         else if (tokenTuple.token == Token::BoardSize) {
             parse_board_size();
             match(Token::Semicomma);
@@ -36,6 +40,7 @@ void Parser::parse() {
 
 std::unique_ptr<Environment> Parser::get_environment() {
     environment->pieces.merge(pieces);
+    environment->post_conditions.merge(post_conditions);
     return std::move(environment);
 }
 
@@ -230,6 +235,29 @@ void Parser::parse_rule() {
     match(Token::OpAssign);
     std::unique_ptr<Node> node = parse_sentence();
     pieces[piece].second = FATools::getMinimizedDfa(node.get());
+}
+
+void Parser::parse_post_condition() {
+    match(Token::PostCondition);
+    Location loc = tokenTuple.location;
+    std::string player = parse_string();
+    if (players.find(player) == players.end()) {
+        std::ostringstream oss;
+        oss << "Unrecognized player " << player << " in post condition declaration in " << loc << ".";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+    loc = tokenTuple.location;
+    std::string piece = parse_string();
+    if (pieces.find(piece) == pieces.end()) {
+        std::ostringstream oss;
+        oss << "Unrecognized piece " << piece << " in rule declaration in " << loc << ".";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+    match(Token::OpAssign);
+    std::unique_ptr<Node> node = parse_sentence();
+    post_conditions[player].push_back(std::make_pair(piece, FATools::getMinimizedDfa(node.get())));
 }
 
 std::unique_ptr<Node> Parser::parse_sentence() {

@@ -1,32 +1,37 @@
 // Game declaration syntax
-game:          player_list ";"
-game:          player_list ";"
-               piece_list ";"
-               (rule ";")*
-               board_size ";"
-               board ";"
+game:            player_list ";"
+                 piece_list ";"
+                 (rule ";")*
+                 (post_condition ";")*
+                 board_size ";"
+                 board ";"
 
 // Player declaration syntax
-player_list:   "players" "=" player ("," player)*
-player:        string
+player_list:     "players" "=" player ("," player)*
+player:          string
 
 // Piece declaration syntax
-piece_list:    "pieces" "=" piece ("," piece)*
-piece:         string ("(" player ")")?
+piece_list:      "pieces" "=" piece ("," piece)*
+piece:           string ("(" player ")")?
 
 // Board declaration syntax
-board_size:    "board_size" "=" int "," int
-board:         "board" "=" board_piece ("," board_piece)*
-board_piece:   string
+board_size:      "board_size" "=" int "," int
+board:           "board" "=" board_piece ("," board_piece)*
+board_piece:     string
 
 // Rule syntax
-rule:         "rule" piece =" sentence
-sentence:      word ("|" word)*
-word:          (core_word unary_op | core_word)+
-core_word:     "(" sentence ")" | letter
-unary_op:      "*" | "?" | "+"
-letter:        "[" int "," int "," string "]" ("{" string "}")?
+rule:            "rule" piece "=" sentence
+
+// Post condition syntax
+post_condition:  "post" player piece "=" sentence
+
+// Regular expression syntax
+sentence:        word ("|" word)*
+word:            (core_word unary_op | core_word)+
+core_word:       "(" sentence ")" | letter
+unary_op:        "*" | "?" | "+"
+letter:          "[" int "," int "," string "]" ("{" string "}")?
 
 // Common
-int:           CLASS OF INTEGERS
-string:        CLASS OF STRINGS WITHOUT INTEGERS
+int:             CLASS OF INTEGERS
+string:          CLASS OF STRINGS WITHOUT INTEGERS
