@@ -60,6 +60,7 @@ void Environment::generate_moves(std::string player) {
             }
         }
     }
+    prune_illegal_moves();
 }
 
 void Environment::generate_moves(DFAState *state, int x, int y) {
