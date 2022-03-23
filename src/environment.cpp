@@ -11,6 +11,7 @@
 // predicates.hpp, effectively including environment.hpp as well.
 #include "predicates.hpp"
 #include "side_effects.hpp"
+#include "terminal_conditions.hpp"
 
 #define COUTRESET "\033[0m"
 #define COUTRED "\033[1m\033[31m"
@@ -60,6 +61,7 @@ void Environment::generate_moves(std::string player) {
             }
         }
     }
+    prune_illegal_moves();
 }
 
 void Environment::generate_moves(DFAState *state, int x, int y) {
@@ -77,6 +79,71 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
         generate_moves(p.second, next_x, next_y);
         candidate_move.pop_back();
     }
+}
+
+bool Environment::verify_post_condition(DFAState *state, int x, int y) {
+    if (state->is_accepting)
+        return false;
+    bool res = true;
+    for (auto &p : state->transition) {
+        const DFAInput &input = p.first;
+        int next_x = x - input.dy;
+        int next_y = y + input.dx;
+        if (!contains_cell(next_x, next_y))
+            continue;
+        if (!(*input.predicate)(this, next_x, next_y))
+            continue;
+        res &= verify_post_condition(p.second, next_x, next_y);
+    }
+    return res;
+}
+
+void Environment::prune_illegal_moves() {
+    std::vector<std::vector<Step>> legal_moves;
+    for (const std::vector<Step> &move : found_moves) {
+        std::vector<std::vector<Cell>> old_board = board;
+        execute_move(move);
+        bool legal_move = true;
+        for (auto &p : post_conditions[current_player]) {
+            const std::string &piece = p.first;
+            const std::unique_ptr<DFAState, DFAStateDeleter> &post_condition = p.second;
+            for (int i = 0; i < board_size_x; i++) {
+                for (int j = 0; j < board_size_y; j++) {
+                    if (board[i][j].piece == piece) {
+                        if (!verify_post_condition(post_condition.get(), i, j)) {
+                            legal_move = false;
+                        }
+                    }
+                }
+            }
+        }
+        if (legal_move)
+            legal_moves.push_back(move);
+        board = old_board;
+    }
+    found_moves = legal_moves;
+}
+
+bool Environment::execute_move(const std::vector<Step> &move) {
+    int n_steps = move.size();
+    for (int i = 1; i < n_steps; i++) {
+        int old_x = move[i - 1].x;
+        int old_y = move[i - 1].y;
+        int new_x = move[i].x;
+        int new_y = move[i].y;
+        (*(move[i].side_effect))(this, old_x, old_y, new_x, new_y);
+    }
+    return check_terminal_conditions();
+}
+
+bool Environment::check_terminal_conditions() {
+    bool game_over = false;
+    for (auto &p : TerminalConditions::terminal_conditions) {
+        const std::shared_ptr<TerminalCondition> &terminal_condition = p.second;
+        if ((*terminal_condition)(this))
+            game_over = true;
+    }
+    return game_over;
 }
 
 void Environment::print() {

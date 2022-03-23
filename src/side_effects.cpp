@@ -3,7 +3,6 @@
  *  Copyright (C) 2022 Bjarni Dagur Thor Kárason <bjarni@bjarnithor.com>
  */
 #include "side_effects.hpp"
-#include <iostream>
 
 Default::Default() {}
 Default::~Default() {}
@@ -28,7 +27,6 @@ void PromoteWhitePawnToQueen::operator()(Environment *environment, int old_x, in
     cell.piece = "wQueen";
     cell.player = "white";
     cell.state = environment->pieces["wQueen"].second.get();
-    std::cout << cell.state << std::endl;
 }
 std::string PromoteWhitePawnToQueen::get_name() const {
     return "promotewhitepawntoqueen";

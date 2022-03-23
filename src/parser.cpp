@@ -22,6 +22,10 @@ void Parser::parse() {
             parse_rule();
             match(Token::Semicomma);
         }
+        else if (tokenTuple.token == Token::PostCondition) {
+            parse_post_condition();
+            match(Token::Semicomma);
+        }
         else if (tokenTuple.token == Token::BoardSize) {
             parse_board_size();
             match(Token::Semicomma);
@@ -36,6 +40,7 @@ void Parser::parse() {
 
 std::unique_ptr<Environment> Parser::get_environment() {
     environment->pieces.merge(pieces);
+    environment->post_conditions.merge(post_conditions);
     return std::move(environment);
 }
 
@@ -232,6 +237,29 @@ void Parser::parse_rule() {
     pieces[piece].second = FATools::getMinimizedDfa(node.get());
 }
 
+void Parser::parse_post_condition() {
+    match(Token::PostCondition);
+    Location loc = tokenTuple.location;
+    std::string player = parse_string();
+    if (players.find(player) == players.end()) {
+        std::ostringstream oss;
+        oss << "Unrecognized player " << player << " in post condition declaration in " << loc << ".";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+    loc = tokenTuple.location;
+    std::string piece = parse_string();
+    if (pieces.find(piece) == pieces.end()) {
+        std::ostringstream oss;
+        oss << "Unrecognized piece " << piece << " in rule declaration in " << loc << ".";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+    match(Token::OpAssign);
+    std::unique_ptr<Node> node = parse_sentence();
+    post_conditions[player].push_back(std::make_pair(piece, FATools::getMinimizedDfa(node.get())));
+}
+
 std::unique_ptr<Node> Parser::parse_sentence() {
     std::unique_ptr<Node> node = parse_word();
     while (match_if(Token::OpOr)) {
@@ -284,6 +312,22 @@ std::unique_ptr<LetterNode> Parser::parse_letter() {
     if (match_if(Token::LCurly)) {
         side_effect_name = parse_string();
         match(Token::RCurly);
+    }
+
+    if (Predicates::get_predicate.find(predicate_name) == Predicates::get_predicate.end()) {
+        std::ostringstream oss;
+        oss << "Syntax error: predicate '" << predicate_name
+            << "'is not defined. Did you forget to add it to Predicates::get_predicate?";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+
+    if (SideEffects::get_side_effect.find(side_effect_name) == SideEffects::get_side_effect.end()) {
+        std::ostringstream oss;
+        oss << "Syntax error: side effect '" << side_effect_name
+            << "'is not defined. Did you forget to add it to SideEffects::get_side_effect?";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
     }
 
     return std::make_unique<LetterNode>(dx, dy, Predicates::get_predicate[predicate_name],

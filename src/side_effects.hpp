@@ -5,6 +5,7 @@
 #pragma once
 
 #include "environment.hpp"
+#include "variables.hpp"
 #include <memory>
 #include <string>
 
