@@ -1,9 +1,11 @@
 from __future__ import annotations
+from xmlrpc.client import Boolean
+from ..Parser.RegexParser.ASTType import Letter
 class Transition:
-    def __init__(self, start: State, end: State, letter) -> None:
+    def __init__(self, start: State, end: State, letter: Letter) -> None:
         self.start: State = start
         self.end: State = end
-        self.letter = letter
+        self.letter: Letter = letter
 
     def __eq__(self, other: Transition) -> bool:
         return (self.start is other.start) and (self.end is other.end) and (self.letter == other.letter)
@@ -13,7 +15,7 @@ class State:
     def __init__(self) -> None:
         self.inTransitions: list[Transition] = []
         self.outTransitions: list[Transition] = []
-        self.final = False
+        self.final: bool = False
 
     def addTransition(self, other: State, letter):
         transition = Transition(self, other, letter)

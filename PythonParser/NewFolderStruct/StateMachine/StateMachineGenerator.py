@@ -67,7 +67,7 @@ class Generator:
     def letter(self, letterNode: Letter) -> StateMachine:
         sm: StateMachine = StateMachine()
         sm.final = sm.addState()
-        sm.addTransition(sm.start, sm.final, letterNode.value)
+        sm.addTransition(sm.start, sm.final, letterNode)
         return sm
 
 if __name__ == "__main__":

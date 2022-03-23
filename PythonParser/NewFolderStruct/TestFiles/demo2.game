@@ -1,0 +1,21 @@
+Players = white, black;
+Pieces = WhiteRook(white), BlackKing(black);
+
+
+variable io3HasMoved = 0;
+
+macro Ray(dx,dy) = (dx, dy, empty)*(dx, dy, enemy) | (dx, dy, empty)+;
+
+
+rule WhiteRook = Ray(1,-1);
+rule BlackKing = (1,1,true);
+
+
+
+BoardSize = 4, 4;
+Board = 
+    WhiteRook, None, None, None,
+    BlackKing, None, None, None,
+    None, None, BlackKing, None,
+    None, None, None, None
+;

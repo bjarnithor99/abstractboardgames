@@ -4,7 +4,10 @@ Pieces = WhiteRook(white), BlackKing(black), io3(black);
 
 variable io3HasMoved = 0;
 
-macro Ray(dx,dy) = (dx, dy, empty)*(dx, dy, enemy) | (dx, dy, empty)+;
+macro Jon(dx, dy) = (dx*2-3, dy*2, empty);
+macro Ray(dx,dy) = Jon(20, dy)*(dx, dy, enemy) | (dx, dy, empty)+;
+
+rule demo = Ray(20,3)Jon(7,2);
 
 predicate CanPromote() {
     return (this.y == 6) and (true) or (0);
