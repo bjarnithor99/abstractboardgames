@@ -1,14 +1,27 @@
 Players = white, black;
-Pieces = WhiteRook(white), BlackKing(black);
+Pieces = WhiteRook(white), WhitePawn(white), BlackKing(black);
 
 
 variable io3HasMoved = 0;
+variable dx = 9;
+variable dy = 9;
 
-macro Ray(dx,dy) = (dx, dy, empty)*(dx, dy, enemy) | (dx, dy, empty)+;
+macro Ray(dx,dy) = (dx, dy, empty)*(dx, dy, true);
+
+predicate Test() {
+    return  this.x == 3;
+};
+
+effect Promote() {
+    Board[this.x][this.y] = WhitePawn;
+    io3HasMoved = io3HasMoved + 1;
+};
 
 
-rule WhiteRook = Ray(1,-1);
-rule BlackKing = (1,1,true);
+rule WhiteRook = Ray(1,-1) | (0,0,Test()){Promote()};
+rule BlackKing = (1,1,true) | (0,0,true);
+rule WhitePawn = (0,1,true);
+
 
 
 

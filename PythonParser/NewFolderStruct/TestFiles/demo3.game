@@ -1,0 +1,48 @@
+Players = white, black;
+Pieces =
+    WhiteRook(white),
+    WhitePawn(white),
+    WhiteQueen(white),
+    BlackPawn(black),
+    BlackKing(black);
+
+
+variable blackLeftRookMoved = 0;
+variable blackRightRookMoved = 0;
+variable whiteLeftRookMoved = 0;
+variable whiteRightRookMoved = 0;
+
+
+macro Ray(dx,dy) = (dx, dy, empty)*(dx, dy, true);
+
+effect PromoteToWhiteQueen() {Board[this.x][this.y] = WhiteQueen;};
+
+effect PromoteToWhiteRook() {Board[this.x][this.y] = WhiteRook;};
+
+predicate BackLane() {return this.y==7;};
+macro WhitePromote() = 
+    (0,0,BackLane()){PromoteToWhiteQueen()} |
+    (0,0,BackLane()){PromoteToWhiteRook()};
+
+macro BishipMacro() = Ray(-1,1) | Ray(1,-1) | Ray(1,1) | Ray(-1,-1);
+macro RookMacro() = Ray(0,1) | Ray(0,-1) | Ray(1,0) | Ray(-1,0);
+macro QueenMacro() = BishipMacro() | RookMacro();
+
+rule WhiteRook = RookMacro();
+rule BlackKing = (1,1,true) | (0,0,true);
+rule WhitePawn = (0,1,true)WhitePromote()?;
+
+
+
+
+BoardSize = 8, 8;
+Board = 
+    None, None, None, BlackKing, None, None, None, None,
+    None, None, None, None, None, None, None, None,
+    None, None, None, None, None, None, None, None,
+    None, None, None, None, None, None, None, None,
+    None, None, None, None, None, None, None, None,
+    None, None, None, None, None, None, None, None,
+    None, None, None, WhiteRook, None, None, None, None,
+    None, None, None, None, None, None, None, None
+;
