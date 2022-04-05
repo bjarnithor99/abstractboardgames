@@ -17,33 +17,53 @@ int main(int argc, char *argv[]) {
     std::unique_ptr<Environment> env = parser.get_environment();
 
     std::string in;
-    std::vector<std::string> players = {"white", "black"};
     int move_count = 0;
     bool game_over = false;
     while (!game_over) {
         if (move_count != 0)
             std::cout << "\n\n\n";
-        std::cout << players[move_count % players.size()] << " turn:" << std::endl;
+        std::cout << env->current_player << " turn:" << std::endl;
         env->print();
-        std::cin >> in;
-        if (in == "quit")
-            return 0;
-        env->generate_moves(players[move_count % players.size()]);
+
+        env->generate_moves();
+        int i = 0;
         for (const std::vector<Step> &move : env->found_moves) {
+            std::cout << i++ << ") ";
             for (const Step &step : move) {
                 std::cout << "(" << step.x << ", " << step.y << "){" << step.side_effect->get_name() << "} ";
             }
             std::cout << std::endl;
         }
+
         if (!env->found_moves.empty()) {
-            std::uniform_int_distribution<int> uni(0, env->found_moves.size() - 1);
-            const std::vector<Step> &chosen_move = env->found_moves[uni(rng)];
-            std::cout << "Chose move at random: ";
-            for (const Step &step : chosen_move) {
-                std::cout << "(" << step.x << ", " << step.y << "){" << step.side_effect->get_name() << "} ";
+            std::cout << "r) Random move" << std::endl;
+            std::cout << "u) Undo" << std::endl;
+            std::cout << "q) Quit" << std::endl;
+
+            std::cin >> in;
+            if (in == "q") {
+                return 0;
             }
-            game_over = env->execute_move(chosen_move);
-            move_count++;
+            else if (in == "u") {
+                env->undo_move();
+            }
+            else {
+                int move_num;
+                if (in == "r") {
+                    std::uniform_int_distribution<int> uni(0, env->found_moves.size() - 1);
+                    move_num = uni(rng);
+                }
+                else {
+                    move_num = std::stoi(in);
+                }
+                const std::vector<Step> &chosen_move = env->found_moves[move_num];
+                std::cout << "Chosen move: ";
+                for (const Step &step : chosen_move) {
+                    std::cout << "(" << step.x << ", " << step.y << "){" << step.side_effect->get_name() << "} ";
+                }
+                game_over = env->execute_move(chosen_move);
+                move_count++;
+            }
         }
         else {
             game_over = env->check_terminal_conditions();

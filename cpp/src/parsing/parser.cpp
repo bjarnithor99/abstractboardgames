@@ -39,6 +39,8 @@ void Parser::parse() {
 }
 
 std::unique_ptr<Environment> Parser::get_environment() {
+    environment->players = players;
+    environment->current_player = players[0];
     environment->pieces.merge(pieces);
     environment->post_conditions.merge(post_conditions);
     return std::move(environment);
@@ -77,17 +79,17 @@ void Parser::parse_player_list() {
         throw std::runtime_error(error_msg);
     }
     std::string player = parse_string();
-    players.insert(player);
+    players.push_back(player);
     while (match_if(Token::Comma)) {
         Location loc = tokenTuple.location;
         player = parse_string();
-        if (players.find(player) != players.end()) {
+        if (std::find(players.begin(), players.end(), player) != players.end()) {
             std::ostringstream oss;
             oss << "Duplicate player " << player << " in player declaration in " << loc << ".";
             std::string error_msg = oss.str();
             throw std::runtime_error(error_msg);
         }
-        players.insert(player);
+        players.push_back(player);
     }
 }
 
@@ -119,7 +121,7 @@ void Parser::parse_piece() {
     if (match_if(Token::LParen)) {
         loc = tokenTuple.location;
         player = parse_string();
-        if (players.find(player) == players.end()) {
+        if (std::find(players.begin(), players.end(), player) == players.end()) {
             std::ostringstream oss;
             oss << "Unrecognized player " << player << " in piece declaration in " << loc << ".";
             std::string error_msg = oss.str();
@@ -241,7 +243,7 @@ void Parser::parse_post_condition() {
     match(Token::PostCondition);
     Location loc = tokenTuple.location;
     std::string player = parse_string();
-    if (players.find(player) == players.end()) {
+    if (std::find(players.begin(), players.end(), player) == players.end()) {
         std::ostringstream oss;
         oss << "Unrecognized player " << player << " in post condition declaration in " << loc << ".";
         std::string error_msg = oss.str();

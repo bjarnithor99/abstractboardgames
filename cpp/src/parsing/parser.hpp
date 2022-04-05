@@ -26,7 +26,7 @@ class Parser
     std::ifstream *filestream;
     Lexer lexer;
     TokenTuple tokenTuple;
-    std::set<std::string> players;
+    std::vector<std::string> players;
     std::map<std::string, std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
     std::map<std::string, std::vector<std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>>>
         post_conditions;

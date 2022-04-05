@@ -7,4 +7,7 @@
 class Variables
 {
   public:
+    Variables();
+    Variables(const Variables &variables);
+    ~Variables();
 };
