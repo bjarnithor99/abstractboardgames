@@ -10,6 +10,7 @@ bool NoMovesLeft::operator()(Environment *environment) {
     if (environment->found_moves.empty()) {
         environment->variables.black_score = 50;
         environment->variables.white_score = 50;
+        environment->variables.game_over = true;
         return true;
     }
     return false;
@@ -25,6 +26,7 @@ bool BlackReachedEnd::operator()(Environment *environment) {
         if (environment->board[3][i].player == "black") {
             environment->variables.black_score = 100;
             environment->variables.white_score = 0;
+            environment->variables.game_over = true;
             return true;
         }
     }
@@ -41,6 +43,7 @@ bool WhiteReachedEnd::operator()(Environment *environment) {
         if (environment->board[0][i].player == "white") {
             environment->variables.black_score = 0;
             environment->variables.white_score = 100;
+            environment->variables.game_over = true;
             return true;
         }
     }

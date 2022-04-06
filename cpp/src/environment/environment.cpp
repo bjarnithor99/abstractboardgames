@@ -123,7 +123,7 @@ void Environment::prune_illegal_moves() {
     found_moves = legal_moves;
 }
 
-bool Environment::execute_move(const std::vector<Step> &move) {
+void Environment::execute_move(const std::vector<Step> &move) {
     move_stack.push({board, variables});
     move_count++;
     int n_steps = move.size();
@@ -134,9 +134,8 @@ bool Environment::execute_move(const std::vector<Step> &move) {
         int new_y = move[i].y;
         (*(move[i].side_effect))(this, old_x, old_y, new_x, new_y);
     }
-    bool game_over = check_terminal_conditions();
+    check_terminal_conditions();
     update_current_player();
-    return game_over;
 }
 
 void Environment::undo_move() {

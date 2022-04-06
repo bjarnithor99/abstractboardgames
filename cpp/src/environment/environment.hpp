@@ -55,7 +55,7 @@ class Environment
     int set_cell(int x, int y, Cell *cell);
     Cell *get_cell(int x, int y);
     void generate_moves();
-    bool execute_move(const std::vector<Step> &move);
+    void execute_move(const std::vector<Step> &move);
     void undo_move();
     bool check_terminal_conditions();
     void print();
