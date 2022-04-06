@@ -74,8 +74,8 @@ int main(int argc, char *argv[]) {
     std::cout << "\n\n\n";
     env->print();
     std::cout << "GAME IS OVER!" << std::endl;
-    std::cout << "Black score: " << env->variables.blackScore << std::endl;
-    std::cout << "White score: " << env->variables.whiteScore << std::endl;
+    std::cout << "Black score: " << env->variables.black_score << std::endl;
+    std::cout << "White score: " << env->variables.white_score << std::endl;
 
     input_file.close();
 

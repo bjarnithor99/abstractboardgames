@@ -8,8 +8,8 @@ NoMovesLeft::NoMovesLeft() {}
 NoMovesLeft::~NoMovesLeft() {}
 bool NoMovesLeft::operator()(Environment *environment) {
     if (environment->found_moves.empty()) {
-        environment->variables.blackScore = 50;
-        environment->variables.whiteScore = 50;
+        environment->variables.black_score = 50;
+        environment->variables.white_score = 50;
         return true;
     }
     return false;
@@ -23,8 +23,8 @@ BlackReachedEnd::~BlackReachedEnd() {}
 bool BlackReachedEnd::operator()(Environment *environment) {
     for (int i = 0; i < 3; i++) {
         if (environment->board[3][i].player == "black") {
-            environment->variables.blackScore = 100;
-            environment->variables.whiteScore = 0;
+            environment->variables.black_score = 100;
+            environment->variables.white_score = 0;
             return true;
         }
     }
@@ -39,8 +39,8 @@ WhiteReachedEnd::~WhiteReachedEnd() {}
 bool WhiteReachedEnd::operator()(Environment *environment) {
     for (int i = 0; i < 3; i++) {
         if (environment->board[0][i].player == "white") {
-            environment->variables.blackScore = 0;
-            environment->variables.whiteScore = 100;
+            environment->variables.black_score = 0;
+            environment->variables.white_score = 100;
             return true;
         }
     }

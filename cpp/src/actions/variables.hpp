@@ -11,6 +11,6 @@ class Variables
     Variables(const Variables &variables);
     ~Variables();
 
-    int blackScore;
-    int whiteScore;
+    int black_score;
+    int white_score;
 };
