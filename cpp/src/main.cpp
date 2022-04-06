@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     std::random_device rd;
     std::mt19937 rng(rd());
 
-    std::ifstream input_file("games/chess_small.game");
+    std::ifstream input_file("games/breakthrough_small.game");
     Parser parser(&input_file);
     parser.parse();
     std::unique_ptr<Environment> env = parser.get_environment();
@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
                 for (const Step &step : chosen_move) {
                     std::cout << "(" << step.x << ", " << step.y << "){" << step.side_effect->get_name() << "} ";
                 }
+                std::cout << std::endl;
                 game_over = env->execute_move(chosen_move);
                 move_count++;
             }
@@ -70,7 +71,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    std::cout << "\n\n\n";
+    env->print();
     std::cout << "GAME IS OVER!" << std::endl;
+    std::cout << "Black score: " << env->variables.blackScore << std::endl;
+    std::cout << "White score: " << env->variables.whiteScore << std::endl;
 
     input_file.close();
 

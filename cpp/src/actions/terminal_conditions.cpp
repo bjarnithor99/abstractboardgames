@@ -7,12 +7,51 @@
 NoMovesLeft::NoMovesLeft() {}
 NoMovesLeft::~NoMovesLeft() {}
 bool NoMovesLeft::operator()(Environment *environment) {
-    return environment->found_moves.empty();
+    if (environment->found_moves.empty()) {
+        environment->variables.blackScore = 50;
+        environment->variables.whiteScore = 50;
+        return true;
+    }
+    return false;
 }
 std::string NoMovesLeft::get_name() const {
     return "nomovesleft";
 }
 
+BlackReachedEnd::BlackReachedEnd() {}
+BlackReachedEnd::~BlackReachedEnd() {}
+bool BlackReachedEnd::operator()(Environment *environment) {
+    for (int i = 0; i < 3; i++) {
+        if (environment->board[3][i].player == "black") {
+            environment->variables.blackScore = 100;
+            environment->variables.whiteScore = 0;
+            return true;
+        }
+    }
+    return false;
+}
+std::string BlackReachedEnd::get_name() const {
+    return "blackreachedend";
+}
+
+WhiteReachedEnd::WhiteReachedEnd() {}
+WhiteReachedEnd::~WhiteReachedEnd() {}
+bool WhiteReachedEnd::operator()(Environment *environment) {
+    for (int i = 0; i < 3; i++) {
+        if (environment->board[0][i].player == "white") {
+            environment->variables.blackScore = 0;
+            environment->variables.whiteScore = 100;
+            return true;
+        }
+    }
+    return false;
+}
+std::string WhiteReachedEnd::get_name() const {
+    return "whitereachedend";
+}
+
 std::map<std::string, std::shared_ptr<TerminalCondition>> TerminalConditions::terminal_conditions = {
     {"nomovesleft", std::make_shared<NoMovesLeft>()},
+    {"blackreachedend", std::make_shared<BlackReachedEnd>()},
+    {"whitereachedend", std::make_shared<WhiteReachedEnd>()},
 };

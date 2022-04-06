@@ -26,6 +26,24 @@ class NoMovesLeft : public TerminalCondition
     std::string get_name() const override;
 };
 
+class WhiteReachedEnd : public TerminalCondition
+{
+  public:
+    WhiteReachedEnd();
+    ~WhiteReachedEnd();
+    bool operator()(Environment *environment) override;
+    std::string get_name() const override;
+};
+
+class BlackReachedEnd : public TerminalCondition
+{
+  public:
+    BlackReachedEnd();
+    ~BlackReachedEnd();
+    bool operator()(Environment *environment) override;
+    std::string get_name() const override;
+};
+
 class TerminalConditions
 {
   public:

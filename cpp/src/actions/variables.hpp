@@ -10,4 +10,7 @@ class Variables
     Variables();
     Variables(const Variables &variables);
     ~Variables();
+
+    int blackScore;
+    int whiteScore;
 };

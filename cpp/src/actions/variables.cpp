@@ -4,6 +4,12 @@
  */
 #include "variables.hpp"
 
-Variables::Variables() {}
-Variables::Variables(const Variables &variables) {}
+Variables::Variables() {
+    int blackScore = 0;
+    int whiteScore = 0;
+}
+Variables::Variables(const Variables &variables) {
+    blackScore = variables.blackScore;
+    whiteScore = variables.whiteScore;
+}
 Variables::~Variables() {}
