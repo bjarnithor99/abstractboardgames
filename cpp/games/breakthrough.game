@@ -1,0 +1,16 @@
+players = white, black;
+
+pieces = empty, wPawn(white), bPawn(black);
+
+rule bPawn = [ 0, -1, empty] | [-1, -1, opponent] | [ 1, -1, opponent];
+rule wPawn = [ 0,  1, empty] | [-1,  1, opponent] | [ 1,  1, opponent];
+
+board_size = 8, 8;
+board = bPawn, bPawn,   bPawn,   bPawn,  bPawn, bPawn,   bPawn,   bPawn,
+        bPawn, bPawn,   bPawn,   bPawn,  bPawn, bPawn,   bPawn,   bPawn,
+        empty, empty,   empty,   empty,  empty, empty,   empty,   empty,
+        empty, empty,   empty,   empty,  empty, empty,   empty,   empty,
+        empty, empty,   empty,   empty,  empty, empty,   empty,   empty,
+        empty, empty,   empty,   empty,  empty, empty,   empty,   empty,
+        wPawn, wPawn,   wPawn,   wPawn,  wPawn, wPawn,   wPawn,   wPawn,
+        wPawn, wPawn,   wPawn,   wPawn,  wPawn, wPawn,   wPawn,   wPawn;

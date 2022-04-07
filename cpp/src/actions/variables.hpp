@@ -7,4 +7,11 @@
 class Variables
 {
   public:
+    Variables();
+    Variables(const Variables &variables);
+    ~Variables();
+
+    int black_score;
+    int white_score;
+    bool game_over;
 };
