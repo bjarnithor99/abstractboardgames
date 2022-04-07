@@ -3,7 +3,7 @@ from ...Lexer.TokenTypes import *
 from .ASTType import RegexTree
 from ...Lexer.Lexer import Lexer
 
-
+#C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.Parser.RegexParser.Parser
 class MatchFailed(Exception):
     pass
 
@@ -34,10 +34,10 @@ class Parser:
     def parse(self) -> RegexTree:
         regex = self.matchRegex()
         #self.matchToken(EOI)
-        return regex
+        return RegexTree(regex)
 
     def matchRegex(self):
-        return RegexTree(self.matchBinaryStmt())
+        return self.matchBinaryStmt()
 
     def matchBinaryStmt(self):
 
@@ -187,7 +187,7 @@ class Parser:
                 numberOfOpenScopes += {'(':1, ')':-1}[token.value]
             return (isinstance(token, Word) or\
             isinstance(token, Integer) or\
-            token.value in '+-*/().' or\
+            token.value in '!=+-*/().' or\
             token.value == '==') and\
             numberOfOpenScopes != -1
         i = 1
@@ -213,6 +213,6 @@ class Parser:
 
 if __name__ == "__main__":
     #text = '(0,0,b(1,2,23)){promote(1,2,3)}(1,1+x*x,empty)?(3,4+x*x,empty)+|(6,8,jon)|(x,y,bob)'
-    text = '(0,0,a){promote(1,2,3)}'
+    text = '''RookMacro() | BishipMacro();'''
     ast = Parser(text).parse()
     print(ast)

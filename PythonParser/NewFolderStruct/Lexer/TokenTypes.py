@@ -31,7 +31,7 @@ class Symbol(Token):
     values = '()[]{}'
 
 class Operator(Token):
-    values = '|=*+-/%?.'
+    values = '!|=*+-/%?.'
 
 class EOI(Token):
     pass

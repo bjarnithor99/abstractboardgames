@@ -7,7 +7,7 @@ class RegexTree:
         self.rootNode = rootNode
 
     def __str__(self) -> str:
-        return str(self.rootNode)
+        return 'REGEX TREE:\n'+str(self.rootNode)
 
 class SyntaxTreeNode:
     def indent(self, string: str) -> str:

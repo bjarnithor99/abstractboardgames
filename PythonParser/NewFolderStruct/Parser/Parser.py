@@ -290,7 +290,7 @@ class Parser(RegexParser):
                 pass
             self.matchToken(Symbol, ")")
             self.matchToken(Operator, "=")
-            regex = self.matchRegex()
+            regex = RegexTree(self.matchRegex())
             self.matchToken(EOL)
             return ASTType.Macro(name, arguments, regex)
         except MatchFailed as error:
@@ -321,7 +321,7 @@ class Parser(RegexParser):
             self.matchToken(Word, "rule")
             name = self.matchToken(Word).value
             self.matchToken(Operator, "=")
-            regex = self.matchRegex()
+            regex = RegexTree(self.matchRegex())
             self.matchToken(EOL)
             return ASTType.PieceRule(name, regex)
         except MatchFailed as error:
