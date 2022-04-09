@@ -121,6 +121,7 @@ void Environment::prune_illegal_moves() {
         undo_move();
     }
     found_moves = legal_moves;
+    variables.n_moves_found = found_moves.size();
 }
 
 void Environment::execute_move(const std::vector<Step> &move) {

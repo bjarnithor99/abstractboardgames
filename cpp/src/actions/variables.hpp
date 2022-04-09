@@ -13,5 +13,6 @@ class Variables
 
     int black_score;
     int white_score;
+    int n_moves_found;
     bool game_over;
 };
