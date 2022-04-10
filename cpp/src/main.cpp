@@ -39,8 +39,7 @@ int main(int argc, char *argv[]) {
     std::random_device rd;
     std::mt19937 rng(rd());
 
-    std::ifstream input_file("games/breakthrough_small.game");
-    Parser parser(&input_file);
+    Parser parser("games/breakthrough_small.game");
     parser.parse();
     std::unique_ptr<Environment> env = parser.get_environment();
 
@@ -107,8 +106,6 @@ int main(int argc, char *argv[]) {
     std::cout << "GAME IS OVER!" << std::endl;
     std::cout << "Black score: " << env->variables.black_score << std::endl;
     std::cout << "White score: " << env->variables.white_score << std::endl;
-
-    input_file.close();
 
     return 0;
 }

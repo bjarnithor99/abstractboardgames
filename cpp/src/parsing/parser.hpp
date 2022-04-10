@@ -17,13 +17,12 @@
 class Parser
 {
   public:
-    Parser(std::ifstream *filestream);
+    Parser(std::string file_path);
     ~Parser();
     void parse();
     std::unique_ptr<Environment> get_environment();
 
   private:
-    std::ifstream *filestream;
     Lexer lexer;
     TokenTuple tokenTuple;
     std::vector<std::string> players;

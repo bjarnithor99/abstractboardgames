@@ -95,11 +95,14 @@ TokenTuple::TokenTuple() {}
 TokenTuple::TokenTuple(Token token, std::string lexeme, Location location)
     : token(token), lexeme(lexeme), location(location) {}
 
-Lexer::Lexer(std::ifstream *filestream) : filestream(filestream), location(1, 0) {
-    if (!filestream->is_open()) {
+Lexer::Lexer(std::string file_path) : filestream(std::ifstream(file_path)), location(1, 0) {
+    if (!filestream.is_open()) {
         throw std::runtime_error("File not open");
     }
     read_next_char();
+}
+Lexer::~Lexer() {
+    filestream.close();
 }
 std::map<std::string, Token> Lexer::reserved_keywords = {
     {"players", Token::Players}, {"pieces", Token::Pieces}, {"board_size", Token::BoardSize},
@@ -220,11 +223,11 @@ TokenTuple Lexer::next() {
 }
 
 char Lexer::read_next_char() {
-    if (filestream->peek() == std::ifstream::traits_type::eof()) {
+    if (filestream.peek() == std::ifstream::traits_type::eof()) {
         ch = '\0';
     }
     else {
-        filestream->get(ch);
+        filestream.get(ch);
         if (ch == '\n') {
             location.line += 1;
             location.col = 0;
