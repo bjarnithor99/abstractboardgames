@@ -4,7 +4,8 @@
  */
 #include "variables.hpp"
 
-Variables::Variables() : black_score(0), white_score(0), game_over(false) {}
+Variables::Variables() : black_score(0), white_score(0), n_moves_found(0), game_over(false) {}
 Variables::Variables(const Variables &variables)
-    : black_score(variables.black_score), white_score(variables.white_score), game_over(variables.game_over) {}
+    : black_score(variables.black_score), white_score(variables.white_score), n_moves_found(variables.n_moves_found),
+      game_over(variables.game_over) {}
 Variables::~Variables() {}

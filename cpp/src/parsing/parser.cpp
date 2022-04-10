@@ -4,8 +4,7 @@
  */
 #include "parser.hpp"
 
-Parser::Parser(std::ifstream *filestream)
-    : filestream(filestream), lexer(filestream), tokenTuple(lexer.next()), environment(nullptr) {}
+Parser::Parser(std::string file_path) : lexer(file_path), tokenTuple(lexer.next()), environment(nullptr) {}
 Parser::~Parser() {}
 
 void Parser::parse() {

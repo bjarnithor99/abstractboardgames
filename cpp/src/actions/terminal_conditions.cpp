@@ -7,7 +7,7 @@
 NoMovesLeft::NoMovesLeft() {}
 NoMovesLeft::~NoMovesLeft() {}
 bool NoMovesLeft::operator()(Environment *environment) {
-    if (environment->found_moves.empty()) {
+    if (environment->variables.n_moves_found == 0) {
         environment->variables.black_score = 50;
         environment->variables.white_score = 50;
         environment->variables.game_over = true;

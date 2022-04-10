@@ -69,12 +69,13 @@ struct TokenTuple {
 class Lexer
 {
   public:
-    Lexer(std::ifstream *filestream);
+    Lexer(std::string file_path);
+    ~Lexer();
     TokenTuple next();
 
   private:
     static std::map<std::string, Token> reserved_keywords;
-    std::ifstream *filestream;
+    std::ifstream filestream;
     char ch;
     Location location;
     char read_next_char();
