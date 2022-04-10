@@ -1,0 +1,48 @@
+SimpleGame.game parsed as:
+Players:
+	['white', 'black']
+Pieces:
+	PIECE(WhitePawn,white),PIECE(BlackPawn,black)
+Rules:
+	VARIABLE WhiteY = {0}
+	VARIABLE BlackY = {3}
+	EFFECT WEnd():
+		WPawnAtEnd = {1}
+	MACRO WhiteCanWin():
+	REGEX TREE:
+		Union
+			({0}; {0}; {this.y==BlackY}){WEnd()}
+			({0}; {0}; {this.y!=BlackY})
+	RULE WhitePawn:
+	REGEX TREE:
+		Concatination
+			Union
+				({0}; {1}; {empty})
+				({0}; {0}; {true})
+			WhiteCanWin()
+	EFFECT BEnd():
+		BPawnAtEnd = {1}
+	MACRO BlackCanWin():
+	REGEX TREE:
+		Union
+			({0}; {0}; {this.y==WhiteY}){BEnd()}
+			({0}; {0}; {this.y!=WhiteY})
+	RULE BlackPawn:
+	REGEX TREE:
+		Concatination
+			Union
+				({0}; {-1}; {empty})
+				({0}; {0}; {true})
+			BlackCanWin()
+	VARIABLE WPawnAtEnd = {0}
+	VARIABLE BPawnAtEnd = {0}
+	VICTORY white:
+		{WPawnAtEnd==1}
+	VICTORY black:
+		{BPawnAtEnd==1}
+Board:
+	x:2, y:4
+	BlackPawn, None
+	None, None
+	None, None
+	None, WhitePawn

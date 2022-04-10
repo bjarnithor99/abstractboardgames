@@ -5,10 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
+            "name": "Python: GameEngine",
             "type": "python",
             "request": "launch",
             "module": "NewFolderStruct.GameEngine",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Module",
+            "type": "python",
+            "request": "launch",
+            "module": "NewFolderStruct.MinMaxAI",
             "justMyCode": true
         }
     ]

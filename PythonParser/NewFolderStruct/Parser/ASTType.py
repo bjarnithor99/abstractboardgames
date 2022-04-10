@@ -79,6 +79,16 @@ class Predicate(Rule):
         returnStr += str(self.expression)
         return returnStr
 
+class Victory(Rule):
+    def __init__(self, name: str, expression: str) -> None:
+        self.name: str = name
+        self.expression: str = expression
+
+    def __str__(self) -> str:
+        returnStr = f'VICTORY {self.name}:\n\t'
+        returnStr += str(self.expression)
+        return returnStr
+
 class Effect(Rule):
     def __init__(self, name: str, arguments: list[str], assignments: list[Assignment]) -> None:
         self.name: str = name

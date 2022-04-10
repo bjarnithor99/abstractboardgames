@@ -13,11 +13,13 @@ class Lexer:
 
     def next(self) -> (str | None):
         self.hitBreak = False
+        self.hitNewline = False
         while self.i < len(self.text) and self.text[self.i] in '\t\n ':
             self.character += 1
             if self.text[self.i] == '\n':
                 self.character = 0
                 self.line += 1
+                self.hitNewline = True
             self.i += 1
             self.hitBreak = True
 
@@ -83,6 +85,15 @@ class Lexer:
                     tokens.append(Operator(char, pos))
                     char = self.next()
 
+            #match comment
+            elif char == '#':
+                commentStr = ''
+                char = self.next()
+                while not self.hitNewline:
+                    commentStr += char
+                    char = self.next()
+                #tokens.append(Comment(commentStr, pos))
+
             else:
                 raise LexingFailed(f'{pos}, Problem: {char}')
 
@@ -92,3 +103,17 @@ class Lexer:
                 print('\t', token.pos, type(token), token.value)
 
         return tokens
+
+def printTokens(tokens: list[Token]):
+    for i in range(len(tokens)):
+        print(i, tokens[i])
+
+'''
+C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.Lexer.Lexer
+'''
+if __name__ == "__main__":
+    f = open("NewFolderStruct/TestFiles/demo1.game")
+    text = ''.join(f.readlines())
+    print(text)
+    tokens = Lexer(text).lex(debug=True)
+    printTokens(tokens)

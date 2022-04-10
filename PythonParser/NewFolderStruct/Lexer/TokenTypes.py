@@ -10,6 +10,12 @@ class Token:
     def __init__(self, value, pos: TextPosition) -> None:
         self.value = value
         self.pos = pos
+    
+    def __str__(self) -> str:
+        return str(type(self)).split('.')[-1].split("'")[0] + f" '{str(self.value)}'"
+
+class Comment(Token):
+    pass
 
 class Integer(Token):
     #numbers

@@ -2,16 +2,20 @@ from __future__ import annotations
 from ...Lexer.TokenTypes import Token
 
 
+def indent(string: str) -> str:
+    return '\t' + '\n\t'.join(string.split('\n'))
+
 class RegexTree:
     def __init__(self, rootNode: SyntaxTreeNode) -> None:
         self.rootNode = rootNode
 
     def __str__(self) -> str:
-        return 'REGEX TREE:\n'+str(self.rootNode)
+        return 'REGEX TREE:\n'+indent(str(self.rootNode))
+
+    
 
 class SyntaxTreeNode:
-    def indent(self, string: str) -> str:
-        return '\t' + '\n\t'.join(string.split('\n'))
+    pass
 
 class FunctionCall(SyntaxTreeNode):
     def __init__(self, name: str, arguments: list[IntegerExpression]) -> None:
@@ -31,9 +35,9 @@ class BinarySymbol(SyntaxTreeNode):
     def __str__(self) -> str:
         returnStr = ''
         returnStr +=  str(type(self)).split('.')[-1].split("'")[0] + '\n'
-        returnStr +=  str(self.child1) + '\n'
-        returnStr +=  str(self.child2)
-        return self.indent(returnStr)
+        childStr =  str(self.child1) + '\n'
+        childStr +=  str(self.child2)
+        return returnStr + indent(childStr)
 
 class Union(BinarySymbol):
     pass
@@ -49,8 +53,8 @@ class UnarySymbol(SyntaxTreeNode):
     def __str__(self) -> str:
         returnStr = ''
         returnStr +=  str(type(self)).split('.')[-1].split("'")[0] + '\n'
-        returnStr +=  str(self.child)
-        return self.indent(returnStr)
+        childStr =  str(self.child)
+        return returnStr + indent(childStr)
 
 
 
@@ -68,7 +72,7 @@ class Letter(SyntaxTreeNode):
     def __init__(self, dx, dy, pre, effect=None) -> None:
         self.dx = dx
         self.dy = dy
-        self.pre = pre
+        self.pre: FunctionCall | IntegerExpression = pre
         self.effect: FunctionCall = effect
 
     def __str__(self) -> str:
@@ -76,14 +80,20 @@ class Letter(SyntaxTreeNode):
         returnStr +=  f'({str(self.dx)}; {str(self.dy)}; {str(self.pre)})'
         if self.effect is not None:
             returnStr += '{' + str(self.effect) + '}'
-        return self.indent(returnStr)
+        return returnStr
+
+    def __eq__(self, other: Letter) -> bool:
+        return str(self) == str(other)
+
+    def __hash__(self):
+        return hash(str(self))
 
 class IntegerExpression(SyntaxTreeNode):
     def __init__(self, tokenList: list[Token]) -> None:
         self.tokenList: list[Token] = tokenList
 
     def __str__(self) -> str:
-        return ''.join([str(token.value) for token in self.tokenList])
+        return '{' + ''.join([str(token.value) for token in self.tokenList]) + '}'
 
 class Variable(SyntaxTreeNode):
     def __init__(self, name: str) -> None:

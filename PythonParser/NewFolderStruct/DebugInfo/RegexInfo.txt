@@ -1,0 +1,102 @@
+
+
+--Compiling regex for WhitePawn:
+REGEX TREE:
+	Concatination
+		Union
+			({0}; {1}; {empty})
+			({0}; {0}; {true})
+		WhiteCanWin()
+
+Resolved regex:
+REGEX TREE:
+	Concatination
+		Union
+			(0; 1; {empty})
+			(0; 0; {true})
+		Union
+			(0; 0; {this.y==BlackY}){WEnd()}
+			(0; 0; {this.y!=BlackY})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:7
+	 self -> None -> state:2
+state:2 has children:
+	 self -> (0; 0; {true}) -> state:3
+state:3 has children:
+	 self -> None -> state:6
+	 self -> None -> state:4
+state:4 has children:
+	 self -> (0; 0; {this.y!=BlackY}) -> state:5
+state:5 has children:
+state:6 has children:
+	 self -> (0; 0; {this.y==BlackY}){WEnd()} -> state:5
+state:7 has children:
+	 self -> (0; 1; {empty}) -> state:3
+The final state is: state:5
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (0; 0; {true}) -> state:2
+	 self -> (0; 1; {empty}) -> state:2
+state:2 has children:
+	 self -> (0; 0; {this.y!=BlackY}) -> state:3
+	 self -> (0; 0; {this.y==BlackY}){WEnd()} -> state:3
+state:3 has children:
+The final states are: [state:3]
+
+
+
+--Compiling regex for BlackPawn:
+REGEX TREE:
+	Concatination
+		Union
+			({0}; {-1}; {empty})
+			({0}; {0}; {true})
+		BlackCanWin()
+
+Resolved regex:
+REGEX TREE:
+	Concatination
+		Union
+			(0; -1; {empty})
+			(0; 0; {true})
+		Union
+			(0; 0; {this.y==WhiteY}){BEnd()}
+			(0; 0; {this.y!=WhiteY})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:7
+	 self -> None -> state:2
+state:2 has children:
+	 self -> (0; 0; {true}) -> state:3
+state:3 has children:
+	 self -> None -> state:6
+	 self -> None -> state:4
+state:4 has children:
+	 self -> (0; 0; {this.y!=WhiteY}) -> state:5
+state:5 has children:
+state:6 has children:
+	 self -> (0; 0; {this.y==WhiteY}){BEnd()} -> state:5
+state:7 has children:
+	 self -> (0; -1; {empty}) -> state:3
+The final state is: state:5
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (0; 0; {true}) -> state:2
+	 self -> (0; -1; {empty}) -> state:2
+state:2 has children:
+	 self -> (0; 0; {this.y==WhiteY}){BEnd()} -> state:3
+	 self -> (0; 0; {this.y!=WhiteY}) -> state:3
+state:3 has children:
+The final states are: [state:3]
+

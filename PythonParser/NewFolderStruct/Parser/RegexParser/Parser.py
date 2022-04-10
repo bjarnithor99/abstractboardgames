@@ -3,7 +3,6 @@ from ...Lexer.TokenTypes import *
 from .ASTType import RegexTree
 from ...Lexer.Lexer import Lexer
 
-#C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.Parser.RegexParser.Parser
 class MatchFailed(Exception):
     pass
 
@@ -150,28 +149,28 @@ class Parser:
             self.matchToken(Delimiter)
 
 
-            wordOrFunCall = None
+            exprOrFunCall = None
             try:
                 funCall = self.matchFunctionCall()
-                wordOrFunCall = funCall
+                exprOrFunCall = funCall
             except MatchFailed:
                 try:
-                    predicate = self.matchToken(Word).value
-                    wordOrFunCall = predicate
+                    predicateExpr = self.matchIntegerExpression()
+                    exprOrFunCall = predicateExpr
                 except MatchFailed:
                     pass
-            if wordOrFunCall is None:
+            if exprOrFunCall is None:
                 raise MatchFailed
             self.matchToken(Symbol, ')')
 
             try:
                 self.matchToken(Symbol, '{')
             except MatchFailed:
-                return Letter(dx, dy, wordOrFunCall)
+                return Letter(dx, dy, exprOrFunCall)
 
             effect = self.matchFunctionCall()
             self.matchToken(Symbol, '}')
-            return Letter(dx, dy, wordOrFunCall, effect)
+            return Letter(dx, dy, exprOrFunCall, effect)
 
 
 
@@ -210,9 +209,9 @@ class Parser:
         return IntegerExpression(expression)
         
 
-
+#C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.Parser.RegexParser.Parser
 if __name__ == "__main__":
-    #text = '(0,0,b(1,2,23)){promote(1,2,3)}(1,1+x*x,empty)?(3,4+x*x,empty)+|(6,8,jon)|(x,y,bob)'
-    text = '''RookMacro() | BishipMacro();'''
+    text = '(0,0,b(1,2,23)){promote(1,2,3)}(1,1+x*x,empty)?(3,4+x*x,empty)+|(6,8,jon)|(x,y,bob)'
+    #text = '''RookMacro() | BishipMacro();'''
     ast = Parser(text).parse()
     print(ast)

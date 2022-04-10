@@ -1,0 +1,45 @@
+Players = white, black;
+Pieces = WhitePawn(white), BlackPawn(black), WhiteQueen(white), BlackQueen(black);
+
+#-- Piece rules --
+macro Ray(dx,dy) = (dx, dy, empty)*Step(dx, dy);
+macro Step(dx, dy) = (dx, dy, empty) | (dx, dy, enemy);
+macro Pawn(dy) = Step(1,dy) | (0,dy,empty) | Step(-1,dy);
+
+macro BishopMacro() = Ray(-1,1) | Ray(1,-1) | Ray(1,1) | Ray(-1,-1);
+macro RookMacro() = Ray(0,1) | Ray(0,-1) | Ray(1,0) | Ray(-1,0);
+macro QueenMacro() = BishopMacro() | RookMacro();
+
+effect PromoteToWhiteQueen() {Board[this.x][this.y] = WhiteQueen;};
+effect PromoteToBlackQueen() {Board[this.x][this.y] = BlackQueen;};
+
+variable WhiteY = 0;
+variable BlackY = 3;
+
+effect WEnd() {WPawnAtEnd = 1;};
+macro WhiteCanWin() = (0,0,this.y==BlackY){WEnd()} | (0,0,this.y!=BlackY);
+rule WhitePawn = 
+    Pawn(1)WhiteCanWin() |
+    (0,0,this.y==WhiteY){PromoteToWhiteQueen()};
+rule WhiteQueen = QueenMacro()WhiteCanWin();
+
+effect BEnd() {BPawnAtEnd = 1;};
+macro BlackCanWin() = (0,0,this.y==WhiteY){BEnd()} | (0,0,this.y!=WhiteY);
+rule BlackPawn = 
+    Pawn(-1)BlackCanWin() |
+    (0,0,this.y==BlackY){PromoteToBlackQueen()};
+rule BlackQueen = QueenMacro()BlackCanWin();
+
+#-- Victory variables --
+variable WPawnAtEnd = 0; variable BPawnAtEnd = 0;
+victory white {return WPawnAtEnd == 1;};
+victory black {return BPawnAtEnd == 1;};
+
+BoardSize = 2, 4;
+Board = 
+    BlackPawn, None,
+    None, None,
+    None, None,
+    None, WhitePawn
+;
+

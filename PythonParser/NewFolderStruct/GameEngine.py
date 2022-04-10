@@ -1,4 +1,5 @@
 from __future__ import annotations
+from tkinter.messagebox import RETRY
 from .Parser.Parser import Parser
 from .Parser.ASTType import *
 from .StateMachine.Types import *
@@ -7,7 +8,6 @@ from .StateMachine.Main import RegexToDFA
 from copy import deepcopy
 
 Position = tuple[int, int]
-# C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.GameEngine
 class Move:
     def __init__(self, letterArr: list[Letter], startPost: Position) -> None:
         self.startPos: Position = startPost
@@ -20,6 +20,19 @@ class Move:
             returnStr += f'({letter.dx}, {letter.dy})' + (('{'+f'{letter.effect}'+'}') if letter.effect is not None else '')
         return returnStr + ']'
 
+class GameState:
+    pass
+
+class Won(GameState):
+    def __init__(self, playerName: str) -> None:
+        self.playerName: str = playerName
+
+class Draw(GameState):
+    pass
+
+class Unresolved:
+    pass
+
 class BoardPiece:
     def __init__(self, stateMachine: DFAStateMachine, name: str, player: str) -> None:
         self.stateMachine: DFAStateMachine = stateMachine
@@ -29,15 +42,53 @@ class BoardPiece:
 EngineBoard = list[list[BoardPiece | None]]
 
 
-#The variable names 'this' and 'Board' have special meaning, don't write
+#The variable names 'this', 'Board', 'enemy', 'empty' and 'true' have special meaning, don't write
 #them if you don't know what you are doing
+DebugFolder = 'NewFolderStruct/DebugInfo/'
 class GameEngine:
-    def __init__(self, fileName) -> None:
+    
+    def __hash__(self):
+        player = self.playersTurn()
+        hashStr = ''
+        X = len(self.variables['Board']); Y = len(self.variables['Board'][0])
+        for x in range(X):
+            for y in range(Y):
+                hashStr += f'{x}{y}'
+                tile = self.getTile(x, y)
+                if tile is None:
+                    hashStr += '0'
+                else:
+                    name = tile.name
+                    hashStr += str(self.pieceNameToHash[name])
+        hashStr += str(self.playersTurn())
+        hashID = hash(hashStr)
+        return hashID
+        
+
+
+
+    def debugParsing(self, fileName, program: Program):
+        f = open(DebugFolder + 'ParsingInfo.txt', 'w+')
+        debugStr = f'{fileName} parsed as:\n{str(program)}'
+        f.write(debugStr)
+        f.close()
+
+    def debugRegexCompiling(self):
+        f = open(DebugFolder + 'RegexInfo.txt', 'w+')
+        f.write(self.debugRegexStr)
+        f.close()
+
+    def __init__(self, fileName, debug=False) -> None:
+        self.debug = debug
         f = open(f'NewFolderStruct/TestFiles/{fileName}')
         txt = ''.join(f.readlines())
         program: Program = Parser(txt).generateAST().root
 
+        if self.debug:
+            self.debugParsing(fileName, program)
+
         self.players = program.players.names
+        self.playersTurnIndex = 0
         #resolve pieceToPlayerDict
         self.piecesToPlayer: dict[str, str] = dict()
         for piece in program.pieces.pieceArr:
@@ -50,20 +101,25 @@ class GameEngine:
         self.predicates: dict[str, Predicate] = dict()
         self.variables: dict[str, int] = dict()
         self.macros: dict[str, Macro] = dict()
-        self.pieceRules: dict[str, DFAStateMachine] = dict()
-        self.pieceRules['None'] = None
+        self.pieceRules: dict[str, DFAStateMachine] = dict(); self.pieceRules['None'] = None
         self.boardPieces: dict[str, BoardPiece] = dict()
+        self.victoryConditions: dict[str, Victory] = dict()
 
         #Resolving rules
+        self.debugRegexStr = ''
         for rule in program.rules.ruleArr:
             visitFunc = {
                 Predicate: self.visitPredicate,
                 Effect: self.visitEffect,
                 Macro: self.visitMacro,
                 PieceRule: self.visitPieceRule,
-                VariableDeclaration: self.visitVariableDeclaration
+                VariableDeclaration: self.visitVariableDeclaration,
+                Victory: self.visitVictory
             }[type(rule)]
             visitFunc(rule)
+
+        if self.debug:
+            self.debugRegexCompiling()
 
         #Load pieces into board
         self.variables['Board'] = [[None for _ in range(program.board.y)] for _ in range(program.board.x)]
@@ -83,8 +139,19 @@ class GameEngine:
         self.changesStack: list[tuple[Letter, Position, BoardPiece, EngineBoard | None]] = []
         self.moveStack: list[int] = []
 
+        #Hash for pieces
+        self.pieceNameToHash = dict()
+        for i, piece in enumerate(program.pieces.pieceArr):
+            name, player = piece.pieceName, piece.playerName
+            self.pieceNameToHash[name] = i+1
+
 
     #--- Resolve rules functions ---
+    def visitVictory(self, victoryCondition: Victory):
+        if victoryCondition.name not in self.players:
+            raise Exception(f'Invalid victory condition:\n{str(victoryCondition)}\n Player {victoryCondition.name} does not exist!')
+        self.victoryConditions[victoryCondition.name] = victoryCondition
+
     def visitPredicate(self, predicate: Predicate):
         self.predicates[predicate.name] = predicate
 
@@ -99,7 +166,11 @@ class GameEngine:
             compiledRegex = self.compileRegex(pieceRule.regex)
         except Exception as e:
             raise Exception(f'{str(e)}\nFailed to compile regex for {pieceRule.pieceName}:\n{str(pieceRule.regex)}')
-        dfa = RegexToDFA(compiledRegex)
+        dfa, debugStr = RegexToDFA(compiledRegex, debug=True)
+        if self.debug:
+            self.debugRegexStr += f'\n\n--Compiling regex for {pieceRule.pieceName}:\n{str(pieceRule.regex)}\n'
+            self.debugRegexStr += f'\nResolved regex:\n{str(compiledRegex)}\n'
+            self.debugRegexStr += debugStr
         self.pieceRules[pieceRule.pieceName] = dfa
 
     def visitVariableDeclaration(self, variableDeclaration: VariableDeclaration):
@@ -261,14 +332,16 @@ class GameEngine:
             x += dx; y += dy
             dx, dy = letter.dx, letter.dy
             self.playLetter(letter, (x, y))
+        self.playersTurnIndex = (self.playersTurnIndex+1)%len(self.players)
 
     def undoMove(self):
         moveLength = self.moveStack.pop()
         for i in range(moveLength):
             self.undoLetter()
+        self.playersTurnIndex = (self.playersTurnIndex-1)%len(self.players)
 
 
-    def evaluatePredicate(self, predicate: str, location: Position, player: str):
+    def evaluatePredicate(self, predicate: FunctionCall | IntegerExpression, location: Position, player: str):
         if type(predicate) == FunctionCall and predicate.name == 'BlackBackLane':
             pass
         x, y = location
@@ -283,12 +356,17 @@ class GameEngine:
             argumentVariables = self.matchFunCallWithArguments(preCall, predicateType)
             f = lambda: self.resolveIntegerExpression(predicateType.expression)
             returnValue = self.runFunctionInEnvironment(f, argumentVariables)
-        else:
-            returnValue = {
+        elif type(predicate) == IntegerExpression:
+            specialPredicates = {
                 'enemy': (self.getTile(x,y) is not None) and (self.getTile(x,y).player!=player),
                 'empty': self.getTile(x,y) is None,
                 'true': True
-            }[predicate]
+            }
+            f = lambda: self.resolveIntegerExpression(predicate)
+            returnValue = self.runFunctionInEnvironment(f, specialPredicates)
+        else:
+            raise Exception(f"Invalid predicate type {type(predicate)}!")
+
         return returnValue 
 
     def runEffect(self, effectCall: FunctionCall):
@@ -323,7 +401,8 @@ class GameEngine:
 
 
      #--- Calculating legal moves ---#
-    def getPlayerMoves(self, player: str) -> list[Move]:
+    def getPlayerMoves(self) -> list[Move]:
+        player = self.playersTurn()
         moves: list[Move] = []
         for x in range(len(self.variables['Board'])):
             for y in range(len(self.variables['Board'][0])):
@@ -372,41 +451,112 @@ class GameEngine:
         maxSize = 0
         for y in range(len(self.variables['Board'][0])-1,-1,-1):
             for x in range(len(self.variables['Board'])):
-                maxSize = max(len(str(self.variables['Board'][x][y])),0)
-        returnStr = ''
+                tile = self.getTile(x,y)
+                maxSize = max(len('e' if tile is None else tile.name), maxSize)
+        returnStr = f'Players turn: {self.playersTurn()}\n'
         for y in range(len(self.variables['Board'][0])-1,-1,-1):
             for x in range(len(self.variables['Board'])):
-                piece = self.variables['Board'][x][y]
+                piece = self.getTile(x,y)
                 if piece is None:
                     temp = 'e'
                 else:
                     temp = piece.name
-                returnStr += temp.rjust(12) + ' '
+                returnStr += temp.rjust(maxSize) + ' '
             returnStr += '\n'
         return returnStr
 
-    def run(self):
-        playersTurnIndex = 0
+    def getGameState(self) -> GameState:
+        winner = 'E:)-|-<'
+        numberOfWins = 0
+        for player in self.players:
+            vicotryCondition = self.victoryConditions[player]
+            if self.resolveIntegerExpression(vicotryCondition.expression):
+                numberOfWins += 1
+                winner = player
+        
+        if numberOfWins == 1:
+            return Won(winner)
+        elif numberOfWins > 1 or len(self.getPlayerMoves()) == 0:
+            return Draw()
+        elif numberOfWins == 0:
+            return Unresolved()
+
+    def playersTurn(self):
+        return self.players[self.playersTurnIndex]
+
+    def run(self, agents: list[Agent]) -> GameState:
+        self.playersTurnIndex = 0
+
+        playerToAgent: dict[str, Agent] = dict()
+        for i, player in enumerate(self.players):
+            playerToAgent[player] = agents[i]
+            agents[i].player = player
+        
         while True:
-            playersTurn = self.players[playersTurnIndex]
-            moves = self.getPlayerMoves(playersTurn)
-            print(self)
-            for i, move in enumerate(moves):
-                print(i, str(move))
-            userInput = input(f'{playersTurn} input move:')
-            if userInput.lower() == 'q':
-                break
-            if userInput.lower() == 'u':
-                playersTurnIndex = (playersTurnIndex-1)%len(self.players)
-                self.undoMove()
-                continue
+            player = self.playersTurn()
+            moves = self.getPlayerMoves()
+            move = playerToAgent[player].getMove(moves)
 
-            indexOfMove = int(userInput)
-            move = moves[indexOfMove]
+            if type(move) == str and move in 'qu':
+                if move == 'q':
+                    break
+                elif move == 'u':
+                    self.undoMove()
+                    continue
+
+
+            if self.debug:
+                print('Player ', player, 'on board')
+                print(self)
+                print('Picked move:', move)
             self.playMove(move)
-            playersTurnIndex = (playersTurnIndex+1)%len(self.players)
+            #print(self)
+
+            gameState = self.getGameState()
+            if type(gameState) in (Draw, Won):
+                resultStr = "Game over"
+                if type(gameState) == Draw:
+                    resultStr += ', the game was a draw.'
+                elif type(gameState) == Won:
+                    win: Won = gameState
+                    resultStr += f', player {win.playerName} Won!'
+                if self.debug:
+                    print(resultStr)
+                return gameState
 
 
+class Agent:
+    def __init__(self, gameEngine: GameEngine) -> None:
+        self.player: str = None
+
+    def getMove(self, moves: list[Move]) -> Move:
+        return moves[0]
+
+class TUIAgent(Agent):
+    def __init__(self, gameEngine: GameEngine) -> None:
+        self.gameEngine = gameEngine
+
+    def getMove(self, moves: list[Move]) -> Move:
+        print(self.gameEngine)
+        for i, move in enumerate(moves):
+            print(i, str(move))
+
+        def validInput(input: str):
+            return (userInput.isdigit() and int(userInput) in range(0, len(moves))) or input.lower() in 'qu'
+
+        userInput = input(f'{self.gameEngine.playersTurn()} input move:')
+        while not validInput(userInput):
+            print(f"Invalid input!")
+            userInput = input(f'{self.gameEngine.playersTurn()} input move:')
+    
+        return moves[int(userInput)] if userInput.isdigit() else userInput
+
+
+'''
+C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.GameEngine
+'''
 if __name__ == '__main__':
-    gm = GameEngine('demo3.game')
-    gm.run()
+    gameFileName = 'SimpleBreakThrough.game'
+    #gm = GameEngine('demo3.game')
+    gm = GameEngine(gameFileName, debug=True)
+    gm.run([TUIAgent(gm), TUIAgent(gm)])

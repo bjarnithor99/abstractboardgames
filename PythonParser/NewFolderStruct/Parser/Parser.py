@@ -7,8 +7,10 @@ from ..Lexer.TokenTypes import Word, EOI, EOL, Integer, Symbol, Operator, Delimi
 from .RegexParser.Parser import MatchFailed
 from .RegexParser.Parser import Parser as RegexParser
 
+#C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.Parser.Parser
 
-# Joining the classes, allowing LanguageParser to use RegexParser.matchRegex() and RegexParser.matchIntegerExpression() (RegexParser as self)
+# Joining the classes, allowing LanguageParser to use 
+# RegexParser.matchRegex() and RegexParser.matchIntegerExpression() (RegexParser as self)
 class Parser(RegexParser):
     #The general rule of the match functions is that if the match failed 
     #the self.i needs to be unchanged when the function exits
@@ -156,7 +158,7 @@ class Parser(RegexParser):
                 if not isinstance(token, Word):
                     raise MatchFailed(token.pos)
                 keyword = token.value
-                if keyword not in ('rule', 'macro', 'predicate', 'effect', 'variable'):
+                if keyword not in ('rule', 'macro', 'predicate', 'effect', 'variable', 'victory'):
                     raise MatchFailed(token.pos)
             except MatchFailed:
                 break
@@ -179,12 +181,29 @@ class Parser(RegexParser):
                 'macro': self.matchMacro,
                 'predicate': self.matchPredicate,
                 'effect': self.matchEffect,
-                'variable': self.matchVariable
+                'variable': self.matchVariable,
+                'victory': self.matchVictory
             }
             if keyword not in keywordToMatchFunc:
                 raise MatchFailed(token.pos)
+            self.skip(1)
             rule = keywordToMatchFunc[keyword]()
             return rule
+        except MatchFailed as error:
+            self.i = backupI
+            raise error
+
+    def matchVictory(self) -> ASTType.Victory:
+        backupI = self.i
+        try:
+            name = self.matchToken(Word).value
+            self.matchToken(Symbol, "{")
+            self.matchToken(Word, "return")
+            exp = self.matchIntegerExpression()
+            self.matchToken(EOL)
+            self.matchToken(Symbol, "}")
+            self.matchToken(EOL)
+            return ASTType.Victory(name, exp)
         except MatchFailed as error:
             self.i = backupI
             raise error
@@ -192,7 +211,6 @@ class Parser(RegexParser):
     def matchVariable(self) -> ASTType.VariableDeclaration:
         backupI = self.i
         try:
-            self.matchToken(Word, "variable")
             name = self.matchToken(Word).value
             self.matchToken(Operator, "=")
             value = self.matchIntegerExpression()
@@ -206,7 +224,6 @@ class Parser(RegexParser):
     def matchPredicate(self) -> ASTType.Predicate:
         backupI = self.i
         try:
-            self.matchToken(Word, "predicate")
             name = self.matchToken(Word).value
             self.matchToken(Symbol, "(")
             arguments = []
@@ -229,7 +246,6 @@ class Parser(RegexParser):
     def matchEffect(self) -> ASTType.Effect:
         backupI = self.i
         try:
-            self.matchToken(Word, "effect")
             name = self.matchToken(Word).value
             self.matchToken(Symbol, "(")
             arguments = []
@@ -280,7 +296,6 @@ class Parser(RegexParser):
     def matchMacro(self) -> ASTType.Macro:
         backupI = self.i
         try:
-            self.matchToken(Word, "macro")
             name = self.matchToken(Word).value
             self.matchToken(Symbol, "(")
             arguments = []
@@ -318,7 +333,6 @@ class Parser(RegexParser):
     def matchPieceRule(self) -> ASTType.PieceRule:
         backupI = self.i
         try:
-            self.matchToken(Word, "rule")
             name = self.matchToken(Word).value
             self.matchToken(Operator, "=")
             regex = RegexTree(self.matchRegex())
@@ -363,7 +377,7 @@ class Parser(RegexParser):
 
 
 if __name__ == "__main__":
-    f = open("demo1.game")
+    f = open("NewFolderStruct/TestFiles/demo1.game")
     text = ''.join(f.readlines())
     print(text)
     ast: AST = Parser(text).generateAST(debug=True)
