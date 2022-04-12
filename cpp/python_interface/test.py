@@ -9,8 +9,7 @@ def minimax(depth, max_player):
     if env.variables.game_over or depth == 0:
         return env.variables.white_score
 
-    env.generate_moves()
-    found_moves = env.found_moves
+    found_moves = env.generate_moves()
     if max_player:
         value = float("-inf")
         for move in found_moves:
@@ -32,8 +31,7 @@ env = parser.get_environment()
 while not env.variables.game_over:
     env.print()
 
-    env.generate_moves()
-    found_moves = env.found_moves
+    found_moves = env.generate_moves()
     i = 0
     for move in found_moves:
         print(f"{i})", end=" ")

@@ -50,7 +50,7 @@ Cell *Environment::get_cell(int x, int y) {
     return &board[x][y];
 }
 
-void Environment::generate_moves() {
+std::vector<std::vector<Step>> Environment::generate_moves() {
     found_moves.clear();
     for (int i = 0; i < board_size_x; i++) {
         for (int j = 0; j < board_size_y; j++) {
@@ -61,7 +61,7 @@ void Environment::generate_moves() {
             }
         }
     }
-    prune_illegal_moves();
+    return prune_illegal_moves();
 }
 
 void Environment::generate_moves(DFAState *state, int x, int y) {
@@ -98,7 +98,7 @@ bool Environment::verify_post_condition(DFAState *state, int x, int y) {
     return res;
 }
 
-void Environment::prune_illegal_moves() {
+std::vector<std::vector<Step>> Environment::prune_illegal_moves() {
     std::vector<std::vector<Step>> legal_moves;
     for (const std::vector<Step> &move : found_moves) {
         execute_move(move);
@@ -117,11 +117,12 @@ void Environment::prune_illegal_moves() {
             }
         }
         if (legal_move)
-            legal_moves.push_back(move);
+            legal_moves.push_back(std::move(move));
         undo_move();
     }
-    found_moves = legal_moves;
-    variables.n_moves_found = found_moves.size();
+    found_moves.clear();
+    variables.n_moves_found = legal_moves.size();
+    return legal_moves;
 }
 
 void Environment::execute_move(const std::vector<Step> &move) {

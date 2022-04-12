@@ -50,11 +50,10 @@ class Environment
     std::vector<std::string> players;
     std::string current_player;
     Variables variables;
-    std::vector<std::vector<Step>> found_moves;
     bool contains_cell(int x, int y);
     int set_cell(int x, int y, Cell *cell);
     Cell *get_cell(int x, int y);
-    void generate_moves();
+    std::vector<std::vector<Step>> generate_moves();
     void execute_move(const std::vector<Step> &move);
     void undo_move();
     bool check_terminal_conditions();
@@ -63,8 +62,9 @@ class Environment
   private:
     bool verify_post_condition(DFAState *state, int x, int y);
     void generate_moves(DFAState *state, int x, int y);
-    void prune_illegal_moves();
+    std::vector<std::vector<Step>> prune_illegal_moves();
     void update_current_player();
+    std::vector<std::vector<Step>> found_moves;
     std::vector<Step> candidate_move;
     std::stack<std::pair<std::vector<std::vector<Cell>>, Variables>> move_stack;
 };

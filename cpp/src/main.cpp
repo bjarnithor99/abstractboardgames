@@ -12,8 +12,7 @@ int minimax(Environment *env, int depth, bool max_player) {
     if (env->variables.game_over || depth == 0)
         return env->variables.white_score;
 
-    env->generate_moves();
-    std::vector<std::vector<Step>> available_moves = env->found_moves;
+    std::vector<std::vector<Step>> available_moves = env->generate_moves();
     int value;
     if (max_player) {
         value = INT_MIN;
@@ -51,8 +50,7 @@ int main(int argc, char *argv[]) {
         std::cout << env->current_player << " turn:" << std::endl;
         env->print();
 
-        env->generate_moves();
-        std::vector<std::vector<Step>> found_moves = env->found_moves;
+        std::vector<std::vector<Step>> found_moves = env->generate_moves();
         int i = 0;
         for (const std::vector<Step> &move : found_moves) {
             std::cout << i++ << ") ";
