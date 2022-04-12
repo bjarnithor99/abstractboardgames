@@ -22,7 +22,7 @@ std::string NoMovesLeft::get_name() const {
 BlackReachedEnd::BlackReachedEnd() {}
 BlackReachedEnd::~BlackReachedEnd() {}
 bool BlackReachedEnd::operator()(Environment *environment) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         if (environment->board[3][i].player == "black") {
             environment->variables.black_score = 100;
             environment->variables.white_score = 0;
@@ -39,7 +39,7 @@ std::string BlackReachedEnd::get_name() const {
 WhiteReachedEnd::WhiteReachedEnd() {}
 WhiteReachedEnd::~WhiteReachedEnd() {}
 bool WhiteReachedEnd::operator()(Environment *environment) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         if (environment->board[0][i].player == "white") {
             environment->variables.black_score = 0;
             environment->variables.white_score = 100;
