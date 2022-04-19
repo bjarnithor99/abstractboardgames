@@ -6,24 +6,24 @@
 
 #include "ast.hpp"
 #include "visitor.hpp"
-#include <iostream>
-#include <memory>
-#include <string>
+#include <cassert>
+#include <map>
+#include <stack>
 
-std::ostream &operator<<(std::ostream &os, const UnaryOperator &unaryOperator);
-std::ostream &operator<<(std::ostream &os, const BinaryOperator &binaryOperator);
-
-class PrintVisitor : public Visitor
+class MacroVisitor : public Visitor
 {
   public:
-    PrintVisitor();
+    MacroVisitor(bool in_macro, std::vector<std::string> argument_names, std::vector<std::string> argument_values);
+    ~MacroVisitor();
     void visitWordsNode(WordsNode *wordsNode) override;
     void visitLetterNode(LetterNode *letterNode) override;
     void visitMacroLetterNode(MacroLetterNode *macroLetterNode) override;
     void visitBinaryOpNode(BinaryOpNode *binaryOpNode) override;
     void visitUnaryOpNode(UnaryOpNode *unaryOpNode) override;
-    std::string indent();
+    std::unique_ptr<Node> get_node();
 
   private:
-    int depth;
+    bool in_macro;
+    std::map<std::string, std::string> argument_value;
+    std::stack<std::unique_ptr<Node>> node_stack;
 };

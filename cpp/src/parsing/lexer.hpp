@@ -39,6 +39,7 @@ enum class Token
     BoardSize,
     Board,
     Rule,
+    Macro,
     PostCondition,
 
     // Units

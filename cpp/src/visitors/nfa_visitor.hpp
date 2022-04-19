@@ -25,6 +25,7 @@ class NFAVisitor : public Visitor
     ~NFAVisitor();
     void visitWordsNode(WordsNode *wordsNode) override;
     void visitLetterNode(LetterNode *letterNode) override;
+    void visitMacroLetterNode(MacroLetterNode *macroLetterNode) override;
     void visitBinaryOpNode(BinaryOpNode *binaryOpNode) override;
     void visitUnaryOpNode(UnaryOpNode *unaryOpNode) override;
     std::unique_ptr<NFAState, NFAStateDeleter> getNFA();

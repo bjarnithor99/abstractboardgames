@@ -9,6 +9,7 @@
 #include "environment.hpp"
 #include "fa_tools.hpp"
 #include "lexer.hpp"
+#include "macro_visitor.hpp"
 #include <memory>
 #include <set>
 #include <sstream>
@@ -27,6 +28,7 @@ class Parser
     TokenTuple tokenTuple;
     std::vector<std::string> players;
     std::map<std::string, std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
+    std::map<std::string, std::pair<std::unique_ptr<Node>, std::vector<std::string>>> macros;
     std::map<std::string, std::vector<std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>>>
         post_conditions;
     std::unique_ptr<Environment> environment;
@@ -38,11 +40,16 @@ class Parser
     void parse_board_size();
     void parse_board();
     void parse_rule();
+    void parse_macro();
+    std::vector<std::string> parse_arguments();
+    std::string parse_argument();
     void parse_post_condition();
-    std::unique_ptr<Node> parse_sentence();
-    std::unique_ptr<WordsNode> parse_word();
-    std::unique_ptr<Node> parse_core_word();
+    std::unique_ptr<Node> parse_macro_call(bool in_macro);
+    std::unique_ptr<Node> parse_sentence(bool in_macro = false);
+    std::unique_ptr<WordsNode> parse_word(bool in_macro);
+    std::unique_ptr<Node> parse_core_word(bool in_macro);
     std::unique_ptr<LetterNode> parse_letter();
+    std::unique_ptr<MacroLetterNode> parse_macro_letter();
     int parse_int();
     std::string parse_string();
 };

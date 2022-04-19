@@ -11,6 +11,14 @@ void LetterNode::accept(Visitor *visitor) {
     visitor->visitLetterNode(this);
 }
 
+MacroLetterNode::MacroLetterNode(std::string dx, std::string dy, std::shared_ptr<Predicate> predicate,
+                                 std::shared_ptr<SideEffect> side_effect)
+    : dx(dx), dy(dy), predicate(predicate), side_effect(side_effect) {}
+MacroLetterNode::~MacroLetterNode() {}
+void MacroLetterNode::accept(Visitor *visitor) {
+    visitor->visitMacroLetterNode(this);
+}
+
 WordsNode::WordsNode() {}
 WordsNode::~WordsNode() {}
 void WordsNode::accept(Visitor *visitor) {

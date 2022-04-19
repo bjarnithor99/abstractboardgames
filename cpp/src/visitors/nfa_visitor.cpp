@@ -44,6 +44,10 @@ void NFAVisitor::visitLetterNode(LetterNode *letterNode) {
     nfa_stack.push(std::make_unique<NFAWrapper>(initial_state, final_state));
 }
 
+void NFAVisitor::visitMacroLetterNode(MacroLetterNode *macroLetterNode) {
+    throw std::runtime_error("MacroLetterNodes are not allowed in NFAVisitor.");
+}
+
 void NFAVisitor::visitBinaryOpNode(BinaryOpNode *binaryOpNode) {
     binaryOpNode->childNodeLHS->accept(this);
     binaryOpNode->childNodeRHS->accept(this);

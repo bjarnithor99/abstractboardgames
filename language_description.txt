@@ -1,6 +1,7 @@
 // Game declaration syntax
 game:            player_list ";"
                  piece_list ";"
+                 (macro_def ";")*
                  (rule ";")*
                  (post_condition ";")*
                  board_size ";"
@@ -22,16 +23,28 @@ board_piece:     string
 // Rule syntax
 rule:            "rule" piece "=" sentence
 
+// Macro syntax
+macro_def:       "macro" macro_name "(" arguments? ")" = macro_sentence
+macro_call:      macro_name "(" arguments? ")"
+macro_name:      string
+arguments:       argument ("," argument)*
+argument:        int | string
+
+macro_sentence:  macro_word ("|" macro_word)*
+macro_word:      (macro_core_word unary_op | macro_core_word | macro_call)+
+macro_core_word: "(" macro_sentence ")" | macro_letter
+macro_letter:    "[" string "," string "," string "]" ("{" string "}")?
+
 // Post condition syntax
 post_condition:  "post" player piece "=" sentence
 
 // Regular expression syntax
 sentence:        word ("|" word)*
-word:            (core_word unary_op | core_word)+
+word:            (core_word unary_op | core_word | macro_call)+
 core_word:       "(" sentence ")" | letter
-unary_op:        "*" | "?" | "+"
 letter:          "[" int "," int "," string "]" ("{" string "}")?
 
 // Common
 int:             CLASS OF INTEGERS
 string:          CLASS OF STRINGS WITHOUT INTEGERS
+unary_op:        "*" | "?" | "+"

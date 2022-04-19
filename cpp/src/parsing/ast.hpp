@@ -42,6 +42,19 @@ class LetterNode : public Node
     std::shared_ptr<SideEffect> side_effect;
 };
 
+class MacroLetterNode : public Node
+{
+  public:
+    MacroLetterNode(std::string dx, std::string dy, std::shared_ptr<Predicate> predicate,
+                    std::shared_ptr<SideEffect> side_effect);
+    ~MacroLetterNode();
+    void accept(Visitor *visitor) override;
+    std::string dx;
+    std::string dy;
+    std::shared_ptr<Predicate> predicate;
+    std::shared_ptr<SideEffect> side_effect;
+};
+
 class WordsNode : public Node
 {
   public:

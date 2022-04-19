@@ -6,6 +6,7 @@
 
 class WordsNode;
 class LetterNode;
+class MacroLetterNode;
 class BinaryOpNode;
 class UnaryOpNode;
 
@@ -15,6 +16,7 @@ class Visitor
     virtual ~Visitor(){};
     virtual void visitWordsNode(WordsNode *wordsNode) = 0;
     virtual void visitLetterNode(LetterNode *letterNode) = 0;
+    virtual void visitMacroLetterNode(MacroLetterNode *macroLetterNode) = 0;
     virtual void visitBinaryOpNode(BinaryOpNode *binaryOpNode) = 0;
     virtual void visitUnaryOpNode(UnaryOpNode *unaryOpNode) = 0;
 };

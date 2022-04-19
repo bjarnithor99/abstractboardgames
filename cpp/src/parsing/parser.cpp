@@ -17,6 +17,10 @@ void Parser::parse() {
             parse_pieces_list();
             match(Token::Semicomma);
         }
+        else if (tokenTuple.token == Token::Macro) {
+            parse_macro();
+            match(Token::Semicomma);
+        }
         else if (tokenTuple.token == Token::Rule) {
             parse_rule();
             match(Token::Semicomma);
@@ -238,6 +242,39 @@ void Parser::parse_rule() {
     pieces[piece].second = FATools::getMinimizedDfa(node.get());
 }
 
+void Parser::parse_macro() {
+    match(Token::Macro);
+    std::string macro_name = parse_string();
+    match(Token::LParen);
+    std::vector<std::string> arguments = parse_arguments();
+    match(Token::RParen);
+    match(Token::OpAssign);
+    std::unique_ptr<Node> node = parse_sentence(true);
+    macros[macro_name] = {std::move(node), arguments};
+}
+
+std::vector<std::string> Parser::parse_arguments() {
+    std::vector<std::string> argument_names;
+    if (tokenTuple.token == Token::RParen)
+        return argument_names;
+    std::string argument_name = parse_argument();
+    argument_names.push_back(argument_name);
+    while (match_if(Token::Comma)) {
+        argument_name = parse_argument();
+        argument_names.push_back(argument_name);
+    }
+    return argument_names;
+}
+
+std::string Parser::parse_argument() {
+    std::string argument;
+    if (tokenTuple.token == Token::Number)
+        argument = std::to_string(parse_int());
+    else
+        argument = parse_string();
+    return argument;
+}
+
 void Parser::parse_post_condition() {
     match(Token::PostCondition);
     Location loc = tokenTuple.location;
@@ -261,19 +298,50 @@ void Parser::parse_post_condition() {
     post_conditions[player].push_back(std::make_pair(piece, FATools::getMinimizedDfa(node.get())));
 }
 
-std::unique_ptr<Node> Parser::parse_sentence() {
-    std::unique_ptr<Node> node = parse_word();
+std::unique_ptr<Node> Parser::parse_macro_call(bool in_macro) {
+    Location loc = tokenTuple.location;
+    std::string macro_name = parse_string();
+    if (macros.find(macro_name) == macros.end()) {
+        std::ostringstream oss;
+        oss << "Unrecognized macro " << macro_name << " in rule declaration in " << loc << ".";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+    match(Token::LParen);
+    std::vector<std::string> argument_values = parse_arguments();
+    match(Token::RParen);
+    std::vector<std::string> argument_names = macros[macro_name].second;
+    if (argument_names.size() != argument_values.size()) {
+        std::ostringstream oss;
+        oss << "Invalid number of arguments for macro " << macro_name << " in rule declaration in " << loc
+            << ". Expected " << argument_names.size() << " but got " << argument_values.size() << ".";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+    Node *macro_node = macros[macro_name].first.get();
+    MacroVisitor macroVisitor = MacroVisitor(in_macro, argument_names, argument_values);
+    macro_node->accept(&macroVisitor);
+    std::unique_ptr<Node> node = macroVisitor.get_node();
+    return node;
+}
+
+std::unique_ptr<Node> Parser::parse_sentence(bool in_macro) {
+    std::unique_ptr<Node> node = parse_word(in_macro);
     while (match_if(Token::OpOr)) {
-        std::unique_ptr<Node> rhs = parse_word();
+        std::unique_ptr<Node> rhs = parse_word(in_macro);
         node = std::make_unique<BinaryOpNode>(BinaryOperator::OpOr, std::move(node), std::move(rhs));
     }
     return node;
 }
 
-std::unique_ptr<WordsNode> Parser::parse_word() {
+std::unique_ptr<WordsNode> Parser::parse_word(bool in_macro) {
     std::unique_ptr<WordsNode> wordsNode = std::make_unique<WordsNode>();
     do {
-        std::unique_ptr<Node> node = parse_core_word();
+        std::unique_ptr<Node> node;
+        if (tokenTuple.token == Token::String)
+            node = parse_macro_call(in_macro);
+        else
+            node = parse_core_word(in_macro);
         if (match_if(Token::OpStar)) {
             node = std::make_unique<UnaryOpNode>(UnaryOperator::OpStar, std::move(node));
         }
@@ -284,18 +352,22 @@ std::unique_ptr<WordsNode> Parser::parse_word() {
             node = std::make_unique<UnaryOpNode>(UnaryOperator::OpPlus, std::move(node));
         }
         wordsNode->add_word_node(std::move(node));
-    } while (tokenTuple.token == Token::LParen || tokenTuple.token == Token::LSquare);
+    } while (tokenTuple.token == Token::LParen || tokenTuple.token == Token::LSquare ||
+             tokenTuple.token == Token::String);
     return wordsNode;
 }
 
-std::unique_ptr<Node> Parser::parse_core_word() {
+std::unique_ptr<Node> Parser::parse_core_word(bool in_macro) {
     std::unique_ptr<Node> node;
     if (match_if(Token::LParen)) {
-        node = parse_sentence();
+        node = parse_sentence(in_macro);
         match(Token::RParen);
     }
     else {
-        node = parse_letter();
+        if (in_macro)
+            node = parse_macro_letter();
+        else
+            node = parse_letter();
     }
     return node;
 }
@@ -333,6 +405,41 @@ std::unique_ptr<LetterNode> Parser::parse_letter() {
 
     return std::make_unique<LetterNode>(dx, dy, Predicates::get_predicate[predicate_name],
                                         SideEffects::get_side_effect[side_effect_name]);
+}
+
+std::unique_ptr<MacroLetterNode> Parser::parse_macro_letter() {
+    match(Token::LSquare);
+    std::string dx = parse_argument();
+    match(Token::Comma);
+    std::string dy = parse_argument();
+    match(Token::Comma);
+    std::string predicate_name = parse_string();
+    match(Token::RSquare);
+
+    std::string side_effect_name = "default";
+    if (match_if(Token::LCurly)) {
+        side_effect_name = parse_string();
+        match(Token::RCurly);
+    }
+
+    if (Predicates::get_predicate.find(predicate_name) == Predicates::get_predicate.end()) {
+        std::ostringstream oss;
+        oss << "Syntax error: predicate '" << predicate_name
+            << "'is not defined. Did you forget to add it to Predicates::get_predicate?";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+
+    if (SideEffects::get_side_effect.find(side_effect_name) == SideEffects::get_side_effect.end()) {
+        std::ostringstream oss;
+        oss << "Syntax error: side effect '" << side_effect_name
+            << "'is not defined. Did you forget to add it to SideEffects::get_side_effect?";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
+
+    return std::make_unique<MacroLetterNode>(dx, dy, Predicates::get_predicate[predicate_name],
+                                             SideEffects::get_side_effect[side_effect_name]);
 }
 
 int Parser::parse_int() {

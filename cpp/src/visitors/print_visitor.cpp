@@ -51,6 +51,12 @@ void PrintVisitor::visitLetterNode(LetterNode *letterNode) {
               << " {" << letterNode->side_effect << "}" << std::endl;
 }
 
+void PrintVisitor::visitMacroLetterNode(MacroLetterNode *macroLetterNode) {
+    std::cout << indent() << "MacroLetterNode (" << macroLetterNode->dx << ", " << macroLetterNode->dy << ", "
+              << macroLetterNode->predicate->get_name() << ")"
+              << " {" << macroLetterNode->side_effect << "}" << std::endl;
+}
+
 void PrintVisitor::visitBinaryOpNode(BinaryOpNode *binaryOpNode) {
     std::cout << indent() << "BinaryOpNode (" << binaryOpNode->binaryOperator << ")" << std::endl;
     depth++;

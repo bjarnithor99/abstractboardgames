@@ -66,6 +66,9 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     case Token::Rule:
         os << "Token::Rule";
         break;
+    case Token::Macro:
+        os << "Token::Macro";
+        break;
     case Token::PostCondition:
         os << "Token::PostCondition";
         break;
@@ -105,8 +108,8 @@ Lexer::~Lexer() {
     filestream.close();
 }
 std::map<std::string, Token> Lexer::reserved_keywords = {
-    {"players", Token::Players}, {"pieces", Token::Pieces}, {"board_size", Token::BoardSize},
-    {"board", Token::Board},     {"rule", Token::Rule},     {"post", Token::PostCondition},
+    {"players", Token::Players}, {"pieces", Token::Pieces}, {"board_size", Token::BoardSize}, {"board", Token::Board},
+    {"rule", Token::Rule},       {"macro", Token::Macro},   {"post", Token::PostCondition},
 };
 
 TokenTuple Lexer::next() {
