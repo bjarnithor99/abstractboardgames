@@ -18,7 +18,7 @@ class NFAInput
 {
   public:
     NFAInput();
-    NFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::shared_ptr<SideEffect> side_effect);
+    NFAInput(const LetterNode &letterNode);
     ~NFAInput();
     bool operator<(const NFAInput &rhs) const;
 

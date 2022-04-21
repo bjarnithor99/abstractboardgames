@@ -54,7 +54,7 @@ struct Location {
     int col;
     Location();
     Location(int line, int col);
-    Location(Location *loc);
+    Location(const Location &loc);
 };
 
 std::ostream &operator<<(std::ostream &os, const Location &location);

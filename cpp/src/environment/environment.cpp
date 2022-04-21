@@ -18,8 +18,7 @@
 #define COUTBLUE "\033[1m\033[34m"
 
 Cell::Cell() {}
-Cell::Cell(int x, int y, std::string piece, std::string player, DFAState *state)
-    : x(x), y(y), piece(piece), player(player), state(state) {}
+Cell::Cell(std::string piece, std::string player, DFAState *state) : piece(piece), player(player), state(state) {}
 Cell::~Cell() {}
 
 Step::Step(int x, int y, std::shared_ptr<SideEffect> side_effect) : x(x), y(y), side_effect(side_effect) {}
@@ -31,23 +30,6 @@ Environment::~Environment() {}
 
 bool Environment::contains_cell(int x, int y) {
     return 0 <= x && x < board_size_x && 0 <= y && y < board_size_y;
-}
-
-int Environment::set_cell(int x, int y, Cell *cell) {
-    if (!contains_cell(x, y))
-        return -1;
-    board[x][y].x = cell->x;
-    board[x][y].y = cell->y;
-    board[x][y].piece = cell->piece;
-    board[x][y].player = cell->player;
-    board[x][y].state = cell->state;
-    return 0;
-}
-
-Cell *Environment::get_cell(int x, int y) {
-    if (!contains_cell(x, y))
-        return nullptr;
-    return &board[x][y];
 }
 
 std::vector<std::vector<Step>> Environment::generate_moves() {

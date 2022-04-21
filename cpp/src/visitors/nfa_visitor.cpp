@@ -38,8 +38,7 @@ void NFAVisitor::visitWordsNode(WordsNode *wordsNode) {
 void NFAVisitor::visitLetterNode(LetterNode *letterNode) {
     NFAState *initial_state = new NFAState();
     NFAState *final_state = new NFAState();
-    initial_state->add_transition(
-        final_state, NFAInput(letterNode->dx, letterNode->dy, letterNode->predicate, letterNode->side_effect));
+    initial_state->add_transition(final_state, NFAInput(*letterNode));
     final_state->is_accepting = true;
     nfa_stack.push(std::make_unique<NFAWrapper>(initial_state, final_state));
 }

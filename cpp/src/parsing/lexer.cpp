@@ -87,7 +87,7 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
 
 Location::Location() {}
 Location::Location(int line, int col) : line(line), col(col) {}
-Location::Location(Location *loc) : line(loc->line), col(loc->col) {}
+Location::Location(const Location &loc) : line(loc.line), col(loc.col) {}
 
 std::ostream &operator<<(std::ostream &os, const Location &location) {
     os << "line: " << location.line << " col: " << location.col;
@@ -119,7 +119,7 @@ TokenTuple Lexer::next() {
     }
 
     // Record the starting location of the lexeme we are matching.
-    Location loc = Location(&location);
+    Location loc = Location(location);
 
     // Try to match a lexeme.
     TokenTuple ret;
