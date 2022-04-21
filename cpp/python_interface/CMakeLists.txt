@@ -2,31 +2,24 @@ cmake_minimum_required(VERSION 3.12)
 
 project(python-interface)
 
-add_library(abg_lib SHARED
-    ../src/parsing/ast.cpp
-    ../src/state_machines/dfa.cpp
-    ../src/environment/environment.cpp
-    ../src/state_machines/fa_tools.cpp
-    ../src/parsing/lexer.cpp
-    ../src/main.cpp
-    ../src/state_machines/nfa.cpp
-    ../src/visitors/nfa_visitor.cpp
-    ../src/parsing/parser.cpp
-    ../src/actions/predicates.cpp
-    ../src/visitors/print_visitor.cpp
-    ../src/actions/side_effects.cpp
-    ../src/actions/terminal_conditions.cpp
-    ../src/actions/variables.cpp
-)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_FLAGS "-Wall")
 
-include_directories(abg_lib PRIVATE
-    ../src/actions
-    ../src/environment
-    ../src/parsing
-    ../src/state_machines
-    ../src/visitors
-)
+file(GLOB_RECURSE abg_SOURCES CONFIGURE_DEDPENDS "../src/*.cpp")
+file(GLOB_RECURSE abg_HEADERS CONFIGURE_DEDPENDS "../src/*.hpp")
 
+set(abg_INCLUDE_DIRS "")
+foreach(_header_file ${abg_HEADERS})
+  get_filename_component(_dir ${_header_file} PATH)
+  list(APPEND abg_INCLUDE_DIRS ${_dir})
+endforeach()
+
+list(REMOVE_DUPLICATES abg_INCLUDE_DIRS)
+
+add_library(abg_lib SHARED ${abg_SOURCES})
+
+include_directories(abg_lib PRIVATE ${abg_INCLUDE_DIRS})
 
 find_package(pybind11 REQUIRED)
 
