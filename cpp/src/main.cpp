@@ -13,6 +13,12 @@ int minimax(Environment *env, int depth, bool max_player) {
         return env->variables.white_score;
 
     std::vector<std::vector<Step>> available_moves = env->generate_moves();
+
+    if (available_moves.empty()) {
+        env->check_terminal_conditions();
+        return env->variables.white_score;
+    }
+
     int value;
     if (max_player) {
         value = INT_MIN;
@@ -38,7 +44,7 @@ int main(int argc, char *argv[]) {
     std::random_device rd;
     std::mt19937 rng(rd());
 
-    Parser parser("games/breakthrough_small.game");
+    Parser parser("games/breakthrough_tiny.game");
     parser.parse();
     std::unique_ptr<Environment> env = parser.get_environment();
 
@@ -58,7 +64,7 @@ int main(int argc, char *argv[]) {
                 std::cout << "(" << step.x << ", " << step.y << "){" << step.side_effect->get_name() << "} ";
             }
             env->execute_move(move);
-            std::cout << " with value " << minimax(env.get(), 3, env->current_player == "white");
+            std::cout << " with value " << minimax(env.get(), 4, env->current_player == "white");
             env->undo_move();
             std::cout << std::endl;
         }

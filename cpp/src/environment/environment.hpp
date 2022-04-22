@@ -128,6 +128,11 @@ class Environment
     /// @returns true if Environment#board[\p x][\p y] exists.
     /// @returns false if Environment#board[\p x][\p y] does not exist.
     bool contains_cell(int x, int y);
+    /// @brief Returns a 3-dimensional representation of the current environment
+    ///  for a neural network.
+    ///
+    /// @returns A 3-dimensional representation of the current environment.
+    std::vector<std::vector<std::vector<int>>> get_environment_representation();
     /// @brief Generates all legal moves for Environment#current_player.
     ///
     /// @returns a vector of legal moves.
@@ -153,6 +158,8 @@ class Environment
     ///
     /// @warning TerminalCondition can update Environment#variables if they are satisfied.
     bool check_terminal_conditions();
+    /// @brief Resets the environment to its original state.
+    void reset();
     /// @brief Prints the current game board state to standard out.
     void print();
 

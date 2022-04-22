@@ -22,9 +22,12 @@ PYBIND11_MODULE(py_interface, m) {
         .def_readonly("board_size_y", &Environment::board_size_y)
         .def_readonly("current_player", &Environment::current_player)
         .def_readonly("variables", &Environment::variables)
+        .def("get_environment_representation", &Environment::get_environment_representation)
         .def("generate_moves", py::overload_cast<>(&Environment::generate_moves), py::return_value_policy::move)
         .def("execute_move", &Environment::execute_move)
         .def("undo_move", &Environment::undo_move)
+        .def("check_terminal_conditions", &Environment::check_terminal_conditions)
+        .def("reset", &Environment::reset)
         .def("print", &Environment::print);
 
     py::class_<Variables>(m, "Variables")

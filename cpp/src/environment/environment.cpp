@@ -32,6 +32,30 @@ bool Environment::contains_cell(int x, int y) {
     return 0 <= x && x < board_size_x && 0 <= y && y < board_size_y;
 }
 
+std::vector<std::vector<std::vector<int>>> Environment::get_environment_representation() {
+    std::vector<std::vector<std::vector<int>>> representation;
+
+    // One plane indicating presence of each piece type.
+    for (auto &p : pieces) {
+        std::string piece_name = p.first;
+        std::vector<std::vector<int>> piece_bitmap(board.size(), std::vector<int>(board[0].size(), 0));
+        for (size_t i = 0; i < board.size(); i++) {
+            for (size_t j = 0; j < board[0].size(); j++) {
+                if (board[i][j].piece == piece_name) {
+                    piece_bitmap[i][j] = 1;
+                }
+            }
+        }
+        representation.push_back(piece_bitmap);
+    }
+
+    // One plane indicating whose turn it is. Assumes two players.
+    std::vector<std::vector<int>> turn(board.size(), std::vector<int>(board[0].size(), current_player == players[0]));
+    representation.push_back(turn);
+
+    return representation;
+}
+
 std::vector<std::vector<Step>> Environment::generate_moves() {
     found_moves.clear();
     for (int i = 0; i < board_size_x; i++) {
@@ -141,6 +165,15 @@ bool Environment::check_terminal_conditions() {
 
 void Environment::update_current_player() {
     current_player = players[move_count % players.size()];
+}
+
+void Environment::reset() {
+    if (move_stack.empty())
+        return;
+    while (move_stack.size() != 1)
+        move_stack.pop();
+    move_count = 1;
+    undo_move();
 }
 
 void Environment::print() {
