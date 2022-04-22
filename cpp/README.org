@@ -1,0 +1,45 @@
+* About
+This is a C++ framework for the abstract board games language defined in
+[[file:../language_description.txt][language_description.txt]]. The framework includes a parser (see [[file:./src/parsing/][parsing/]]) for
+parsing game descriptions (see [[file:./games/][games/]] for examples), an interactive environment
+(see [[file:./src/environment/][environment/]]) built game descriptions, and facilities to extend the
+environment with user-defined concepts that are not supported by the language
+itself (see [[file:./src/actions/][actions/]]).
+
+This framework is meant to be compiled as Python bindings and used to create a
+game playing agent.
+
+* Requirements
+- [[https://github.com/pybind/pybind11][pybind11]] to compile the Python bindings.
+- (optional) [[https://github.com/doxygen/doxygen][Doxygen]] to compile the C++ framework's documentation.
+
+* Compiling and running
+Before compiling the C++ framework and the Python bindings you first have to run
+#+begin_src bash
+cmake -Dpybind11_ROOT=$(pybind11-config --cmakedir) .
+#+end_src
+If you have [[https://github.com/doxygen/doxygen][Doxygen]] installed you enable compilation of the framework's
+documentation by running
+#+begin_src bash
+cmake -Dpybind11_ROOT=$(pybind11-config --cmakedir) -DBUILD_DOCS=IN .
+#+end_src
+
+To compile the C++ framework with the provided main file (meant for testing),
+run
+#+begin_src bash
+make abstract-board-games
+#+end_src
+To compile the Python bindings for the C++ framework, run
+#+begin_src bash
+make python-bindings
+#+end_src
+To compile the documentation, run
+#+begin_src bash
+make docs
+#+end_src
+
+Note: running
+#+begin_src bash
+make
+#+end_src
+will compile both =abstract-board-games= and =python-bindings= but not =docs=.

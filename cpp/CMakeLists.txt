@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "-Wall")
 
+add_subdirectory(python_bindings)
+
 file(GLOB_RECURSE abg_SOURCES CONFIGURE_DEDPENDS "src/*.cpp")
 file(GLOB_RECURSE abg_HEADERS CONFIGURE_DEDPENDS "src/*.hpp")
 
@@ -19,3 +21,20 @@ list(REMOVE_DUPLICATES abg_INCLUDE_DIRS)
 
 add_executable(abstract-board-games ${abg_SOURCES})
 target_include_directories(abstract-board-games PRIVATE ${abg_INCLUDE_DIRS})
+
+option(BUILD_DOCS "Build documentation" OFF)
+if (BUILD_DOCS)
+    find_package(Doxygen
+                 REQUIRED dot)
+
+    if (NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "Doxygen executable not found")
+    endif()
+
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+
+    add_custom_target(docs
+                      ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                      COMMENT "Generating Doxygen documentation" VERBATIM)
+endif()

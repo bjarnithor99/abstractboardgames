@@ -36,8 +36,6 @@ PYBIND11_MODULE(py_interface, m) {
         .def_readonly("game_over", &Variables::game_over);
 
     py::class_<Cell>(m, "Cell")
-        .def_readonly("x", &Cell::x)
-        .def_readonly("y", &Cell::y)
         .def_readonly("piece", &Cell::piece)
         .def_readonly("player", &Cell::player);
 
