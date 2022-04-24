@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(python-bindings)
+project(python_bindings)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -23,5 +23,5 @@ include_directories(abg_lib PRIVATE ${abg_INCLUDE_DIRS})
 
 find_package(pybind11 REQUIRED)
 
-pybind11_add_module(python-bindings python_bindings.cpp)
-target_link_libraries(python-bindings PRIVATE abg_lib)
+pybind11_add_module(python_bindings python_bindings.cpp)
+target_link_libraries(python_bindings PRIVATE abg_lib)

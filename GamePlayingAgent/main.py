@@ -9,7 +9,7 @@ import torch
 from breakthrough.breakthrough_agent import BreakthroughAgent
 from tui_agent import TUIAgent
 from coach import Coach
-import py_interface
+import python_bindings
 
 
 if __name__ == "__main__":
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     coloredlogs.install(level="INFO")
 
     log.info("Parsing game")
-    parser = py_interface.Parser("../cpp/games/breakthrough_tiny.game")
+    parser = python_bindings.Parser("../cpp/games/breakthrough_tiny.game")
     parser.parse()
     env = parser.get_environment()
 
