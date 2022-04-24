@@ -1,102 +1,1692 @@
 
 
---Compiling regex for WhitePawn:
+--Compiling regex for WhiteKing:
 REGEX TREE:
-	Concatination
-		Union
-			({0}; {1}; {empty})
-			({0}; {0}; {true})
-		WhiteCanWin()
+	KingMacro({0})
 
 Resolved regex:
 REGEX TREE:
-	Concatination
+	Union
 		Union
-			(0; 1; {empty})
-			(0; 0; {true})
+			(1; 0; {empty})
+			(1; 0; {enemy})
 		Union
-			(0; 0; {this.y==BlackY}){WEnd()}
-			(0; 0; {this.y!=BlackY})
+			Union
+				(0; 1; {empty})
+				(0; 1; {enemy})
+			Union
+				Union
+					(-1; 0; {empty})
+					(-1; 0; {enemy})
+				Union
+					Union
+						(0; -1; {empty})
+						(0; -1; {enemy})
+					Union
+						Union
+							(1; 1; {empty})
+							(1; 1; {enemy})
+						Union
+							Union
+								(-1; 1; {empty})
+								(-1; 1; {enemy})
+							Union
+								Union
+									(1; -1; {empty})
+									(1; -1; {enemy})
+								Union
+									(-1; -1; {empty})
+									(-1; -1; {enemy})
 
 NFA created:
 
 Start state:1 has children:
-	 self -> None -> state:7
+	 self -> None -> state:30
 	 self -> None -> state:2
 state:2 has children:
-	 self -> (0; 0; {true}) -> state:3
+	 self -> None -> state:27
+	 self -> None -> state:3
 state:3 has children:
-	 self -> None -> state:6
+	 self -> None -> state:24
 	 self -> None -> state:4
 state:4 has children:
-	 self -> (0; 0; {this.y!=BlackY}) -> state:5
+	 self -> None -> state:21
+	 self -> None -> state:5
 state:5 has children:
+	 self -> None -> state:18
+	 self -> None -> state:6
 state:6 has children:
-	 self -> (0; 0; {this.y==BlackY}){WEnd()} -> state:5
+	 self -> None -> state:15
+	 self -> None -> state:7
 state:7 has children:
-	 self -> (0; 1; {empty}) -> state:3
-The final state is: state:5
+	 self -> None -> state:12
+	 self -> None -> state:8
+state:8 has children:
+	 self -> None -> state:11
+	 self -> None -> state:9
+state:9 has children:
+	 self -> (-1; -1; {enemy}) -> state:10
+state:10 has children:
+state:11 has children:
+	 self -> (-1; -1; {empty}) -> state:10
+state:12 has children:
+	 self -> None -> state:14
+	 self -> None -> state:13
+state:13 has children:
+	 self -> (1; -1; {enemy}) -> state:10
+state:14 has children:
+	 self -> (1; -1; {empty}) -> state:10
+state:15 has children:
+	 self -> None -> state:17
+	 self -> None -> state:16
+state:16 has children:
+	 self -> (-1; 1; {enemy}) -> state:10
+state:17 has children:
+	 self -> (-1; 1; {empty}) -> state:10
+state:18 has children:
+	 self -> None -> state:20
+	 self -> None -> state:19
+state:19 has children:
+	 self -> (1; 1; {enemy}) -> state:10
+state:20 has children:
+	 self -> (1; 1; {empty}) -> state:10
+state:21 has children:
+	 self -> None -> state:23
+	 self -> None -> state:22
+state:22 has children:
+	 self -> (0; -1; {enemy}) -> state:10
+state:23 has children:
+	 self -> (0; -1; {empty}) -> state:10
+state:24 has children:
+	 self -> None -> state:26
+	 self -> None -> state:25
+state:25 has children:
+	 self -> (-1; 0; {enemy}) -> state:10
+state:26 has children:
+	 self -> (-1; 0; {empty}) -> state:10
+state:27 has children:
+	 self -> None -> state:29
+	 self -> None -> state:28
+state:28 has children:
+	 self -> (0; 1; {enemy}) -> state:10
+state:29 has children:
+	 self -> (0; 1; {empty}) -> state:10
+state:30 has children:
+	 self -> None -> state:32
+	 self -> None -> state:31
+state:31 has children:
+	 self -> (1; 0; {enemy}) -> state:10
+state:32 has children:
+	 self -> (1; 0; {empty}) -> state:10
+The final state is: state:10
 
 
 DFA created:
 
 Start state:1 has children:
-	 self -> (0; 0; {true}) -> state:2
+	 self -> (1; 0; {empty}) -> state:2
+	 self -> (-1; 1; {enemy}) -> state:2
+	 self -> (1; -1; {enemy}) -> state:2
+	 self -> (0; 1; {enemy}) -> state:2
+	 self -> (0; -1; {empty}) -> state:2
+	 self -> (1; -1; {empty}) -> state:2
 	 self -> (0; 1; {empty}) -> state:2
+	 self -> (1; 1; {empty}) -> state:2
+	 self -> (-1; -1; {enemy}) -> state:2
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (1; 1; {enemy}) -> state:2
+	 self -> (-1; 1; {empty}) -> state:2
+	 self -> (-1; -1; {empty}) -> state:2
+	 self -> (-1; 0; {empty}) -> state:2
+	 self -> (1; 0; {enemy}) -> state:2
+	 self -> (0; -1; {enemy}) -> state:2
 state:2 has children:
-	 self -> (0; 0; {this.y!=BlackY}) -> state:3
-	 self -> (0; 0; {this.y==BlackY}){WEnd()} -> state:3
+The final states are: [state:2]
+
+
+
+--Compiling regex for BlackKing:
+REGEX TREE:
+	KingMacro({7})
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Union
+			(1; 0; {empty})
+			(1; 0; {enemy})
+		Union
+			Union
+				(0; 1; {empty})
+				(0; 1; {enemy})
+			Union
+				Union
+					(-1; 0; {empty})
+					(-1; 0; {enemy})
+				Union
+					Union
+						(0; -1; {empty})
+						(0; -1; {enemy})
+					Union
+						Union
+							(1; 1; {empty})
+							(1; 1; {enemy})
+						Union
+							Union
+								(-1; 1; {empty})
+								(-1; 1; {enemy})
+							Union
+								Union
+									(1; -1; {empty})
+									(1; -1; {enemy})
+								Union
+									(-1; -1; {empty})
+									(-1; -1; {enemy})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:30
+	 self -> None -> state:2
+state:2 has children:
+	 self -> None -> state:27
+	 self -> None -> state:3
 state:3 has children:
+	 self -> None -> state:24
+	 self -> None -> state:4
+state:4 has children:
+	 self -> None -> state:21
+	 self -> None -> state:5
+state:5 has children:
+	 self -> None -> state:18
+	 self -> None -> state:6
+state:6 has children:
+	 self -> None -> state:15
+	 self -> None -> state:7
+state:7 has children:
+	 self -> None -> state:12
+	 self -> None -> state:8
+state:8 has children:
+	 self -> None -> state:11
+	 self -> None -> state:9
+state:9 has children:
+	 self -> (-1; -1; {enemy}) -> state:10
+state:10 has children:
+state:11 has children:
+	 self -> (-1; -1; {empty}) -> state:10
+state:12 has children:
+	 self -> None -> state:14
+	 self -> None -> state:13
+state:13 has children:
+	 self -> (1; -1; {enemy}) -> state:10
+state:14 has children:
+	 self -> (1; -1; {empty}) -> state:10
+state:15 has children:
+	 self -> None -> state:17
+	 self -> None -> state:16
+state:16 has children:
+	 self -> (-1; 1; {enemy}) -> state:10
+state:17 has children:
+	 self -> (-1; 1; {empty}) -> state:10
+state:18 has children:
+	 self -> None -> state:20
+	 self -> None -> state:19
+state:19 has children:
+	 self -> (1; 1; {enemy}) -> state:10
+state:20 has children:
+	 self -> (1; 1; {empty}) -> state:10
+state:21 has children:
+	 self -> None -> state:23
+	 self -> None -> state:22
+state:22 has children:
+	 self -> (0; -1; {enemy}) -> state:10
+state:23 has children:
+	 self -> (0; -1; {empty}) -> state:10
+state:24 has children:
+	 self -> None -> state:26
+	 self -> None -> state:25
+state:25 has children:
+	 self -> (-1; 0; {enemy}) -> state:10
+state:26 has children:
+	 self -> (-1; 0; {empty}) -> state:10
+state:27 has children:
+	 self -> None -> state:29
+	 self -> None -> state:28
+state:28 has children:
+	 self -> (0; 1; {enemy}) -> state:10
+state:29 has children:
+	 self -> (0; 1; {empty}) -> state:10
+state:30 has children:
+	 self -> None -> state:32
+	 self -> None -> state:31
+state:31 has children:
+	 self -> (1; 0; {enemy}) -> state:10
+state:32 has children:
+	 self -> (1; 0; {empty}) -> state:10
+The final state is: state:10
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (1; 0; {empty}) -> state:2
+	 self -> (-1; 1; {enemy}) -> state:2
+	 self -> (1; -1; {enemy}) -> state:2
+	 self -> (0; -1; {empty}) -> state:2
+	 self -> (0; 1; {enemy}) -> state:2
+	 self -> (1; -1; {empty}) -> state:2
+	 self -> (-1; 0; {empty}) -> state:2
+	 self -> (0; 1; {empty}) -> state:2
+	 self -> (1; 1; {empty}) -> state:2
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (1; 1; {enemy}) -> state:2
+	 self -> (-1; 1; {empty}) -> state:2
+	 self -> (-1; -1; {empty}) -> state:2
+	 self -> (-1; -1; {enemy}) -> state:2
+	 self -> (1; 0; {enemy}) -> state:2
+	 self -> (0; -1; {enemy}) -> state:2
+state:2 has children:
+The final states are: [state:2]
+
+
+
+--Compiling regex for WhiteQueen:
+REGEX TREE:
+	QueenMacro()
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Union
+			Concatination
+				Star
+					(-1; 1; {empty})
+				Union
+					(-1; 1; {empty})
+					(-1; 1; {enemy})
+			Union
+				Concatination
+					Star
+						(1; -1; {empty})
+					Union
+						(1; -1; {empty})
+						(1; -1; {enemy})
+				Union
+					Concatination
+						Star
+							(1; 1; {empty})
+						Union
+							(1; 1; {empty})
+							(1; 1; {enemy})
+					Concatination
+						Star
+							(-1; -1; {empty})
+						Union
+							(-1; -1; {empty})
+							(-1; -1; {enemy})
+		Union
+			Concatination
+				Star
+					(0; 1; {empty})
+				Union
+					(0; 1; {empty})
+					(0; 1; {enemy})
+			Union
+				Concatination
+					Star
+						(0; -1; {empty})
+					Union
+						(0; -1; {empty})
+						(0; -1; {enemy})
+				Union
+					Concatination
+						Star
+							(1; 0; {empty})
+						Union
+							(1; 0; {empty})
+							(1; 0; {enemy})
+					Concatination
+						Star
+							(-1; 0; {empty})
+						Union
+							(-1; 0; {empty})
+							(-1; 0; {enemy})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:22
+	 self -> None -> state:2
+state:2 has children:
+	 self -> None -> state:18
+	 self -> None -> state:3
+state:3 has children:
+	 self -> None -> state:14
+	 self -> None -> state:4
+state:4 has children:
+	 self -> None -> state:10
+	 self -> None -> state:5
+state:5 has children:
+	 self -> (-1; 0; {empty}) -> state:5
+	 self -> None -> state:6
+state:6 has children:
+	 self -> None -> state:9
+	 self -> None -> state:7
+state:7 has children:
+	 self -> (-1; 0; {enemy}) -> state:8
+state:8 has children:
+state:9 has children:
+	 self -> (-1; 0; {empty}) -> state:8
+state:10 has children:
+	 self -> (1; 0; {empty}) -> state:10
+	 self -> None -> state:11
+state:11 has children:
+	 self -> None -> state:13
+	 self -> None -> state:12
+state:12 has children:
+	 self -> (1; 0; {enemy}) -> state:8
+state:13 has children:
+	 self -> (1; 0; {empty}) -> state:8
+state:14 has children:
+	 self -> (0; -1; {empty}) -> state:14
+	 self -> None -> state:15
+state:15 has children:
+	 self -> None -> state:17
+	 self -> None -> state:16
+state:16 has children:
+	 self -> (0; -1; {enemy}) -> state:8
+state:17 has children:
+	 self -> (0; -1; {empty}) -> state:8
+state:18 has children:
+	 self -> (0; 1; {empty}) -> state:18
+	 self -> None -> state:19
+state:19 has children:
+	 self -> None -> state:21
+	 self -> None -> state:20
+state:20 has children:
+	 self -> (0; 1; {enemy}) -> state:8
+state:21 has children:
+	 self -> (0; 1; {empty}) -> state:8
+state:22 has children:
+	 self -> None -> state:37
+	 self -> None -> state:23
+state:23 has children:
+	 self -> None -> state:33
+	 self -> None -> state:24
+state:24 has children:
+	 self -> None -> state:29
+	 self -> None -> state:25
+state:25 has children:
+	 self -> (-1; -1; {empty}) -> state:25
+	 self -> None -> state:26
+state:26 has children:
+	 self -> None -> state:28
+	 self -> None -> state:27
+state:27 has children:
+	 self -> (-1; -1; {enemy}) -> state:8
+state:28 has children:
+	 self -> (-1; -1; {empty}) -> state:8
+state:29 has children:
+	 self -> (1; 1; {empty}) -> state:29
+	 self -> None -> state:30
+state:30 has children:
+	 self -> None -> state:32
+	 self -> None -> state:31
+state:31 has children:
+	 self -> (1; 1; {enemy}) -> state:8
+state:32 has children:
+	 self -> (1; 1; {empty}) -> state:8
+state:33 has children:
+	 self -> (1; -1; {empty}) -> state:33
+	 self -> None -> state:34
+state:34 has children:
+	 self -> None -> state:36
+	 self -> None -> state:35
+state:35 has children:
+	 self -> (1; -1; {enemy}) -> state:8
+state:36 has children:
+	 self -> (1; -1; {empty}) -> state:8
+state:37 has children:
+	 self -> (-1; 1; {empty}) -> state:37
+	 self -> None -> state:38
+state:38 has children:
+	 self -> None -> state:40
+	 self -> None -> state:39
+state:39 has children:
+	 self -> (-1; 1; {enemy}) -> state:8
+state:40 has children:
+	 self -> (-1; 1; {empty}) -> state:8
+The final state is: state:8
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (1; 0; {empty}) -> state:10
+	 self -> (-1; 1; {enemy}) -> state:2
+	 self -> (1; -1; {enemy}) -> state:2
+	 self -> (0; -1; {empty}) -> state:9
+	 self -> (0; 1; {enemy}) -> state:2
+	 self -> (1; -1; {empty}) -> state:8
+	 self -> (0; 1; {empty}) -> state:7
+	 self -> (1; 1; {empty}) -> state:6
+	 self -> (-1; -1; {enemy}) -> state:2
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (1; 1; {enemy}) -> state:2
+	 self -> (-1; 1; {empty}) -> state:5
+	 self -> (-1; -1; {empty}) -> state:4
+	 self -> (-1; 0; {empty}) -> state:3
+	 self -> (1; 0; {enemy}) -> state:2
+	 self -> (0; -1; {enemy}) -> state:2
+state:2 has children:
+state:3 has children:
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (-1; 0; {empty}) -> state:3
+state:4 has children:
+	 self -> (-1; -1; {empty}) -> state:4
+	 self -> (-1; -1; {enemy}) -> state:2
+state:5 has children:
+	 self -> (-1; 1; {empty}) -> state:5
+	 self -> (-1; 1; {enemy}) -> state:2
+state:6 has children:
+	 self -> (1; 1; {enemy}) -> state:2
+	 self -> (1; 1; {empty}) -> state:6
+state:7 has children:
+	 self -> (0; 1; {empty}) -> state:7
+	 self -> (0; 1; {enemy}) -> state:2
+state:8 has children:
+	 self -> (1; -1; {enemy}) -> state:2
+	 self -> (1; -1; {empty}) -> state:8
+state:9 has children:
+	 self -> (0; -1; {empty}) -> state:9
+	 self -> (0; -1; {enemy}) -> state:2
+state:10 has children:
+	 self -> (1; 0; {empty}) -> state:10
+	 self -> (1; 0; {enemy}) -> state:2
+The final states are: [state:2, state:3, state:4, state:5, state:6, state:7, state:8, state:9, state:10]
+
+
+
+--Compiling regex for BlackQueen:
+REGEX TREE:
+	QueenMacro()
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Union
+			Concatination
+				Star
+					(-1; 1; {empty})
+				Union
+					(-1; 1; {empty})
+					(-1; 1; {enemy})
+			Union
+				Concatination
+					Star
+						(1; -1; {empty})
+					Union
+						(1; -1; {empty})
+						(1; -1; {enemy})
+				Union
+					Concatination
+						Star
+							(1; 1; {empty})
+						Union
+							(1; 1; {empty})
+							(1; 1; {enemy})
+					Concatination
+						Star
+							(-1; -1; {empty})
+						Union
+							(-1; -1; {empty})
+							(-1; -1; {enemy})
+		Union
+			Concatination
+				Star
+					(0; 1; {empty})
+				Union
+					(0; 1; {empty})
+					(0; 1; {enemy})
+			Union
+				Concatination
+					Star
+						(0; -1; {empty})
+					Union
+						(0; -1; {empty})
+						(0; -1; {enemy})
+				Union
+					Concatination
+						Star
+							(1; 0; {empty})
+						Union
+							(1; 0; {empty})
+							(1; 0; {enemy})
+					Concatination
+						Star
+							(-1; 0; {empty})
+						Union
+							(-1; 0; {empty})
+							(-1; 0; {enemy})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:22
+	 self -> None -> state:2
+state:2 has children:
+	 self -> None -> state:18
+	 self -> None -> state:3
+state:3 has children:
+	 self -> None -> state:14
+	 self -> None -> state:4
+state:4 has children:
+	 self -> None -> state:10
+	 self -> None -> state:5
+state:5 has children:
+	 self -> (-1; 0; {empty}) -> state:5
+	 self -> None -> state:6
+state:6 has children:
+	 self -> None -> state:9
+	 self -> None -> state:7
+state:7 has children:
+	 self -> (-1; 0; {enemy}) -> state:8
+state:8 has children:
+state:9 has children:
+	 self -> (-1; 0; {empty}) -> state:8
+state:10 has children:
+	 self -> (1; 0; {empty}) -> state:10
+	 self -> None -> state:11
+state:11 has children:
+	 self -> None -> state:13
+	 self -> None -> state:12
+state:12 has children:
+	 self -> (1; 0; {enemy}) -> state:8
+state:13 has children:
+	 self -> (1; 0; {empty}) -> state:8
+state:14 has children:
+	 self -> (0; -1; {empty}) -> state:14
+	 self -> None -> state:15
+state:15 has children:
+	 self -> None -> state:17
+	 self -> None -> state:16
+state:16 has children:
+	 self -> (0; -1; {enemy}) -> state:8
+state:17 has children:
+	 self -> (0; -1; {empty}) -> state:8
+state:18 has children:
+	 self -> (0; 1; {empty}) -> state:18
+	 self -> None -> state:19
+state:19 has children:
+	 self -> None -> state:21
+	 self -> None -> state:20
+state:20 has children:
+	 self -> (0; 1; {enemy}) -> state:8
+state:21 has children:
+	 self -> (0; 1; {empty}) -> state:8
+state:22 has children:
+	 self -> None -> state:37
+	 self -> None -> state:23
+state:23 has children:
+	 self -> None -> state:33
+	 self -> None -> state:24
+state:24 has children:
+	 self -> None -> state:29
+	 self -> None -> state:25
+state:25 has children:
+	 self -> (-1; -1; {empty}) -> state:25
+	 self -> None -> state:26
+state:26 has children:
+	 self -> None -> state:28
+	 self -> None -> state:27
+state:27 has children:
+	 self -> (-1; -1; {enemy}) -> state:8
+state:28 has children:
+	 self -> (-1; -1; {empty}) -> state:8
+state:29 has children:
+	 self -> (1; 1; {empty}) -> state:29
+	 self -> None -> state:30
+state:30 has children:
+	 self -> None -> state:32
+	 self -> None -> state:31
+state:31 has children:
+	 self -> (1; 1; {enemy}) -> state:8
+state:32 has children:
+	 self -> (1; 1; {empty}) -> state:8
+state:33 has children:
+	 self -> (1; -1; {empty}) -> state:33
+	 self -> None -> state:34
+state:34 has children:
+	 self -> None -> state:36
+	 self -> None -> state:35
+state:35 has children:
+	 self -> (1; -1; {enemy}) -> state:8
+state:36 has children:
+	 self -> (1; -1; {empty}) -> state:8
+state:37 has children:
+	 self -> (-1; 1; {empty}) -> state:37
+	 self -> None -> state:38
+state:38 has children:
+	 self -> None -> state:40
+	 self -> None -> state:39
+state:39 has children:
+	 self -> (-1; 1; {enemy}) -> state:8
+state:40 has children:
+	 self -> (-1; 1; {empty}) -> state:8
+The final state is: state:8
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (1; 0; {empty}) -> state:10
+	 self -> (-1; 1; {enemy}) -> state:2
+	 self -> (1; -1; {enemy}) -> state:2
+	 self -> (0; -1; {empty}) -> state:9
+	 self -> (0; 1; {enemy}) -> state:2
+	 self -> (0; 1; {empty}) -> state:8
+	 self -> (1; 1; {empty}) -> state:7
+	 self -> (-1; -1; {enemy}) -> state:2
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (1; 1; {enemy}) -> state:2
+	 self -> (1; 0; {enemy}) -> state:2
+	 self -> (-1; 1; {empty}) -> state:6
+	 self -> (-1; -1; {empty}) -> state:5
+	 self -> (-1; 0; {empty}) -> state:4
+	 self -> (1; -1; {empty}) -> state:3
+	 self -> (0; -1; {enemy}) -> state:2
+state:2 has children:
+state:3 has children:
+	 self -> (1; -1; {enemy}) -> state:2
+	 self -> (1; -1; {empty}) -> state:3
+state:4 has children:
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (-1; 0; {empty}) -> state:4
+state:5 has children:
+	 self -> (-1; -1; {empty}) -> state:5
+	 self -> (-1; -1; {enemy}) -> state:2
+state:6 has children:
+	 self -> (-1; 1; {empty}) -> state:6
+	 self -> (-1; 1; {enemy}) -> state:2
+state:7 has children:
+	 self -> (1; 1; {enemy}) -> state:2
+	 self -> (1; 1; {empty}) -> state:7
+state:8 has children:
+	 self -> (0; 1; {empty}) -> state:8
+	 self -> (0; 1; {enemy}) -> state:2
+state:9 has children:
+	 self -> (0; -1; {empty}) -> state:9
+	 self -> (0; -1; {enemy}) -> state:2
+state:10 has children:
+	 self -> (1; 0; {empty}) -> state:10
+	 self -> (1; 0; {enemy}) -> state:2
+The final states are: [state:2, state:3, state:4, state:5, state:6, state:7, state:8, state:9, state:10]
+
+
+
+--Compiling regex for WhiteRook:
+REGEX TREE:
+	RookMacro()
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Concatination
+			Star
+				(0; 1; {empty})
+			Union
+				(0; 1; {empty})
+				(0; 1; {enemy})
+		Union
+			Concatination
+				Star
+					(0; -1; {empty})
+				Union
+					(0; -1; {empty})
+					(0; -1; {enemy})
+			Union
+				Concatination
+					Star
+						(1; 0; {empty})
+					Union
+						(1; 0; {empty})
+						(1; 0; {enemy})
+				Concatination
+					Star
+						(-1; 0; {empty})
+					Union
+						(-1; 0; {empty})
+						(-1; 0; {enemy})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:17
+	 self -> None -> state:2
+state:2 has children:
+	 self -> None -> state:13
+	 self -> None -> state:3
+state:3 has children:
+	 self -> None -> state:9
+	 self -> None -> state:4
+state:4 has children:
+	 self -> (-1; 0; {empty}) -> state:4
+	 self -> None -> state:5
+state:5 has children:
+	 self -> None -> state:8
+	 self -> None -> state:6
+state:6 has children:
+	 self -> (-1; 0; {enemy}) -> state:7
+state:7 has children:
+state:8 has children:
+	 self -> (-1; 0; {empty}) -> state:7
+state:9 has children:
+	 self -> (1; 0; {empty}) -> state:9
+	 self -> None -> state:10
+state:10 has children:
+	 self -> None -> state:12
+	 self -> None -> state:11
+state:11 has children:
+	 self -> (1; 0; {enemy}) -> state:7
+state:12 has children:
+	 self -> (1; 0; {empty}) -> state:7
+state:13 has children:
+	 self -> (0; -1; {empty}) -> state:13
+	 self -> None -> state:14
+state:14 has children:
+	 self -> None -> state:16
+	 self -> None -> state:15
+state:15 has children:
+	 self -> (0; -1; {enemy}) -> state:7
+state:16 has children:
+	 self -> (0; -1; {empty}) -> state:7
+state:17 has children:
+	 self -> (0; 1; {empty}) -> state:17
+	 self -> None -> state:18
+state:18 has children:
+	 self -> None -> state:20
+	 self -> None -> state:19
+state:19 has children:
+	 self -> (0; 1; {enemy}) -> state:7
+state:20 has children:
+	 self -> (0; 1; {empty}) -> state:7
+The final state is: state:7
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (1; 0; {empty}) -> state:6
+	 self -> (0; 1; {enemy}) -> state:2
+	 self -> (0; -1; {empty}) -> state:5
+	 self -> (0; 1; {empty}) -> state:4
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (-1; 0; {empty}) -> state:3
+	 self -> (1; 0; {enemy}) -> state:2
+	 self -> (0; -1; {enemy}) -> state:2
+state:2 has children:
+state:3 has children:
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (-1; 0; {empty}) -> state:3
+state:4 has children:
+	 self -> (0; 1; {empty}) -> state:4
+	 self -> (0; 1; {enemy}) -> state:2
+state:5 has children:
+	 self -> (0; -1; {empty}) -> state:5
+	 self -> (0; -1; {enemy}) -> state:2
+state:6 has children:
+	 self -> (1; 0; {empty}) -> state:6
+	 self -> (1; 0; {enemy}) -> state:2
+The final states are: [state:2, state:3, state:4, state:5, state:6]
+
+
+
+--Compiling regex for BlackRook:
+REGEX TREE:
+	RookMacro()
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Concatination
+			Star
+				(0; 1; {empty})
+			Union
+				(0; 1; {empty})
+				(0; 1; {enemy})
+		Union
+			Concatination
+				Star
+					(0; -1; {empty})
+				Union
+					(0; -1; {empty})
+					(0; -1; {enemy})
+			Union
+				Concatination
+					Star
+						(1; 0; {empty})
+					Union
+						(1; 0; {empty})
+						(1; 0; {enemy})
+				Concatination
+					Star
+						(-1; 0; {empty})
+					Union
+						(-1; 0; {empty})
+						(-1; 0; {enemy})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:17
+	 self -> None -> state:2
+state:2 has children:
+	 self -> None -> state:13
+	 self -> None -> state:3
+state:3 has children:
+	 self -> None -> state:9
+	 self -> None -> state:4
+state:4 has children:
+	 self -> (-1; 0; {empty}) -> state:4
+	 self -> None -> state:5
+state:5 has children:
+	 self -> None -> state:8
+	 self -> None -> state:6
+state:6 has children:
+	 self -> (-1; 0; {enemy}) -> state:7
+state:7 has children:
+state:8 has children:
+	 self -> (-1; 0; {empty}) -> state:7
+state:9 has children:
+	 self -> (1; 0; {empty}) -> state:9
+	 self -> None -> state:10
+state:10 has children:
+	 self -> None -> state:12
+	 self -> None -> state:11
+state:11 has children:
+	 self -> (1; 0; {enemy}) -> state:7
+state:12 has children:
+	 self -> (1; 0; {empty}) -> state:7
+state:13 has children:
+	 self -> (0; -1; {empty}) -> state:13
+	 self -> None -> state:14
+state:14 has children:
+	 self -> None -> state:16
+	 self -> None -> state:15
+state:15 has children:
+	 self -> (0; -1; {enemy}) -> state:7
+state:16 has children:
+	 self -> (0; -1; {empty}) -> state:7
+state:17 has children:
+	 self -> (0; 1; {empty}) -> state:17
+	 self -> None -> state:18
+state:18 has children:
+	 self -> None -> state:20
+	 self -> None -> state:19
+state:19 has children:
+	 self -> (0; 1; {enemy}) -> state:7
+state:20 has children:
+	 self -> (0; 1; {empty}) -> state:7
+The final state is: state:7
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (1; 0; {empty}) -> state:6
+	 self -> (0; 1; {enemy}) -> state:2
+	 self -> (0; -1; {empty}) -> state:5
+	 self -> (0; 1; {empty}) -> state:4
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (-1; 0; {empty}) -> state:3
+	 self -> (1; 0; {enemy}) -> state:2
+	 self -> (0; -1; {enemy}) -> state:2
+state:2 has children:
+state:3 has children:
+	 self -> (-1; 0; {enemy}) -> state:2
+	 self -> (-1; 0; {empty}) -> state:3
+state:4 has children:
+	 self -> (0; 1; {empty}) -> state:4
+	 self -> (0; 1; {enemy}) -> state:2
+state:5 has children:
+	 self -> (0; -1; {empty}) -> state:5
+	 self -> (0; -1; {enemy}) -> state:2
+state:6 has children:
+	 self -> (1; 0; {empty}) -> state:6
+	 self -> (1; 0; {enemy}) -> state:2
+The final states are: [state:2, state:3, state:4, state:5, state:6]
+
+
+
+--Compiling regex for WhiteBishop:
+REGEX TREE:
+	BishopMacro()
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Concatination
+			Star
+				(-1; 1; {empty})
+			Union
+				(-1; 1; {empty})
+				(-1; 1; {enemy})
+		Union
+			Concatination
+				Star
+					(1; -1; {empty})
+				Union
+					(1; -1; {empty})
+					(1; -1; {enemy})
+			Union
+				Concatination
+					Star
+						(1; 1; {empty})
+					Union
+						(1; 1; {empty})
+						(1; 1; {enemy})
+				Concatination
+					Star
+						(-1; -1; {empty})
+					Union
+						(-1; -1; {empty})
+						(-1; -1; {enemy})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:17
+	 self -> None -> state:2
+state:2 has children:
+	 self -> None -> state:13
+	 self -> None -> state:3
+state:3 has children:
+	 self -> None -> state:9
+	 self -> None -> state:4
+state:4 has children:
+	 self -> (-1; -1; {empty}) -> state:4
+	 self -> None -> state:5
+state:5 has children:
+	 self -> None -> state:8
+	 self -> None -> state:6
+state:6 has children:
+	 self -> (-1; -1; {enemy}) -> state:7
+state:7 has children:
+state:8 has children:
+	 self -> (-1; -1; {empty}) -> state:7
+state:9 has children:
+	 self -> (1; 1; {empty}) -> state:9
+	 self -> None -> state:10
+state:10 has children:
+	 self -> None -> state:12
+	 self -> None -> state:11
+state:11 has children:
+	 self -> (1; 1; {enemy}) -> state:7
+state:12 has children:
+	 self -> (1; 1; {empty}) -> state:7
+state:13 has children:
+	 self -> (1; -1; {empty}) -> state:13
+	 self -> None -> state:14
+state:14 has children:
+	 self -> None -> state:16
+	 self -> None -> state:15
+state:15 has children:
+	 self -> (1; -1; {enemy}) -> state:7
+state:16 has children:
+	 self -> (1; -1; {empty}) -> state:7
+state:17 has children:
+	 self -> (-1; 1; {empty}) -> state:17
+	 self -> None -> state:18
+state:18 has children:
+	 self -> None -> state:20
+	 self -> None -> state:19
+state:19 has children:
+	 self -> (-1; 1; {enemy}) -> state:7
+state:20 has children:
+	 self -> (-1; 1; {empty}) -> state:7
+The final state is: state:7
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (-1; 1; {enemy}) -> state:3
+	 self -> (1; -1; {enemy}) -> state:3
+	 self -> (1; 1; {empty}) -> state:6
+	 self -> (1; 1; {enemy}) -> state:3
+	 self -> (-1; 1; {empty}) -> state:5
+	 self -> (-1; -1; {empty}) -> state:4
+	 self -> (-1; -1; {enemy}) -> state:3
+	 self -> (1; -1; {empty}) -> state:2
+state:2 has children:
+	 self -> (1; -1; {enemy}) -> state:3
+	 self -> (1; -1; {empty}) -> state:2
+state:3 has children:
+state:4 has children:
+	 self -> (-1; -1; {empty}) -> state:4
+	 self -> (-1; -1; {enemy}) -> state:3
+state:5 has children:
+	 self -> (-1; 1; {empty}) -> state:5
+	 self -> (-1; 1; {enemy}) -> state:3
+state:6 has children:
+	 self -> (1; 1; {enemy}) -> state:3
+	 self -> (1; 1; {empty}) -> state:6
+The final states are: [state:2, state:3, state:4, state:5, state:6]
+
+
+
+--Compiling regex for BlackBishop:
+REGEX TREE:
+	BishopMacro()
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Concatination
+			Star
+				(-1; 1; {empty})
+			Union
+				(-1; 1; {empty})
+				(-1; 1; {enemy})
+		Union
+			Concatination
+				Star
+					(1; -1; {empty})
+				Union
+					(1; -1; {empty})
+					(1; -1; {enemy})
+			Union
+				Concatination
+					Star
+						(1; 1; {empty})
+					Union
+						(1; 1; {empty})
+						(1; 1; {enemy})
+				Concatination
+					Star
+						(-1; -1; {empty})
+					Union
+						(-1; -1; {empty})
+						(-1; -1; {enemy})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:17
+	 self -> None -> state:2
+state:2 has children:
+	 self -> None -> state:13
+	 self -> None -> state:3
+state:3 has children:
+	 self -> None -> state:9
+	 self -> None -> state:4
+state:4 has children:
+	 self -> (-1; -1; {empty}) -> state:4
+	 self -> None -> state:5
+state:5 has children:
+	 self -> None -> state:8
+	 self -> None -> state:6
+state:6 has children:
+	 self -> (-1; -1; {enemy}) -> state:7
+state:7 has children:
+state:8 has children:
+	 self -> (-1; -1; {empty}) -> state:7
+state:9 has children:
+	 self -> (1; 1; {empty}) -> state:9
+	 self -> None -> state:10
+state:10 has children:
+	 self -> None -> state:12
+	 self -> None -> state:11
+state:11 has children:
+	 self -> (1; 1; {enemy}) -> state:7
+state:12 has children:
+	 self -> (1; 1; {empty}) -> state:7
+state:13 has children:
+	 self -> (1; -1; {empty}) -> state:13
+	 self -> None -> state:14
+state:14 has children:
+	 self -> None -> state:16
+	 self -> None -> state:15
+state:15 has children:
+	 self -> (1; -1; {enemy}) -> state:7
+state:16 has children:
+	 self -> (1; -1; {empty}) -> state:7
+state:17 has children:
+	 self -> (-1; 1; {empty}) -> state:17
+	 self -> None -> state:18
+state:18 has children:
+	 self -> None -> state:20
+	 self -> None -> state:19
+state:19 has children:
+	 self -> (-1; 1; {enemy}) -> state:7
+state:20 has children:
+	 self -> (-1; 1; {empty}) -> state:7
+The final state is: state:7
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (-1; 1; {enemy}) -> state:3
+	 self -> (1; -1; {enemy}) -> state:3
+	 self -> (1; 1; {empty}) -> state:6
+	 self -> (1; 1; {enemy}) -> state:3
+	 self -> (-1; 1; {empty}) -> state:5
+	 self -> (-1; -1; {empty}) -> state:4
+	 self -> (-1; -1; {enemy}) -> state:3
+	 self -> (1; -1; {empty}) -> state:2
+state:2 has children:
+	 self -> (1; -1; {enemy}) -> state:3
+	 self -> (1; -1; {empty}) -> state:2
+state:3 has children:
+state:4 has children:
+	 self -> (-1; -1; {empty}) -> state:4
+	 self -> (-1; -1; {enemy}) -> state:3
+state:5 has children:
+	 self -> (-1; 1; {empty}) -> state:5
+	 self -> (-1; 1; {enemy}) -> state:3
+state:6 has children:
+	 self -> (1; 1; {enemy}) -> state:3
+	 self -> (1; 1; {empty}) -> state:6
+The final states are: [state:2, state:3, state:4, state:5, state:6]
+
+
+
+--Compiling regex for WhiteKnight:
+REGEX TREE:
+	KnightMacro()
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Union
+			Union
+				(2; 1; {empty})
+				(2; 1; {enemy})
+			Union
+				(1; 2; {empty})
+				(1; 2; {enemy})
+		Union
+			Union
+				Union
+					(-2; 1; {empty})
+					(-2; 1; {enemy})
+				Union
+					(-1; 2; {empty})
+					(-1; 2; {enemy})
+			Union
+				Union
+					Union
+						(2; -1; {empty})
+						(2; -1; {enemy})
+					Union
+						(1; -2; {empty})
+						(1; -2; {enemy})
+				Union
+					Union
+						(-2; -1; {empty})
+						(-2; -1; {enemy})
+					Union
+						(-1; -2; {empty})
+						(-1; -2; {enemy})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:26
+	 self -> None -> state:2
+state:2 has children:
+	 self -> None -> state:19
+	 self -> None -> state:3
+state:3 has children:
+	 self -> None -> state:12
+	 self -> None -> state:4
+state:4 has children:
+	 self -> None -> state:9
+	 self -> None -> state:5
+state:5 has children:
+	 self -> None -> state:8
+	 self -> None -> state:6
+state:6 has children:
+	 self -> (-1; -2; {enemy}) -> state:7
+state:7 has children:
+state:8 has children:
+	 self -> (-1; -2; {empty}) -> state:7
+state:9 has children:
+	 self -> None -> state:11
+	 self -> None -> state:10
+state:10 has children:
+	 self -> (-2; -1; {enemy}) -> state:7
+state:11 has children:
+	 self -> (-2; -1; {empty}) -> state:7
+state:12 has children:
+	 self -> None -> state:16
+	 self -> None -> state:13
+state:13 has children:
+	 self -> None -> state:15
+	 self -> None -> state:14
+state:14 has children:
+	 self -> (1; -2; {enemy}) -> state:7
+state:15 has children:
+	 self -> (1; -2; {empty}) -> state:7
+state:16 has children:
+	 self -> None -> state:18
+	 self -> None -> state:17
+state:17 has children:
+	 self -> (2; -1; {enemy}) -> state:7
+state:18 has children:
+	 self -> (2; -1; {empty}) -> state:7
+state:19 has children:
+	 self -> None -> state:23
+	 self -> None -> state:20
+state:20 has children:
+	 self -> None -> state:22
+	 self -> None -> state:21
+state:21 has children:
+	 self -> (-1; 2; {enemy}) -> state:7
+state:22 has children:
+	 self -> (-1; 2; {empty}) -> state:7
+state:23 has children:
+	 self -> None -> state:25
+	 self -> None -> state:24
+state:24 has children:
+	 self -> (-2; 1; {enemy}) -> state:7
+state:25 has children:
+	 self -> (-2; 1; {empty}) -> state:7
+state:26 has children:
+	 self -> None -> state:30
+	 self -> None -> state:27
+state:27 has children:
+	 self -> None -> state:29
+	 self -> None -> state:28
+state:28 has children:
+	 self -> (1; 2; {enemy}) -> state:7
+state:29 has children:
+	 self -> (1; 2; {empty}) -> state:7
+state:30 has children:
+	 self -> None -> state:32
+	 self -> None -> state:31
+state:31 has children:
+	 self -> (2; 1; {enemy}) -> state:7
+state:32 has children:
+	 self -> (2; 1; {empty}) -> state:7
+The final state is: state:7
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (2; -1; {enemy}) -> state:2
+	 self -> (-2; 1; {empty}) -> state:2
+	 self -> (2; 1; {enemy}) -> state:2
+	 self -> (1; -2; {enemy}) -> state:2
+	 self -> (1; 2; {enemy}) -> state:2
+	 self -> (1; -2; {empty}) -> state:2
+	 self -> (-1; -2; {enemy}) -> state:2
+	 self -> (-2; -1; {enemy}) -> state:2
+	 self -> (2; 1; {empty}) -> state:2
+	 self -> (1; 2; {empty}) -> state:2
+	 self -> (2; -1; {empty}) -> state:2
+	 self -> (-2; 1; {enemy}) -> state:2
+	 self -> (-1; 2; {enemy}) -> state:2
+	 self -> (-2; -1; {empty}) -> state:2
+	 self -> (-1; 2; {empty}) -> state:2
+	 self -> (-1; -2; {empty}) -> state:2
+state:2 has children:
+The final states are: [state:2]
+
+
+
+--Compiling regex for BlackKnight:
+REGEX TREE:
+	KnightMacro()
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Union
+			Union
+				(2; 1; {empty})
+				(2; 1; {enemy})
+			Union
+				(1; 2; {empty})
+				(1; 2; {enemy})
+		Union
+			Union
+				Union
+					(-2; 1; {empty})
+					(-2; 1; {enemy})
+				Union
+					(-1; 2; {empty})
+					(-1; 2; {enemy})
+			Union
+				Union
+					Union
+						(2; -1; {empty})
+						(2; -1; {enemy})
+					Union
+						(1; -2; {empty})
+						(1; -2; {enemy})
+				Union
+					Union
+						(-2; -1; {empty})
+						(-2; -1; {enemy})
+					Union
+						(-1; -2; {empty})
+						(-1; -2; {enemy})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:26
+	 self -> None -> state:2
+state:2 has children:
+	 self -> None -> state:19
+	 self -> None -> state:3
+state:3 has children:
+	 self -> None -> state:12
+	 self -> None -> state:4
+state:4 has children:
+	 self -> None -> state:9
+	 self -> None -> state:5
+state:5 has children:
+	 self -> None -> state:8
+	 self -> None -> state:6
+state:6 has children:
+	 self -> (-1; -2; {enemy}) -> state:7
+state:7 has children:
+state:8 has children:
+	 self -> (-1; -2; {empty}) -> state:7
+state:9 has children:
+	 self -> None -> state:11
+	 self -> None -> state:10
+state:10 has children:
+	 self -> (-2; -1; {enemy}) -> state:7
+state:11 has children:
+	 self -> (-2; -1; {empty}) -> state:7
+state:12 has children:
+	 self -> None -> state:16
+	 self -> None -> state:13
+state:13 has children:
+	 self -> None -> state:15
+	 self -> None -> state:14
+state:14 has children:
+	 self -> (1; -2; {enemy}) -> state:7
+state:15 has children:
+	 self -> (1; -2; {empty}) -> state:7
+state:16 has children:
+	 self -> None -> state:18
+	 self -> None -> state:17
+state:17 has children:
+	 self -> (2; -1; {enemy}) -> state:7
+state:18 has children:
+	 self -> (2; -1; {empty}) -> state:7
+state:19 has children:
+	 self -> None -> state:23
+	 self -> None -> state:20
+state:20 has children:
+	 self -> None -> state:22
+	 self -> None -> state:21
+state:21 has children:
+	 self -> (-1; 2; {enemy}) -> state:7
+state:22 has children:
+	 self -> (-1; 2; {empty}) -> state:7
+state:23 has children:
+	 self -> None -> state:25
+	 self -> None -> state:24
+state:24 has children:
+	 self -> (-2; 1; {enemy}) -> state:7
+state:25 has children:
+	 self -> (-2; 1; {empty}) -> state:7
+state:26 has children:
+	 self -> None -> state:30
+	 self -> None -> state:27
+state:27 has children:
+	 self -> None -> state:29
+	 self -> None -> state:28
+state:28 has children:
+	 self -> (1; 2; {enemy}) -> state:7
+state:29 has children:
+	 self -> (1; 2; {empty}) -> state:7
+state:30 has children:
+	 self -> None -> state:32
+	 self -> None -> state:31
+state:31 has children:
+	 self -> (2; 1; {enemy}) -> state:7
+state:32 has children:
+	 self -> (2; 1; {empty}) -> state:7
+The final state is: state:7
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (2; -1; {enemy}) -> state:2
+	 self -> (-2; 1; {empty}) -> state:2
+	 self -> (2; 1; {enemy}) -> state:2
+	 self -> (1; 2; {enemy}) -> state:2
+	 self -> (1; -2; {empty}) -> state:2
+	 self -> (1; -2; {enemy}) -> state:2
+	 self -> (-1; -2; {enemy}) -> state:2
+	 self -> (-2; -1; {enemy}) -> state:2
+	 self -> (2; 1; {empty}) -> state:2
+	 self -> (1; 2; {empty}) -> state:2
+	 self -> (2; -1; {empty}) -> state:2
+	 self -> (-2; 1; {enemy}) -> state:2
+	 self -> (-1; 2; {enemy}) -> state:2
+	 self -> (-2; -1; {empty}) -> state:2
+	 self -> (-1; 2; {empty}) -> state:2
+	 self -> (-1; -2; {empty}) -> state:2
+state:2 has children:
+The final states are: [state:2]
+
+
+
+--Compiling regex for WhitePawn:
+REGEX TREE:
+	Union
+		Concatination
+			Union
+				({0}; {1}; {empty})
+				Union
+					({1}; {1}; {enemy})
+					({-1}; {1}; {enemy})
+			Union
+				WhitePromote()
+				({0}; {0}; NotWhiteBackLane())
+		Concatination
+			({0}; {0}; yis1())
+			({0}; {2}; {empty})
+
+Resolved regex:
+REGEX TREE:
+	Union
+		Concatination
+			Union
+				(0; 1; {empty})
+				Union
+					(1; 1; {enemy})
+					(-1; 1; {enemy})
+			Union
+				Union
+					(0; 0; WhiteBackLane()){PromoteToWhiteKnight()}
+					Union
+						(0; 0; WhiteBackLane()){PromoteToWhiteBishop()}
+						Union
+							(0; 0; WhiteBackLane()){PromoteToWhiteQueen()}
+							(0; 0; WhiteBackLane()){PromoteToWhiteRook()}
+				(0; 0; NotWhiteBackLane())
+		Concatination
+			(0; 0; yis1())
+			(0; 2; {empty})
+
+NFA created:
+
+Start state:1 has children:
+	 self -> None -> state:5
+	 self -> None -> state:2
+state:2 has children:
+	 self -> (0; 0; yis1()) -> state:3
+state:3 has children:
+	 self -> (0; 2; {empty}) -> state:4
+state:4 has children:
+state:5 has children:
+	 self -> None -> state:18
+	 self -> None -> state:6
+state:6 has children:
+	 self -> None -> state:17
+	 self -> None -> state:7
+state:7 has children:
+	 self -> (-1; 1; {enemy}) -> state:8
+state:8 has children:
+	 self -> None -> state:10
+	 self -> None -> state:9
+state:9 has children:
+	 self -> (0; 0; NotWhiteBackLane()) -> state:4
+state:10 has children:
+	 self -> None -> state:16
+	 self -> None -> state:11
+state:11 has children:
+	 self -> None -> state:15
+	 self -> None -> state:12
+state:12 has children:
+	 self -> None -> state:14
+	 self -> None -> state:13
+state:13 has children:
+	 self -> (0; 0; WhiteBackLane()){PromoteToWhiteRook()} -> state:4
+state:14 has children:
+	 self -> (0; 0; WhiteBackLane()){PromoteToWhiteQueen()} -> state:4
+state:15 has children:
+	 self -> (0; 0; WhiteBackLane()){PromoteToWhiteBishop()} -> state:4
+state:16 has children:
+	 self -> (0; 0; WhiteBackLane()){PromoteToWhiteKnight()} -> state:4
+state:17 has children:
+	 self -> (1; 1; {enemy}) -> state:8
+state:18 has children:
+	 self -> (0; 1; {empty}) -> state:8
+The final state is: state:4
+
+
+DFA created:
+
+Start state:1 has children:
+	 self -> (0; 1; {empty}) -> state:2
+	 self -> (0; 0; yis1()) -> state:4
+	 self -> (-1; 1; {enemy}) -> state:2
+	 self -> (1; 1; {enemy}) -> state:2
+state:2 has children:
+	 self -> (0; 0; WhiteBackLane()){PromoteToWhiteBishop()} -> state:3
+	 self -> (0; 0; WhiteBackLane()){PromoteToWhiteKnight()} -> state:3
+	 self -> (0; 0; WhiteBackLane()){PromoteToWhiteQueen()} -> state:3
+	 self -> (0; 0; WhiteBackLane()){PromoteToWhiteRook()} -> state:3
+	 self -> (0; 0; NotWhiteBackLane()) -> state:3
+state:3 has children:
+state:4 has children:
+	 self -> (0; 2; {empty}) -> state:3
 The final states are: [state:3]
 
 
 
 --Compiling regex for BlackPawn:
 REGEX TREE:
-	Concatination
-		Union
-			({0}; {-1}; {empty})
-			({0}; {0}; {true})
-		BlackCanWin()
+	Union
+		Concatination
+			Union
+				({0}; {-1}; {empty})
+				Union
+					({1}; {-1}; {enemy})
+					({-1}; {-1}; {enemy})
+			Union
+				BlackPromote()
+				({0}; {0}; NotBlackBackLane())
+		Concatination
+			({0}; {0}; yis6())
+			({0}; {-2}; {empty})
 
 Resolved regex:
 REGEX TREE:
-	Concatination
-		Union
-			(0; -1; {empty})
-			(0; 0; {true})
-		Union
-			(0; 0; {this.y==WhiteY}){BEnd()}
-			(0; 0; {this.y!=WhiteY})
+	Union
+		Concatination
+			Union
+				(0; -1; {empty})
+				Union
+					(1; -1; {enemy})
+					(-1; -1; {enemy})
+			Union
+				Union
+					(0; 0; BlackBackLane()){PromoteToBlackKnight()}
+					Union
+						(0; 0; BlackBackLane()){PromoteToBlackBishop()}
+						Union
+							(0; 0; BlackBackLane()){PromoteToBlackQueen()}
+							(0; 0; BlackBackLane()){PromoteToBlackRook()}
+				(0; 0; NotBlackBackLane())
+		Concatination
+			(0; 0; yis6())
+			(0; -2; {empty})
 
 NFA created:
 
 Start state:1 has children:
-	 self -> None -> state:7
+	 self -> None -> state:5
 	 self -> None -> state:2
 state:2 has children:
-	 self -> (0; 0; {true}) -> state:3
+	 self -> (0; 0; yis6()) -> state:3
 state:3 has children:
-	 self -> None -> state:6
-	 self -> None -> state:4
+	 self -> (0; -2; {empty}) -> state:4
 state:4 has children:
-	 self -> (0; 0; {this.y!=WhiteY}) -> state:5
 state:5 has children:
+	 self -> None -> state:18
+	 self -> None -> state:6
 state:6 has children:
-	 self -> (0; 0; {this.y==WhiteY}){BEnd()} -> state:5
+	 self -> None -> state:17
+	 self -> None -> state:7
 state:7 has children:
-	 self -> (0; -1; {empty}) -> state:3
-The final state is: state:5
+	 self -> (-1; -1; {enemy}) -> state:8
+state:8 has children:
+	 self -> None -> state:10
+	 self -> None -> state:9
+state:9 has children:
+	 self -> (0; 0; NotBlackBackLane()) -> state:4
+state:10 has children:
+	 self -> None -> state:16
+	 self -> None -> state:11
+state:11 has children:
+	 self -> None -> state:15
+	 self -> None -> state:12
+state:12 has children:
+	 self -> None -> state:14
+	 self -> None -> state:13
+state:13 has children:
+	 self -> (0; 0; BlackBackLane()){PromoteToBlackRook()} -> state:4
+state:14 has children:
+	 self -> (0; 0; BlackBackLane()){PromoteToBlackQueen()} -> state:4
+state:15 has children:
+	 self -> (0; 0; BlackBackLane()){PromoteToBlackBishop()} -> state:4
+state:16 has children:
+	 self -> (0; 0; BlackBackLane()){PromoteToBlackKnight()} -> state:4
+state:17 has children:
+	 self -> (1; -1; {enemy}) -> state:8
+state:18 has children:
+	 self -> (0; -1; {empty}) -> state:8
+The final state is: state:4
 
 
 DFA created:
 
 Start state:1 has children:
-	 self -> (0; 0; {true}) -> state:2
+	 self -> (0; 0; yis6()) -> state:4
+	 self -> (1; -1; {enemy}) -> state:2
 	 self -> (0; -1; {empty}) -> state:2
+	 self -> (-1; -1; {enemy}) -> state:2
 state:2 has children:
-	 self -> (0; 0; {this.y==WhiteY}){BEnd()} -> state:3
-	 self -> (0; 0; {this.y!=WhiteY}) -> state:3
+	 self -> (0; 0; BlackBackLane()){PromoteToBlackQueen()} -> state:3
+	 self -> (0; 0; BlackBackLane()){PromoteToBlackKnight()} -> state:3
+	 self -> (0; 0; NotBlackBackLane()) -> state:3
+	 self -> (0; 0; BlackBackLane()){PromoteToBlackRook()} -> state:3
+	 self -> (0; 0; BlackBackLane()){PromoteToBlackBishop()} -> state:3
 state:3 has children:
+state:4 has children:
+	 self -> (0; -2; {empty}) -> state:3
 The final states are: [state:3]
 

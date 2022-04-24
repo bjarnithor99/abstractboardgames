@@ -1,4 +1,3 @@
-from NewFolderStruct.Parser.RegexParser.ASTType import IntegerExpression
 from .Types import *
 from ..Parser.ASTType import Letter
 

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script>
+			WEBSOCKET_UPDATER_URL = 'REPLACE_WITH_WEBSOCKET_UPDATER_URL';
+			BACKEND_URL = 'REPLACE_WITH_BACKEND_URL';
+		</script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<link rel="stylesheet" href="./main.css" type="text/css">
+		<script type="module" src="./main.js"></script>
+		<script type="module">
+			//import createNewGame from "./main.js"
+			//window.createNewGame = createNewGame;
+		</script>
+		<title>
+			Abstract Board Game
+		</title>
+	</head>
+	<body>
+		<div class="flex-center-content" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;" id="main-div">
+			<div class="flex-column">
+				<div id='chess-board' style="display: flex;"></div>
+			</div>
+		</div>
+	</body>
+</html>

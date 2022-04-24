@@ -60,7 +60,7 @@ predicate WhiteRightPiecesUnmoved() {return (not whiteRightRookMoved) and (not w
 
 macro Castling(y) = (1,0,empty)(1,0,empty)(0,0,WhiteRightPiecesUnmoved()){Move(7, y, -2, 0)};
 
-macro KingMacro(y) = KingSteps() | Castling(y);
+macro KingMacro(y) = KingSteps(); #| Castling(y);
 
 macro T(dx, dy) = Step(dx*2,dy) | Step(dx,dy*2);
 macro KnightMacro() = T(1, 1) | T(-1, 1)| T(1, -1)| T(-1, -1);
@@ -90,6 +90,8 @@ rule BlackPawn = (
     )(BlackPromote() | (0,0,NotBlackBackLane())) |
     (0,0,yis6())(0,-2,empty);
 
+victory white {return 0;};
+victory black {return 0;};
 
 BoardSize = 8, 8;
 Board = 

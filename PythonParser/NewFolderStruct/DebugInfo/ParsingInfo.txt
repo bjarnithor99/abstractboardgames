@@ -1,48 +1,211 @@
-SimpleGame.game parsed as:
+demo3.game parsed as:
 Players:
 	['white', 'black']
 Pieces:
-	PIECE(WhitePawn,white),PIECE(BlackPawn,black)
+	PIECE(WhitePawn,white),PIECE(BlackPawn,black),PIECE(WhiteKnight,white),PIECE(BlackKnight,black),PIECE(WhiteBishop,white),PIECE(BlackBishop,black),PIECE(WhiteRook,white),PIECE(BlackRook,black),PIECE(WhiteQueen,white),PIECE(BlackQueen,black),PIECE(WhiteKing,white),PIECE(BlackKing,black)
 Rules:
-	VARIABLE WhiteY = {0}
-	VARIABLE BlackY = {3}
-	EFFECT WEnd():
-		WPawnAtEnd = {1}
-	MACRO WhiteCanWin():
+	MACRO Ray(dx,dy):
+	REGEX TREE:
+		Concatination
+			Star
+				({dx}; {dy}; {empty})
+			Step({dx},{dy})
+	MACRO Step(dx,dy):
 	REGEX TREE:
 		Union
-			({0}; {0}; {this.y==BlackY}){WEnd()}
-			({0}; {0}; {this.y!=BlackY})
+			({dx}; {dy}; {empty})
+			({dx}; {dy}; {enemy})
+	EFFECT PromoteToWhiteQueen():
+		Board[{this.x}][{this.y}] = {WhiteQueen}
+	EFFECT PromoteToWhiteRook():
+		Board[{this.x}][{this.y}] = {WhiteRook}
+	EFFECT PromoteToWhiteKnight():
+		Board[{this.x}][{this.y}] = {WhiteKnight}
+	EFFECT PromoteToWhiteBishop():
+		Board[{this.x}][{this.y}] = {WhiteBishop}
+	EFFECT PromoteToBlackQueen():
+		Board[{this.x}][{this.y}] = {BlackQueen}
+	EFFECT PromoteToBlackRook():
+		Board[{this.x}][{this.y}] = {BlackRook}
+	EFFECT PromoteToBlackKnight():
+		Board[{this.x}][{this.y}] = {BlackKnight}
+	EFFECT PromoteToBlackBishop():
+		Board[{this.x}][{this.y}] = {BlackBishop}
+	PREDICATE WhiteBackLane():
+		{this.y==7}
+	PREDICATE NotWhiteBackLane():
+		{this.y!=7}
+	PREDICATE BlackBackLane():
+		{this.y==1}
+	PREDICATE NotBlackBackLane():
+		{this.y!=1}
+	MACRO WhitePromote():
+	REGEX TREE:
+		Union
+			({0}; {0}; WhiteBackLane()){PromoteToWhiteKnight()}
+			Union
+				({0}; {0}; WhiteBackLane()){PromoteToWhiteBishop()}
+				Union
+					({0}; {0}; WhiteBackLane()){PromoteToWhiteQueen()}
+					({0}; {0}; WhiteBackLane()){PromoteToWhiteRook()}
+	MACRO BlackPromote():
+	REGEX TREE:
+		Union
+			({0}; {0}; BlackBackLane()){PromoteToBlackKnight()}
+			Union
+				({0}; {0}; BlackBackLane()){PromoteToBlackBishop()}
+				Union
+					({0}; {0}; BlackBackLane()){PromoteToBlackQueen()}
+					({0}; {0}; BlackBackLane()){PromoteToBlackRook()}
+	MACRO BishopMacro():
+	REGEX TREE:
+		Union
+			Ray({-1},{1})
+			Union
+				Ray({1},{-1})
+				Union
+					Ray({1},{1})
+					Ray({-1},{-1})
+	MACRO RookMacro():
+	REGEX TREE:
+		Union
+			Ray({0},{1})
+			Union
+				Ray({0},{-1})
+				Union
+					Ray({1},{0})
+					Ray({-1},{0})
+	MACRO QueenMacro():
+	REGEX TREE:
+		Union
+			BishopMacro()
+			RookMacro()
+	MACRO KingSteps():
+	REGEX TREE:
+		Union
+			Step({1},{0})
+			Union
+				Step({0},{1})
+				Union
+					Step({-1},{0})
+					Union
+						Step({0},{-1})
+						Union
+							Step({1},{1})
+							Union
+								Step({-1},{1})
+								Union
+									Step({1},{-1})
+									Step({-1},{-1})
+	EFFECT Move(x,y,dx,dy):
+		Board[{x+dx}][{y+dy}] = {jon}
+		Board[{x}][{y}] = {None}
+	VARIABLE blackLeftRookMoved = {0}
+	VARIABLE blackRightRookMoved = {0}
+	VARIABLE whiteLeftRookMoved = {0}
+	VARIABLE whiteRightRookMoved = {0}
+	VARIABLE whiteKingMoved = {0}
+	PREDICATE WhiteRightPiecesUnmoved():
+		{(notwhiteRightRookMoved)and(notwhiteKingMoved)}
+	MACRO Castling(y):
+	REGEX TREE:
+		Concatination
+			({1}; {0}; {empty})
+			Concatination
+				({1}; {0}; {empty})
+				({0}; {0}; WhiteRightPiecesUnmoved()){Move({7},{y},{-2},{0})}
+	MACRO KingMacro(y):
+	REGEX TREE:
+		KingSteps()
+	MACRO T(dx,dy):
+	REGEX TREE:
+		Union
+			Step({dx*2},{dy})
+			Step({dx},{dy*2})
+	MACRO KnightMacro():
+	REGEX TREE:
+		Union
+			T({1},{1})
+			Union
+				T({-1},{1})
+				Union
+					T({1},{-1})
+					T({-1},{-1})
+	RULE WhiteKing:
+	REGEX TREE:
+		KingMacro({0})
+	RULE BlackKing:
+	REGEX TREE:
+		KingMacro({7})
+	RULE WhiteQueen:
+	REGEX TREE:
+		QueenMacro()
+	RULE BlackQueen:
+	REGEX TREE:
+		QueenMacro()
+	RULE WhiteRook:
+	REGEX TREE:
+		RookMacro()
+	RULE BlackRook:
+	REGEX TREE:
+		RookMacro()
+	RULE WhiteBishop:
+	REGEX TREE:
+		BishopMacro()
+	RULE BlackBishop:
+	REGEX TREE:
+		BishopMacro()
+	RULE WhiteKnight:
+	REGEX TREE:
+		KnightMacro()
+	RULE BlackKnight:
+	REGEX TREE:
+		KnightMacro()
+	PREDICATE yis1():
+		{this.y==1}
 	RULE WhitePawn:
 	REGEX TREE:
-		Concatination
-			Union
-				({0}; {1}; {empty})
-				({0}; {0}; {true})
-			WhiteCanWin()
-	EFFECT BEnd():
-		BPawnAtEnd = {1}
-	MACRO BlackCanWin():
-	REGEX TREE:
 		Union
-			({0}; {0}; {this.y==WhiteY}){BEnd()}
-			({0}; {0}; {this.y!=WhiteY})
+			Concatination
+				Union
+					({0}; {1}; {empty})
+					Union
+						({1}; {1}; {enemy})
+						({-1}; {1}; {enemy})
+				Union
+					WhitePromote()
+					({0}; {0}; NotWhiteBackLane())
+			Concatination
+				({0}; {0}; yis1())
+				({0}; {2}; {empty})
+	PREDICATE yis6():
+		{this.y==6}
 	RULE BlackPawn:
 	REGEX TREE:
-		Concatination
-			Union
-				({0}; {-1}; {empty})
-				({0}; {0}; {true})
-			BlackCanWin()
-	VARIABLE WPawnAtEnd = {0}
-	VARIABLE BPawnAtEnd = {0}
+		Union
+			Concatination
+				Union
+					({0}; {-1}; {empty})
+					Union
+						({1}; {-1}; {enemy})
+						({-1}; {-1}; {enemy})
+				Union
+					BlackPromote()
+					({0}; {0}; NotBlackBackLane())
+			Concatination
+				({0}; {0}; yis6())
+				({0}; {-2}; {empty})
 	VICTORY white:
-		{WPawnAtEnd==1}
+		{0}
 	VICTORY black:
-		{BPawnAtEnd==1}
+		{0}
 Board:
-	x:2, y:4
-	BlackPawn, None
-	None, None
-	None, None
-	None, WhitePawn
+	x:8, y:8
+	BlackRook, BlackKnight, BlackBishop, BlackKing, BlackQueen, BlackBishop, BlackKnight, BlackRook
+	BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn
+	None, None, None, None, None, None, None, None
+	None, None, None, None, None, None, None, None
+	None, None, None, None, None, None, None, None
+	None, None, None, None, None, None, None, None
+	WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn
+	WhiteRook, WhiteKnight, WhiteBishop, WhiteKing, WhiteQueen, WhiteBishop, WhiteKnight, WhiteRook

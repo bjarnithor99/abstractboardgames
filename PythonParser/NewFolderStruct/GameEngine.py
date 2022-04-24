@@ -1,5 +1,5 @@
 from __future__ import annotations
-from tkinter.messagebox import RETRY
+from telnetlib import GA
 from .Parser.Parser import Parser
 from .Parser.ASTType import *
 from .StateMachine.Types import *
@@ -20,18 +20,6 @@ class Move:
             returnStr += f'({letter.dx}, {letter.dy})' + (('{'+f'{letter.effect}'+'}') if letter.effect is not None else '')
         return returnStr + ']'
 
-class GameState:
-    pass
-
-class Won(GameState):
-    def __init__(self, playerName: str) -> None:
-        self.playerName: str = playerName
-
-class Draw(GameState):
-    pass
-
-class Unresolved:
-    pass
 
 class BoardPiece:
     def __init__(self, stateMachine: DFAStateMachine, name: str, player: str) -> None:
@@ -44,7 +32,8 @@ EngineBoard = list[list[BoardPiece | None]]
 
 #The variable names 'this', 'Board', 'enemy', 'empty' and 'true' have special meaning, don't write
 #them if you don't know what you are doing
-DebugFolder = 'NewFolderStruct/DebugInfo/'
+NewFolderAbs = 'C:/Users/gudmu/Desktop/Lokaverkefni/lokaverkefniCode/ru_final_project/PythonParser/NewFolderStruct/'
+DebugFolder = NewFolderAbs +'DebugInfo/'
 class GameEngine:
     
     def __hash__(self):
@@ -80,7 +69,7 @@ class GameEngine:
 
     def __init__(self, fileName, debug=False) -> None:
         self.debug = debug
-        f = open(f'NewFolderStruct/TestFiles/{fileName}')
+        f = open(NewFolderAbs+f'TestFiles/{fileName}')
         txt = ''.join(f.readlines())
         program: Program = Parser(txt).generateAST().root
 
@@ -189,7 +178,7 @@ class GameEngine:
                 child2 = visitor(regexNode.child2)
                 return type(regexNode)(child1, child2)
             elif type(regexNode) == Letter:
-                #Resolve integer expression
+                # Resolve integer expression
                 letter: Letter = regexNode
                 dx = self.resolveIntegerExpression(letter.dx)
                 dy = self.resolveIntegerExpression(letter.dy)
@@ -205,7 +194,7 @@ class GameEngine:
                 raise Exception(f'uncaught regexNode type {type(regexNode)}')
 
 
-        #clean regex
+        # clean regex
         return RegexTree(visitor(regex.rootNode))
     #--- Resolve rule functions end ---
 
@@ -273,7 +262,10 @@ class GameEngine:
                         expStr += str(self.variables[word.value][secondWordToken.value])
                         continue
                 i += 1
-                expStr += str(self.variables[word.value])
+                if word.value not in ('not', 'and', 'or'):
+                    expStr += str(self.variables[word.value])
+                else:
+                    expStr += word.value
                 continue
 
             else:
@@ -342,8 +334,6 @@ class GameEngine:
 
 
     def evaluatePredicate(self, predicate: FunctionCall | IntegerExpression, location: Position, player: str):
-        if type(predicate) == FunctionCall and predicate.name == 'BlackBackLane':
-            pass
         x, y = location
         inRange = (0<=x<len(self.variables['Board'])) and (0<=y<len(self.variables['Board'][0]))
         if not inRange:
@@ -469,8 +459,8 @@ class GameEngine:
         winner = 'E:)-|-<'
         numberOfWins = 0
         for player in self.players:
-            vicotryCondition = self.victoryConditions[player]
-            if self.resolveIntegerExpression(vicotryCondition.expression):
+            victoryCondition = self.victoryConditions[player]
+            if self.resolveIntegerExpression(victoryCondition.expression):
                 numberOfWins += 1
                 winner = player
         
@@ -484,6 +474,10 @@ class GameEngine:
     def playersTurn(self):
         return self.players[self.playersTurnIndex]
 
+    def reset(self):
+        while len(self.moveStack) != 0:
+            self.undoMove()
+
     def run(self, agents: list[Agent]) -> GameState:
         self.playersTurnIndex = 0
 
@@ -495,7 +489,7 @@ class GameEngine:
         while True:
             player = self.playersTurn()
             moves = self.getPlayerMoves()
-            move = playerToAgent[player].getMove(moves)
+            move = playerToAgent[player].getMove(self)
 
             if type(move) == str and move in 'qu':
                 if move == 'q':
@@ -514,49 +508,29 @@ class GameEngine:
 
             gameState = self.getGameState()
             if type(gameState) in (Draw, Won):
-                resultStr = "Game over"
-                if type(gameState) == Draw:
-                    resultStr += ', the game was a draw.'
-                elif type(gameState) == Won:
-                    win: Won = gameState
-                    resultStr += f', player {win.playerName} Won!'
                 if self.debug:
-                    print(resultStr)
+                    print(gameState)
                 return gameState
 
 
-class Agent:
-    def __init__(self, gameEngine: GameEngine) -> None:
-        self.player: str = None
+class GameState:
+    pass
 
-    def getMove(self, moves: list[Move]) -> Move:
-        return moves[0]
+class Won(GameState):
+    def __init__(self, playerName: str) -> None:
+        self.playerName: str = playerName
 
-class TUIAgent(Agent):
-    def __init__(self, gameEngine: GameEngine) -> None:
-        self.gameEngine = gameEngine
+    def __str__(self) -> str:
+        return f'Player {self.playerName} won!'
 
-    def getMove(self, moves: list[Move]) -> Move:
-        print(self.gameEngine)
-        for i, move in enumerate(moves):
-            print(i, str(move))
+class Draw(GameState):
+    def __str__(self) -> str:
+        return 'Draw'
 
-        def validInput(input: str):
-            return (userInput.isdigit() and int(userInput) in range(0, len(moves))) or input.lower() in 'qu'
-
-        userInput = input(f'{self.gameEngine.playersTurn()} input move:')
-        while not validInput(userInput):
-            print(f"Invalid input!")
-            userInput = input(f'{self.gameEngine.playersTurn()} input move:')
-    
-        return moves[int(userInput)] if userInput.isdigit() else userInput
+class Unresolved:
+    def __str__(self) -> str:
+        return 'Unresolved'
 
 
-'''
-C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.GameEngine
-'''
 if __name__ == '__main__':
-    gameFileName = 'SimpleBreakThrough.game'
-    #gm = GameEngine('demo3.game')
-    gm = GameEngine(gameFileName, debug=True)
-    gm.run([TUIAgent(gm), TUIAgent(gm)])
+    pass
