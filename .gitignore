@@ -38,7 +38,7 @@ abstract-board-games
 # Python
 PythonParser/Old
 PythonParser/ProjectData
-PythonParser/NewFolderStruct/DebugInfo/*.txt
+PythonParser/NewFolderStruct/DebugInfo/
 *__pycache__
 
 # cmake
