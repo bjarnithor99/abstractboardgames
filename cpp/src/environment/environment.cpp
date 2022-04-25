@@ -128,6 +128,10 @@ std::vector<std::vector<Step>> Environment::prune_illegal_moves() {
     }
     found_moves.clear();
     variables.n_moves_found = legal_moves.size();
+
+    if (legal_moves.empty())
+        check_terminal_conditions();
+
     return legal_moves;
 }
 
@@ -177,10 +181,10 @@ void Environment::reset() {
 }
 
 void Environment::print() {
-    for (int i = 0; i < board_size_x; i++) {
+    for (size_t i = 0; i < board.size(); i++) {
         if (i != 0)
             std::cout << "\n";
-        for (int j = 0; j < board_size_y; j++) {
+        for (size_t j = 0; j < board[0].size(); j++) {
             if (j != 0)
                 std::cout << " ";
             if (board[i][j].player == "white")

@@ -22,9 +22,6 @@ class Tournament:
             if move is not None:
                 self.env.execute_move(move)
                 move_count += 1
-            else:
-                self.env.check_terminal_conditions()
-                assert self.env.variables.game_over
         return self.env.variables.white_score
 
     def play(self, n_games):

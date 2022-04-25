@@ -32,9 +32,6 @@ class Coach:
                 states.append(
                     (self.env.get_environment_representation(), self.env.current_player)
                 )
-            else:
-                self.env.check_terminal_conditions()
-                assert self.env.variables.game_over
         score = self.env.variables.white_score
         return [
             (state[0], [score * ((-1) ** ("white" != state[1]))]) for state in states

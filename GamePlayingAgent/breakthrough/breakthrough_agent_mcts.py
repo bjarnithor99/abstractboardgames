@@ -38,6 +38,8 @@ class BreakthroughAgent:
         self.log.info("Training on %d sample(s)", len(samples))
         dataloader = self.process_samples_to_dataloader(samples)
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.LEARNING_RATE)
+
+        best_loss = np.inf
         for epoch in range(n_epochs):
             self.model.train()
             epoch_loss = 0.0
@@ -52,20 +54,16 @@ class BreakthroughAgent:
             self.log.info(
                 "Epoch %d/%d total loss: %f", epoch + 1, n_epochs, round(epoch_loss, 7)
             )
+            if best_loss > epoch_loss:
+                best_loss = epoch_loss
+                self.save_checkpoint("./best_mcts.pth")
+
+        self.load_checkpoint("./best_mcts.pth")
 
     def get_move(self, env, temperature=0.0):
         mcts = MCTS(env, self.model)
         root = mcts.run(n_simulations=50)
         return root.select_move(temperature)
-
-        # moves = list(root.children.keys())
-
-        # if not moves:
-        #     return None
-
-        # visit_counts = np.array([child.visit_count for child in root.children.values()])
-        # move = moves[np.argmax(visit_counts)]
-        # return move
 
     def save_checkpoint(self, checkpoint_path):
         torch.save(self.model.state_dict(), checkpoint_path)

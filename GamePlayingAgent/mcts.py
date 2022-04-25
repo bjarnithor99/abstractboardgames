@@ -97,8 +97,6 @@ class MCTS:
                     search_path.append(node)
                     self.env.execute_move(move)
 
-            self.env.check_terminal_conditions()
-
             if not self.env.variables.game_over and node is not None:
                 node.expand(self.env)
 

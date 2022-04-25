@@ -33,6 +33,7 @@ if __name__ == "__main__":
 
     players = [agent, TUIAgent()]
     # players = [TUIAgent(), agent]
+    # players = [TUIAgent(), TUIAgent()]
     while True:
         env.reset()
         move_count = 0
@@ -44,9 +45,6 @@ if __name__ == "__main__":
             if move is not None:
                 env.execute_move(move)
                 move_count += 1
-            else:
-                env.check_terminal_conditions()
-                assert env.variables.game_over
         print("GAME OVER!")
         print("White score", env.variables.white_score)
         print("Black score", env.variables.black_score)

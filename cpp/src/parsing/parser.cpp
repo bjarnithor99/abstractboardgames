@@ -153,7 +153,7 @@ void Parser::parse_board_size() {
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    environment = std::make_unique<Environment>(x, y);
+    environment = std::make_unique<Environment>(y, x);
 }
 
 void Parser::parse_board() {
@@ -242,7 +242,14 @@ void Parser::parse_rule() {
 
 void Parser::parse_macro() {
     match(Token::Macro);
+    Location loc = tokenTuple.location;
     std::string macro_name = parse_string();
+    if (macros.find(macro_name) != macros.end()) {
+        std::ostringstream oss;
+        oss << "Redefinition of macro " << macro_name << " in " << loc << ".";
+        std::string error_msg = oss.str();
+        throw std::runtime_error(error_msg);
+    }
     match(Token::LParen);
     std::vector<std::string> arguments = parse_arguments();
     match(Token::RParen);
@@ -255,10 +262,18 @@ std::vector<std::string> Parser::parse_arguments() {
     std::vector<std::string> argument_names;
     if (tokenTuple.token == Token::RParen)
         return argument_names;
+    Location loc = tokenTuple.location;
     std::string argument_name = parse_argument();
     argument_names.push_back(argument_name);
     while (match_if(Token::Comma)) {
+        loc = tokenTuple.location;
         argument_name = parse_argument();
+        if (find(argument_names.begin(), argument_names.end(), argument_name) != argument_names.end()) {
+            std::ostringstream oss;
+            oss << "Duplicate argument " << argument_name << " in macro definition in " << loc << ".";
+            std::string error_msg = oss.str();
+            throw std::runtime_error(error_msg);
+        }
         argument_names.push_back(argument_name);
     }
     return argument_names;

@@ -85,7 +85,6 @@ class BreakthroughAgent:
         found_moves = env.generate_moves()
 
         if not found_moves:
-            env.check_terminal_conditions()
             board_score = self.model.predict(
                 env.get_environment_representation()
             ).item()
