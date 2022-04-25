@@ -25,7 +25,8 @@ class Coach:
             (self.env.get_environment_representation(), self.env.current_player)
         )
         while not self.env.variables.game_over:
-            move = self.training_agent.get_move(self.env, random_prop=0.20)
+            # move = self.training_agent.get_move(self.env, random_prop=0.20)
+            move = self.training_agent.get_move(self.env, temperature=1)
             if move is not None:
                 self.env.execute_move(move)
                 states.append(

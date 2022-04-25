@@ -6,7 +6,9 @@
 import logging
 import coloredlogs
 import torch
-from breakthrough.breakthrough_agent import BreakthroughAgent
+
+# from breakthrough.breakthrough_agent_alphabeta import BreakthroughAgent
+from breakthrough.breakthrough_agent_mcts import BreakthroughAgent
 from tui_agent import TUIAgent
 from coach import Coach
 import python_bindings
@@ -17,7 +19,7 @@ if __name__ == "__main__":
     coloredlogs.install(level="INFO")
 
     log.info("Parsing game")
-    parser = python_bindings.Parser("../cpp/games/breakthrough_tiny.game")
+    parser = python_bindings.Parser("../cpp/games/breakthrough_small.game")
     parser.parse()
     env = parser.get_environment()
 
@@ -29,8 +31,8 @@ if __name__ == "__main__":
     log.info("Beginning training")
     coach.train_agent(10, 20)
 
-    # players = [agent, TUIAgent()]
-    players = [TUIAgent(), agent]
+    players = [agent, TUIAgent()]
+    # players = [TUIAgent(), agent]
     while True:
         env.reset()
         move_count = 0
