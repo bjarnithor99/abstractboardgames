@@ -57,7 +57,7 @@ class Coach:
 
             self.training_agent.save_checkpoint("./before_training.pth")
             # self.old_agent.load_checkpoint("./before_training.pth")
-            self.training_agent.train(training_samples, n_epochs=75)
+            self.training_agent.train(training_samples, n_epochs=25)
 
             self.log.info("Starting tournament between new agent and old agent")
             tournament = Tournament(self.env, self.training_agent, self.old_agent)

@@ -18,7 +18,7 @@ class BreakthroughAgent:
         self.device = (
             torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         )
-        self.model = Model(sample_input).to(self.device)
+        self.model = Model(sample_input, self.device)
         print(summary(self.model, sample_input.shape))
         self.log = logging.getLogger(__name__)
         self.BATCH_SIZE = 32
@@ -52,16 +52,6 @@ class BreakthroughAgent:
                 "Epoch %d/%d total loss: %f", epoch + 1, n_epochs, round(epoch_loss, 7)
             )
 
-    def predict(self, state):
-        self.model.eval()
-        with torch.no_grad():
-            v = self.model(
-                torch.unsqueeze(torch.tensor(state, dtype=torch.float), dim=0).to(
-                    self.device
-                )
-            )
-        return v
-
     def get_move(self, env, random_prop=0.0):
         available_moves = env.generate_moves()
 
@@ -76,7 +66,7 @@ class BreakthroughAgent:
         for move in available_moves:
             env.execute_move(move)
             move_score = -self.negamax(
-                env, 7, float("-inf"), float("inf"), env.current_player == "white"
+                env, 4, float("-inf"), float("inf"), env.current_player == "white"
             )
             # print("move_score", move_score)
             if move_score > best_move_score:
@@ -87,14 +77,18 @@ class BreakthroughAgent:
 
     def negamax(self, env, depth, alpha, beta, max_player):
         if env.variables.game_over or depth == 0:
-            board_score = self.predict(env.get_environment_representation()).item()
+            board_score = self.model.predict(
+                env.get_environment_representation()
+            ).item()
             return board_score if max_player else -board_score
 
         found_moves = env.generate_moves()
 
         if not found_moves:
             env.check_terminal_conditions()
-            board_score = self.predict(env.get_environment_representation()).item()
+            board_score = self.model.predict(
+                env.get_environment_representation()
+            ).item()
             return board_score if max_player else -board_score
         else:
             best_score = float("-inf")
