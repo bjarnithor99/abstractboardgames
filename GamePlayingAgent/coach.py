@@ -35,9 +35,8 @@ class Coach:
                 self.env.check_terminal_conditions()
                 assert self.env.variables.game_over
         score = self.env.variables.white_score
-        winner = "white" if score == 1 else "black" if score == -1 else "draw"
         return [
-            (state[0], [score * ((-1) ** (winner != state[1]))]) for state in states
+            (state[0], [score * ((-1) ** ("white" != state[1]))]) for state in states
         ]
 
     def train_agent(self, n_iterations, episodes_per_iteration):

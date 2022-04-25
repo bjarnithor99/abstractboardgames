@@ -88,18 +88,14 @@ class BreakthroughAgent:
     def negamax(self, env, depth, alpha, beta, max_player):
         if env.variables.game_over or depth == 0:
             board_score = self.predict(env.get_environment_representation()).item()
-            # game_score = env.variables.white_score
-            # print(-board_score, game_score)
-            return -board_score if max_player else board_score
+            return board_score if max_player else -board_score
 
         found_moves = env.generate_moves()
 
         if not found_moves:
             env.check_terminal_conditions()
             board_score = self.predict(env.get_environment_representation()).item()
-            # game_score = env.variables.white_score
-            # print(-board_score, game_score)
-            return -board_score if max_player else board_score
+            return board_score if max_player else -board_score
         else:
             best_score = float("-inf")
             for move in found_moves:
