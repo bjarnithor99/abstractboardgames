@@ -62,7 +62,7 @@ std::vector<std::vector<Step>> Environment::generate_moves() {
         for (int j = 0; j < board_size_y; j++) {
             if (board[i][j].player == current_player) {
                 candidate_move.clear();
-                candidate_move.push_back(Step(i, j, SideEffects::get_side_effect["default"]));
+                candidate_move.push_back(Step(i, j, SideEffects::get_side_effect["Default"]));
                 generate_moves(board[i][j].state, i, j);
             }
         }
@@ -83,10 +83,11 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
             continue;
         candidate_move.push_back(Step(next_x, next_y, input.side_effect));
         execute_move(
-            std::vector<Step>{candidate_move[candidate_move.size() - 2], candidate_move[candidate_move.size() - 1]});
+            std::vector<Step>{candidate_move[candidate_move.size() - 2], candidate_move[candidate_move.size() - 1]},
+            true);
         generate_moves(p.second, next_x, next_y);
         candidate_move.pop_back();
-        undo_move();
+        undo_move(true);
     }
 }
 
@@ -110,7 +111,7 @@ bool Environment::verify_post_condition(DFAState *state, int x, int y) {
 std::vector<std::vector<Step>> Environment::prune_illegal_moves() {
     std::vector<std::vector<Step>> legal_moves;
     for (const std::vector<Step> &move : found_moves) {
-        execute_move(move);
+        execute_move(move, true);
         bool legal_move = true;
         for (auto &p : post_conditions[current_player]) {
             const std::string &piece = p.first;
@@ -127,7 +128,7 @@ std::vector<std::vector<Step>> Environment::prune_illegal_moves() {
         }
         if (legal_move)
             legal_moves.push_back(std::move(move));
-        undo_move();
+        undo_move(true);
     }
     found_moves.clear();
     variables.n_moves_found = legal_moves.size();
@@ -138,9 +139,8 @@ std::vector<std::vector<Step>> Environment::prune_illegal_moves() {
     return legal_moves;
 }
 
-void Environment::execute_move(const std::vector<Step> &move) {
+void Environment::execute_move(const std::vector<Step> &move, bool searching) {
     move_stack.push({board, variables});
-    move_count++;
     int n_steps = move.size();
     for (int i = 1; i < n_steps; i++) {
         int old_x = move[i - 1].x;
@@ -149,15 +149,20 @@ void Environment::execute_move(const std::vector<Step> &move) {
         int new_y = move[i].y;
         (*(move[i].side_effect))(this, old_x, old_y, new_x, new_y);
     }
-    check_terminal_conditions();
-    update_current_player();
+    if (!searching) {
+        move_count++;
+        check_terminal_conditions();
+        update_current_player();
+    }
 }
 
-void Environment::undo_move() {
+void Environment::undo_move(bool searching) {
     std::tie(board, variables) = move_stack.top();
-    move_count--;
     move_stack.pop();
-    update_current_player();
+    if (!searching) {
+        move_count--;
+        update_current_player();
+    }
 }
 
 bool Environment::check_terminal_conditions() {
