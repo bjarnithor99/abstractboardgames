@@ -4,7 +4,8 @@ class ChessService {
 		try {
 			const formData = new FormData();
 			formData.append('moveIndex', moveIndex);
-			const response = await axios.post(`${ChessService.baseURL}/chess-board/moves`, formData);
+			console.log(formData.get('moveIndex'), moveIndex);
+			const response = await axios.post(`${ChessService.baseURL}/chess-board/moves`, {'moveIndex': moveIndex});
 			return response.data['gameState']
 		} catch (error) {
 			console.error('playMove err', error);

@@ -37,7 +37,7 @@ class Symbol(Token):
     values = '()[]{}'
 
 class Operator(Token):
-    values = '!|=*+-/%?.'
+    values =  ['and', 'not', '//', 'or', '!=', '==', '&&', '||', '.', '%', '/', '!', '*', '+', '-', '=', '|']
 
 class EOI(Token):
     pass

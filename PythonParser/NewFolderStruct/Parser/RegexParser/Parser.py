@@ -2,11 +2,9 @@ from .ASTType import Concatination, FunctionCall, Letter, Union, Star, Plus, Que
 from ...Lexer.TokenTypes import *
 from .ASTType import RegexTree
 from ...Lexer.Lexer import Lexer
-
-class MatchFailed(Exception):
-    pass
-
-class Parser:
+from ..IntegerExpressionParser.Parser import Parser as IntegerExpressionParser
+from ..ASTType import MatchFailed
+class Parser(IntegerExpressionParser):
     def __init__(self, regex: str | list[Token]) -> None:
         self.tokens: list[Token] = []
         if type(regex) == str:
@@ -142,7 +140,7 @@ class Parser:
     def matchLetter(self):
         backupI = self.i
         try:
-            self.matchToken(Symbol, '(')
+            self.matchToken(Symbol, '[')
             dx = self.matchIntegerExpression()
             self.matchToken(Delimiter)
             dy = self.matchIntegerExpression()
@@ -161,7 +159,7 @@ class Parser:
                     pass
             if exprOrFunCall is None:
                 raise MatchFailed
-            self.matchToken(Symbol, ')')
+            self.matchToken(Symbol, ']')
 
             try:
                 self.matchToken(Symbol, '{')
@@ -178,7 +176,7 @@ class Parser:
             self.i = backupI
             raise error
 
-    def matchIntegerExpression(self):
+    def DELETETHIS(self):
         numberOfOpenScopes = 0
         def validExpToken(token: Token):
             nonlocal numberOfOpenScopes
@@ -186,6 +184,7 @@ class Parser:
                 numberOfOpenScopes += {'(':1, ')':-1}[token.value]
             return (isinstance(token, Word) or\
             isinstance(token, Integer) or\
+            isinstance(token, Operator) or\
             token.value in '!=+-*/().' or\
             token.value == '==') and\
             numberOfOpenScopes != -1

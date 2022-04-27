@@ -58,17 +58,17 @@ class MinMaxAI(Agent):
 
     def getMove(self, gameEngine: GameEngine) -> Move:
         self.calculateTimes(gameEngine)
-        #self.count = 0
+        self.count = 0
         self.memo = dict()
         bestMove, bestScore = self.bestMoveAndScore(gameEngine, self.thinkingTime)
-        #print('MinMaxAI2 looked at', self.count, 'final positions')
+        print('MinMaxAI2 looked at', self.count, 'final positions')
         return bestMove
 
     def bestMoveAndScore(self, gameEngine: GameEngine, thinkingTime) -> Tuple[Move, int]:
         boardID = hash(gameEngine)
         if boardID in self.memo:
             return self.memo[boardID]
-        #self.count += 1
+        self.count += 1
 
         moves = gameEngine.getPlayerMoves()
 
@@ -92,7 +92,7 @@ class MinMaxAI(Agent):
         return bestMove, bestScore
 
     def evalBoard(self, gameEngine: GameEngine) -> int:
-        #self.count += 1
+        self.count += 1
         gameState = gameEngine.getGameState()
         if type(gameState) == Won:
             win: Won = gameState
@@ -114,9 +114,10 @@ C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m ru_final_pr
 if __name__ == '__main__':
     #gameFileName = 'SimpleBreakThrough.game'
     #gameFileName = 'MediumBreakThrough.game'
-    gameFileName = 'demo3.game'
+    gameFileName = 'chess.game'
     gm = GameEngine(gameFileName, debug=True)
-    #result = gm.run([BrowserGUIAgent(port=8082), MinMaxAI(thinkingTime=5)])
-    result = gm.run([BrowserGUIAgent(port=8082), RandomAgent()])
-    #result = gm.run([MinMaxAI(thinkingTime=0.1), MinMaxAI(thinkingTime=0.1)])
+    result = gm.run([BrowserGUIAgent(port=8082), MinMaxAI(thinkingTime=1)])
+    #result = gm.run([BrowserGUIAgent(port=8082), RandomAgent()])
+    #result = gm.run([BrowserGUIAgent(port=8082), BrowserGUIAgent(port=8081)])
+    #result = gm.run([MinMaxAI(thinkingTime=5), MinMaxAI(thinkingTime=5)])
     print(result)

@@ -1,5 +1,8 @@
 from __future__ import annotations
-from telnetlib import GA
+
+from .Parser.IntegerExpressionParser.ASTType import SyntaxTreeNode as IntegerExpressionTreeNode
+from .Parser.IntegerExpressionParser.ASTType import Variable as IntegerExpressionVariable
+from .IntegerExpression.Evaluator import evaluateIntegerExpression
 from .Parser.Parser import Parser
 from .Parser.ASTType import *
 from .StateMachine.Types import *
@@ -181,7 +184,7 @@ class GameEngine:
                 # Resolve integer expression
                 letter: Letter = regexNode
                 dx = self.resolveIntegerExpression(letter.dx)
-                dy = self.resolveIntegerExpression(letter.dy)
+                dy = self.resolveIntegerExpression(letter.dy) #Predicates and effects need to be compiled too
                 return Letter(dx, dy, letter.pre, effect=letter.effect)
             elif type(regexNode) == FunctionCall:
                 funCall: FunctionCall = regexNode
@@ -235,11 +238,10 @@ class GameEngine:
         return argumentVariables
 
 
-    def resolveIntegerExpression(self, integerExpression: IntegerExpression) -> int | BoardPiece:
+    def resolveIntegerExpression(self, integerExpression: IntegerExpressionTreeNode) -> int | BoardPiece:
         #If integer expression is loading a state machine
-        token = integerExpression.tokenList[0]
-        if len(integerExpression.tokenList) == 1 and type(token) == Word and token.value in self.pieceRules:
-            pieceName = token.value
+        if type(integerExpression) == IntegerExpressionVariable and integerExpression.name in self.pieceRules:
+            pieceName = integerExpression.name
             dfa = self.pieceRules[pieceName]
             if dfa is None:
                 return None
@@ -247,32 +249,7 @@ class GameEngine:
                 playerName = self.piecesToPlayer[pieceName]
                 return BoardPiece(dfa, pieceName, playerName)
 
-        #Else it is returning an int
-        i = 0
-        expStr = ''
-        while i < len(integerExpression.tokenList):
-            token = integerExpression.tokenList[i]
-            if isinstance(token, Word):
-                word: Word = token
-                if i + 2 < len(integerExpression.tokenList):
-                    dotToken = integerExpression.tokenList[i+1]
-                    secondWordToken = integerExpression.tokenList[i+2]
-                    if type(dotToken) == Operator and dotToken.value == '.' and type(secondWordToken) == Word:
-                        i += 3
-                        expStr += str(self.variables[word.value][secondWordToken.value])
-                        continue
-                i += 1
-                if word.value not in ('not', 'and', 'or'):
-                    expStr += str(self.variables[word.value])
-                else:
-                    expStr += word.value
-                continue
-
-            else:
-                i += 1
-                expStr += str(token.value)
-                continue
-        return eval(expStr)
+        return evaluateIntegerExpression(integerExpression, self.variables)
 
     def setThis(self, thisVariables: dict[str: int]):
         self.variables['this'] = thisVariables
@@ -333,7 +310,7 @@ class GameEngine:
         self.playersTurnIndex = (self.playersTurnIndex-1)%len(self.players)
 
 
-    def evaluatePredicate(self, predicate: FunctionCall | IntegerExpression, location: Position, player: str):
+    def evaluatePredicate(self, predicate: FunctionCall | IntegerExpressionTreeNode, location: Position, player: str):
         x, y = location
         inRange = (0<=x<len(self.variables['Board'])) and (0<=y<len(self.variables['Board'][0]))
         if not inRange:
@@ -346,7 +323,7 @@ class GameEngine:
             argumentVariables = self.matchFunCallWithArguments(preCall, predicateType)
             f = lambda: self.resolveIntegerExpression(predicateType.expression)
             returnValue = self.runFunctionInEnvironment(f, argumentVariables)
-        elif type(predicate) == IntegerExpression:
+        elif isinstance(predicate, IntegerExpressionTreeNode):
             specialPredicates = {
                 'enemy': (self.getTile(x,y) is not None) and (self.getTile(x,y).player!=player),
                 'empty': self.getTile(x,y) is None,

@@ -62,7 +62,8 @@ class AgentService:
         def chessBoardMovesHanlder():
             response_body = dict()
             if request.method == 'POST':
-                moveIndex = int(request.form.get('moveIndex'))
+                dataDict = json.loads(request.data)
+                moveIndex = int(dataDict['moveIndex'])
                 moves = self.gameEngine.getPlayerMoves()
                 self.move = moves[moveIndex] #Storing the move
                 tempEngine = deepcopy(self.gameEngine)

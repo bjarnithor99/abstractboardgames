@@ -1,6 +1,10 @@
 from __future__ import annotations
 from .RegexParser.ASTType import *
 
+
+class MatchFailed(Exception):
+    pass
+
 class AST:
     def __init__(self, root: ASTNode) -> None:
         self.root: ASTNode = root

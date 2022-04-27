@@ -1,88 +1,113 @@
-Players := white, black;
+players = white, black;
+pieces =
+    WhitePawn(white), BlackPawn(black),
+    WhiteKnight(white), BlackKnight(black),
+    WhiteBishop(white), BlackBishop(black),
+    WhiteRook(white), BlackRook(black),
+    WhiteQueen(white), BlackQueen(black),
+    WhiteKing(white), BlackKing(black);
 
-Pieces =  BlackRook(black), WhiteRook(white), WhiteQueen(white);
+macro Ray(dx,dy) = [dx, dy, empty]*Step(dx, dy);
+macro Step(dx, dy) = [dx, dy, empty] | [dx, dy, enemy];
 
-Ray(dx, dy) := (dx,dy,empty)*(dx,dy,enemy)|(dx,dy,empty)+;
-Rook() := Ray(1,0) | Ray(0,1) | Ray(-1,0) | Ray(0,-1);
-Bishop() := Ray(1,1) | Ray(-1,1) | Ray(1,-1) | Ray(-1,-1);
-Queen() := Rook() | Bishop();
+macro BishopMacro() = Ray(-1,1) | Ray(1,-1) | Ray(1,1) | Ray(-1,-1);
+macro RookMacro() = Ray(0,1) | Ray(0,-1) | Ray(1,0) | Ray(-1,0);
+macro QueenMacro() = BishopMacro() | RookMacro();
+macro KingSteps() = Step(1,0) | Step(0,1) | Step(-1,0) | Step(0,-1) |
+                Step(1,1) | Step(-1,1) | Step(1,-1) | Step(-1,-1);
 
-
-
-effect rightCastling(y) {
-    Board[5][y] = Board[7][y];
-    Board[7][y] = None;
+effect Move(x, y, dx, dy) {
+    Board[x+dx][y+dy] = jon;
+    Board[x][y] = None;
 };
 
+variable blackLeftRookMoved = 0;
+variable blackRightRookMoved = 0;
+variable blackKingMoved = 0;
 
-effect promoteToWhiteQueen(x,y) {
-    Board[x][y] = WhiteQueen;
-};
+variable whiteLeftRookMoved = 0;
+variable whiteRightRookMoved = 0;
+variable whiteKingMoved = 0;
 
-effect promoteToWhiteRook(x,y) {
-    Board[x][y] = WhiteRook;
-};
+#predicate WhiteRightPiecesUnmoved() {return (not whiteRightRookMoved) and (not whiteKingMoved);};
 
-effect promoteToWhiteKnight(x,y) {
-    Board[x][y] = WhiteRook;
-};
 
-effect promoteToWhiteBishop(x,y) {
-    Board[x][y] = WhiteRook;
-};
 
-predicate whitePromotionRow(y) {
-    return (y == 7);
-}
+macro Castling(y) = [1,0,empty][1,0,empty][0,0,not whiteRightRookMoved and not whiteKingMoved]{Move(7, y, -2, 0)};
 
-predicate whiteDoubleStepRow(y) {
-    return (y == 1);
-}
+macro KingMacro(y) = KingSteps() | Castling(y);
 
-macro promoteWhitePawn(x, y) =
-    (0,0,whitePromotionRow(y))){promoteToWhiteQueen(x,y)} |
-    (0,0,whitePromotionRow(y)){promoteToWhiteRook(x,y)} |
-    (0,0,whitePromotionRow(y)){promoteToWhiteKnight(x,y)} |
-    (0,0,whitePromotionRow(y)){promoteToWhiteBishop(x,y)};
+macro T(dx, dy) = Step(dx*2,dy) | Step(dx,dy*2);
+macro KnightMacro() = T(1, 1) | T(-1, 1)| T(1, -1)| T(-1, -1);
+
+
+rule WhiteKing = KingMacro(0); rule BlackKing = KingMacro(7);
+rule WhiteQueen = QueenMacro(); rule BlackQueen = QueenMacro();
+rule WhiteRook = RookMacro(); rule BlackRook = RookMacro();
+rule WhiteBishop = BishopMacro(); rule BlackBishop = BishopMacro();
+rule WhiteKnight = KnightMacro(); rule BlackKnight = KnightMacro();
+
+
+#--Pawn code--
+effect PromoteToWhiteQueen() {Board[this.x][this.y] = WhiteQueen;};
+effect PromoteToWhiteRook() {Board[this.x][this.y] = WhiteRook;};
+effect PromoteToWhiteKnight() {Board[this.x][this.y] = WhiteKnight;};
+effect PromoteToWhiteBishop() {Board[this.x][this.y] = WhiteBishop;};
+
+effect PromoteToBlackQueen() {Board[this.x][this.y] = BlackQueen;};
+effect PromoteToBlackRook() {Board[this.x][this.y] = BlackRook;};
+effect PromoteToBlackKnight() {Board[this.x][this.y] = BlackKnight;};
+effect PromoteToBlackBishop() {Board[this.x][this.y] = BlackBishop;};
+
+
+macro WhitePromotePossibility() = 
+    (
+        [0,0,this.y==7]{PromoteToWhiteKnight()} |
+        [0,0,this.y==7]{PromoteToWhiteBishop()} |
+        [0,0,this.y==7]{PromoteToWhiteQueen()} |
+        [0,0,this.y==7]{PromoteToWhiteRook()}
+    ) |
+        [0,0,this.y!=7]
+    ;
+
+macro BlackPromotePossibility() =
+    (
+        [0,0,this.y==0]{PromoteToBlackKnight()} |
+        [0,0,this.y==0]{PromoteToBlackBishop()} |
+        [0,0,this.y==0]{PromoteToBlackQueen()} |
+        [0,0,this.y==0]{PromoteToBlackRook()}
+    ) |
+        [0,0,this.y!=0]
+    ;
 
 rule WhitePawn = 
     (
-        (0,0,whiteDoubleStepRow(this.y))(0,1,empty)(0,1,empty)
-    ) |
+        [0,1,empty] |
+        [1,1, enemy] | 
+        [-1,1, enemy]
+    )WhitePromotePossibility() |
+    [0,0,this.y==1][0,1,empty][0,1,empty];
+
+
+rule BlackPawn = 
     (
-        (
-            (0,1,empty) |
-            (-1,1,enemy) |
-            (1,1,enemy)
-        )
-        promoteWhitePawn(this.x, this.y)?
-    );
+        [0,-1,empty] |
+        [1,-1, enemy] | 
+        [-1,-1, enemy]
+    )BlackPromotePossibility() |
+    [0,0,this.y==6][0,-1,empty][0,-1,empty];
 
-rule BlackQueen = Queen();
+victory white {return 0;};
+victory black {return 0;};
 
-rule BlackRook = Rook();
-rule WhiteRook = Rook();
-
-rule 
-
-Step(dx,dy) := (dx,dy,empty) | (dx,dy,enemy);
-TMove(xSign, ySign) := Step(xSign1, ySign2) | Step(xSign2, ySign1);
-Knight := TMove(0,-) | TMove(-,-) | TMove(0,0) | TMove(-,0);
-
-WhitePawn := ((0,1,empty)(0,1,empty)?) | (-1,1,enemy) | (1,1,enemy);
-BlackPawn := ((0,-1,empty)(0,-1,empty)?) | (-1,-1,enemy) | (1,-1,enemy);
-
-King := Step(1,0) | Step(1,1) | Step(0,1) | Step(1,-1){rightCastling(x)} | 
-        Step(-1,0) | Step(-1,-1) | Step(0,-1) | Step(-1,1);
-
-BoardSize := 8, 8;
-Board := 
-    Rook(black), Knight(black), Bishop(black), Queen(black), King(black), Bishop(black), Knight(black), Rook(black),
-    BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black), BlackPawn(black),
+board_size = 8, 8;
+board = 
+    BlackRook, BlackKnight, BlackBishop, BlackKing, BlackQueen, BlackBishop, BlackKnight, BlackRook,
+    BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn,
     None, None, None, None, None, None, None, None,
     None, None, None, None, None, None, None, None,
     None, None, None, None, None, None, None, None,
     None, None, None, None, None, None, None, None,
-    WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white), WhitePawn(white),
-    Rook(white), Knight(white), Bishop(white), Queen(white), King(white), Bishop(white), Knight(white), Rook(white)
+    WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn,
+    WhiteRook, WhiteKnight, WhiteBishop, WhiteKing, WhiteQueen, WhiteBishop, WhiteKnight, WhiteRook
 ;

@@ -3,12 +3,11 @@ from .ASTType import *
 from . import ASTType
 from ..Lexer.Lexer import Lexer
 from ..Lexer.TokenTypes import Word, EOI, EOL, Integer, Symbol, Operator, Delimiter, TextPosition
-
-from .RegexParser.Parser import MatchFailed
 from .RegexParser.Parser import Parser as RegexParser
 
 #C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.Parser.Parser
-
+#\(([^=|,]*?),([^=|,]*?),([^=|,]*?)\)
+#[$1,$2,$3]
 # Joining the classes, allowing LanguageParser to use 
 # RegexParser.matchRegex() and RegexParser.matchIntegerExpression() (RegexParser as self)
 class Parser(RegexParser):
@@ -60,7 +59,7 @@ class Parser(RegexParser):
         names: list[str] = []
 
         token = self.peak(1)
-        if not(type(token) == Word and token.value == "Players"):
+        if not(type(token) == Word and token.value == "players"):
             raise MatchFailed(token.pos)
 
         token = self.peak(2)
@@ -96,7 +95,7 @@ class Parser(RegexParser):
 
         try:
             token = self.next()
-            if not(type(token) == Word and token.value == "Pieces"):
+            if not(type(token) == Word and token.value == "pieces"):
                 raise MatchFailed(token.pos)
 
             token = self.next()
@@ -348,7 +347,7 @@ class Parser(RegexParser):
         try:
             boardArr: list[str] = []
             #Board size
-            self.matchToken(Word, "BoardSize")
+            self.matchToken(Word, "board_size")
             self.matchToken(Operator, "=")
             x = self.matchToken(Integer).value
             self.matchToken(Delimiter)
@@ -356,7 +355,7 @@ class Parser(RegexParser):
             self.matchToken(EOL)
 
             #Board
-            self.matchToken(Word, "Board")
+            self.matchToken(Word, "board")
             self.matchToken(Operator, "=")
             boardArr = self.matchCommaSperatedWords()
             self.matchToken(EOL)

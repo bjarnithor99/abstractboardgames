@@ -1,0 +1,25 @@
+
+
+
+
+
+
+
+
+
+integer_expression := <binary_stmt>
+binary_stmt := 
+    <unary_stmt><binary_op><binary_stmt> |
+    <unary_stmt>
+unary_stmt := 
+    <unary_op><unary_stmt> | 
+    <core_stmt>
+core_stmt := 
+    <int> | 
+    <variable> ('.' <variable>)? | 
+    '('<integer_expression>')'
+
+binary_op := ['*', '+', '-', '//', '/', '%', 'and', 'or', '!=', '==', '&&', '||']
+unary_op := ['not', '!', '-']
+int := CLASS OF INTEGERS
+variable := CLASS OF STRINGS 
