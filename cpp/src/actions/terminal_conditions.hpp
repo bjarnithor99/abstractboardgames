@@ -11,6 +11,7 @@
 #pragma once
 
 #include "environment.hpp"
+#include "predicates.hpp"
 #include "variables.hpp"
 #include <memory>
 #include <string>

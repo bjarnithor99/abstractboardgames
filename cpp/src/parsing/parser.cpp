@@ -394,7 +394,7 @@ std::unique_ptr<LetterNode> Parser::parse_letter() {
     std::string predicate_name = parse_string();
     match(Token::RSquare);
 
-    std::string side_effect_name = "default";
+    std::string side_effect_name = "Default";
     if (match_if(Token::LCurly)) {
         side_effect_name = parse_string();
         match(Token::RCurly);
@@ -429,7 +429,7 @@ std::unique_ptr<MacroLetterNode> Parser::parse_macro_letter() {
     std::string predicate_name = parse_string();
     match(Token::RSquare);
 
-    std::string side_effect_name = "default";
+    std::string side_effect_name = "Default";
     if (match_if(Token::LCurly)) {
         side_effect_name = parse_string();
         match(Token::RCurly);

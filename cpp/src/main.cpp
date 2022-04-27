@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     std::random_device rd;
     std::mt19937 rng(rd());
 
-    Parser parser("games/breakthrough_tiny.game");
+    Parser parser("games/chess.game");
     parser.parse();
     std::unique_ptr<Environment> env = parser.get_environment();
 
@@ -62,9 +62,9 @@ int main(int argc, char *argv[]) {
             for (const Step &step : move) {
                 std::cout << "(" << step.x << ", " << step.y << "){" << step.side_effect->get_name() << "} ";
             }
-            env->execute_move(move);
-            std::cout << " with value " << minimax(env.get(), 4, env->current_player == "white");
-            env->undo_move();
+            // env->execute_move(move);
+            // std::cout << " with value " << minimax(env.get(), 4, env->current_player == "white");
+            // env->undo_move();
             std::cout << std::endl;
         }
 

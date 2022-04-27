@@ -57,14 +57,94 @@ class Default : public SideEffect
     std::string get_name() const override;
 };
 
-/// @brief A side effect that promotes a WhitePawn to a WhiteQueen once it
-///  reaches the end of the board.
+/// @brief A side effect that promotes a Pawn to a Queen once it reaches the end
+///  of the board.
 /// @author Bjarni Dagur Thor Kárason
-class PromoteWhitePawnToQueen : public SideEffect
+class PromoteToQueen : public SideEffect
 {
   public:
-    PromoteWhitePawnToQueen();
-    ~PromoteWhitePawnToQueen();
+    PromoteToQueen();
+    ~PromoteToQueen();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect that promotes a Pawn to a Rook once it reaches the end
+///  of the board.
+/// @author Bjarni Dagur Thor Kárason
+class PromoteToRook : public SideEffect
+{
+  public:
+    PromoteToRook();
+    ~PromoteToRook();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect that promotes a Pawn to a Bishop once it reaches the end
+///  of the board.
+/// @author Bjarni Dagur Thor Kárason
+class PromoteToBishop : public SideEffect
+{
+  public:
+    PromoteToBishop();
+    ~PromoteToBishop();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect that promotes a Pawn to a Knight once it reaches the end
+///  of the board.
+/// @author Bjarni Dagur Thor Kárason
+class PromoteToKnight : public SideEffect
+{
+  public:
+    PromoteToKnight();
+    ~PromoteToKnight();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect to indicate that a pawn is can be captured en passant.
+/// @author Bjarni Dagur Thor Kárason
+class SetEnPassantable : public SideEffect
+{
+  public:
+    SetEnPassantable();
+    ~SetEnPassantable();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect to castle to the right.
+/// @author Bjarni Dagur Thor Kárason
+class CastleLeft : public SideEffect
+{
+  public:
+    CastleLeft();
+    ~CastleLeft();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect to castle to the right.
+/// @author Bjarni Dagur Thor Kárason
+class CastleRight : public SideEffect
+{
+  public:
+    CastleRight();
+    ~CastleRight();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect castle to mark a piece as moved.
+/// @author Bjarni Dagur Thor Kárason
+class MarkMoved : public SideEffect
+{
+  public:
+    MarkMoved();
+    ~MarkMoved();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
     std::string get_name() const override;
 };
