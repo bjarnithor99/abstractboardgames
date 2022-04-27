@@ -15,7 +15,6 @@ int minimax(Environment *env, int depth, bool max_player) {
     std::vector<std::vector<Step>> available_moves = env->generate_moves();
 
     if (available_moves.empty()) {
-        env->check_terminal_conditions();
         return env->variables.white_score;
     }
 
@@ -99,9 +98,6 @@ int main(int argc, char *argv[]) {
                 env->execute_move(chosen_move);
                 move_count++;
             }
-        }
-        else {
-            env->check_terminal_conditions();
         }
     }
 

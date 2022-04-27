@@ -11,7 +11,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(py_interface, m) {
+PYBIND11_MODULE(python_bindings, m) {
     py::class_<Parser>(m, "Parser")
         .def(py::init<std::string>())
         .def("parse", &Parser::parse)

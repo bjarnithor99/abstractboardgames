@@ -25,19 +25,16 @@ class Coach:
             (self.env.get_environment_representation(), self.env.current_player)
         )
         while not self.env.variables.game_over:
-            move = self.training_agent.get_move(self.env, random_prop=0.20)
+            # move = self.training_agent.get_move(self.env, random_prop=0.20)
+            move = self.training_agent.get_move(self.env, temperature=1)
             if move is not None:
                 self.env.execute_move(move)
                 states.append(
                     (self.env.get_environment_representation(), self.env.current_player)
                 )
-            else:
-                self.env.check_terminal_conditions()
-                assert self.env.variables.game_over
         score = self.env.variables.white_score
-        winner = "white" if score == 1 else "black" if score == -1 else "draw"
         return [
-            (state[0], [score * ((-1) ** (winner != state[1]))]) for state in states
+            (state[0], [score * ((-1) ** ("white" != state[1]))]) for state in states
         ]
 
     def train_agent(self, n_iterations, episodes_per_iteration):
@@ -58,7 +55,7 @@ class Coach:
 
             self.training_agent.save_checkpoint("./before_training.pth")
             # self.old_agent.load_checkpoint("./before_training.pth")
-            self.training_agent.train(training_samples, n_epochs=75)
+            self.training_agent.train(training_samples, n_epochs=25)
 
             self.log.info("Starting tournament between new agent and old agent")
             tournament = Tournament(self.env, self.training_agent, self.old_agent)

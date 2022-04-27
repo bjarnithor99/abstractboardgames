@@ -98,8 +98,9 @@ class ValueHead(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, sample_input):
+    def __init__(self, sample_input, device):
         super().__init__()
+        self.device = device
         in_channels, height, width = sample_input.shape
         n_filters = 64
         self.conv = ConvLayer(
@@ -134,6 +135,8 @@ class Model(nn.Module):
 
         self.value = ValueHead(in_channels=n_filters, in_features=height * width)
 
+        self.to(device)
+
     def forward(self, x):
         x = self.conv(x)
         x = self.res1(x)
@@ -141,3 +144,13 @@ class Model(nn.Module):
         x = self.res3(x)
         x = self.value(x)
         return x
+
+    def predict(self, state):
+        self.eval()
+        with torch.no_grad():
+            v = self.forward(
+                torch.unsqueeze(torch.tensor(state, dtype=torch.float), dim=0).to(
+                    self.device
+                )
+            )
+        return v
