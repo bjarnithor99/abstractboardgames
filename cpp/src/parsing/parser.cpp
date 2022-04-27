@@ -258,7 +258,7 @@ void Parser::parse_macro() {
     macros[macro_name] = {std::move(node), arguments};
 }
 
-std::vector<std::string> Parser::parse_arguments() {
+std::vector<std::string> Parser::parse_arguments(bool in_macro) {
     std::vector<std::string> argument_names;
     if (tokenTuple.token == Token::RParen)
         return argument_names;
@@ -268,7 +268,7 @@ std::vector<std::string> Parser::parse_arguments() {
     while (match_if(Token::Comma)) {
         loc = tokenTuple.location;
         argument_name = parse_argument();
-        if (find(argument_names.begin(), argument_names.end(), argument_name) != argument_names.end()) {
+        if (!in_macro && find(argument_names.begin(), argument_names.end(), argument_name) != argument_names.end()) {
             std::ostringstream oss;
             oss << "Duplicate argument " << argument_name << " in macro definition in " << loc << ".";
             std::string error_msg = oss.str();
@@ -321,7 +321,7 @@ std::unique_ptr<Node> Parser::parse_macro_call(bool in_macro) {
         throw std::runtime_error(error_msg);
     }
     match(Token::LParen);
-    std::vector<std::string> argument_values = parse_arguments();
+    std::vector<std::string> argument_values = parse_arguments(true);
     match(Token::RParen);
     std::vector<std::string> argument_names = macros[macro_name].second;
     if (argument_names.size() != argument_values.size()) {

@@ -82,8 +82,11 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
         if (!(*input.predicate)(this, next_x, next_y))
             continue;
         candidate_move.push_back(Step(next_x, next_y, input.side_effect));
+        execute_move(
+            std::vector<Step>{candidate_move[candidate_move.size() - 2], candidate_move[candidate_move.size() - 1]});
         generate_moves(p.second, next_x, next_y);
         candidate_move.pop_back();
+        undo_move();
     }
 }
 

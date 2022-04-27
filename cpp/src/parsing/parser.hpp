@@ -174,11 +174,14 @@ class Parser
     void parse_macro();
     /// @brief Extracts a macro's arguments names/values.
     ///
+    /// @param in_macro true if macro is a being called from another macro,
+    ///  false otherwise.
+    ///
     /// @warning Uses Token::match which can throw errors.
     /// @warning Uses Token::parse_argument which can throw errors.
     ///
     /// @returns a vector containing a macro's argument names/values.
-    std::vector<std::string> parse_arguments();
+    std::vector<std::string> parse_arguments(bool in_macro = false);
     /// @brief Extracts a single macro argument name/value.
     ///
     /// @warning Uses Token::match which can throw errors.
