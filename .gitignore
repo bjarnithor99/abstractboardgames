@@ -32,14 +32,18 @@
 *.app
 abstract-board-games
 
-# LSP cache
+# Configs/caches
 .ccls-cache/
+.ccls
+.pylintrc
 
 # Python
 PythonParser/Old
 PythonParser/ProjectData
 PythonParser/NewFolderStruct/DebugInfo/*.txt
 *__pycache__
+Pipfile
+Pipfile.lock
 
 # cmake
 CMakeLists.txt.user
@@ -53,6 +57,15 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+CMakeDoxyfile.in
+CMakeDoxygenDefaults.cmake
+Doxyfile
 
 # PyTorch models
 *.pth
+
+# Artifacts
+*.dot
+*.pdf
+*.profile
+*.pstats
