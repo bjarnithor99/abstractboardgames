@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2022 Bjarni Dagur Thor Karason <bjarni@bjarnithor.com>
 
-from agent import Agent
+from .agent import Agent
 
 
 @Agent.register

@@ -206,3 +206,45 @@ void Environment::print() {
     }
     std::cout << std::flush;
 }
+
+std::string Environment::jsonify() {
+    std::string json = "{\"board\": [";
+    for (size_t i = 0; i < board.size(); i++) {
+        if (i != 0)
+            json += ", ";
+        json += "[";
+        for (size_t j = 0; j < board[0].size(); j++) {
+            if (j != 0)
+                json += ", ";
+            json += "\"" + board[board.size() - 1 - j][i].piece + "\"";
+        }
+        json += "]";
+    }
+    json += "], \"moves\": [";
+    std::vector<std::vector<Step>> moves = generate_moves();
+    bool need_move_separator = false;
+    for (const std::vector<Step> &move : moves) {
+        if (need_move_separator)
+            json += ", ";
+        json += "{\"start\": [";
+        int x = move[0].x, y = move[0].y;
+        json += std::to_string(y) + ", " + std::to_string(board.size() - 1 - x);
+        json += "], \"letters\": [";
+        bool need_step_separator = false;
+        for (size_t i = 1; i < move.size(); i++) {
+            if (need_step_separator)
+                json += ", ";
+            int dx = move[i].y - y, dy = -(move[i].x - x);
+            x = move[i].x, y = move[i].y;
+            json += "{\"dx\": " + std::to_string(dx) + ", \"dy\": " + std::to_string(dy) + ", \"effect\": \"" +
+                    move[i].side_effect->get_name() + "\"}";
+            need_step_separator = true;
+        }
+        json += "]";
+        json += "}";
+        need_move_separator = true;
+    }
+    json += "]";
+    json += "}";
+    return json;
+}

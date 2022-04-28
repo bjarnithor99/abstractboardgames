@@ -167,6 +167,8 @@ class Environment
     void reset();
     /// @brief Prints the current game board state to standard out.
     void print();
+    /// @brief Return a json representation of the envirnment for the GUI service.
+    std::string jsonify();
 
   private:
     /// @brief Verifies that a post condition holds.

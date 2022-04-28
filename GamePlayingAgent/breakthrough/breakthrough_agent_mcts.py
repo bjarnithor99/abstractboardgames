@@ -9,8 +9,8 @@ import torch
 from torch import nn
 from torchsummary import summary
 from .model import Model
-from agent import Agent
-from mcts import MCTS
+from ..agent import Agent
+from ..mcts import MCTS
 
 
 @Agent.register

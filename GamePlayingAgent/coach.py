@@ -6,7 +6,7 @@
 import logging
 import copy
 from tqdm import tqdm
-from tournament import Tournament
+from .tournament import Tournament
 
 
 class Coach:

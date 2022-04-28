@@ -6,7 +6,7 @@ window.onload = () => {
 
 const IDToEmojiSymbol = {
     'None': ' ',
-    'BlackPawn': '♟︎',
+    'BlackPawn': '♟',
     'BlackKnight': '♞',
     'BlackBishop': '♝',
     'BlackRook': '♜',
@@ -17,7 +17,21 @@ const IDToEmojiSymbol = {
     'WhiteBishop': '♗',
     'WhiteRook': '♖',
     'WhiteQueen': '♕',
-    'WhiteKing': '♔'
+    'WhiteKing': '♔',
+
+    'empty': ' ',
+    'bPawn': '♟',
+    'bKnight': '♞',
+    'bBishop': '♝',
+    'bRook': '♜',
+    'bQueen': '♛',
+    'bKing': '♚',
+    'wPawn': '♙',
+    'wKnight': '♘',
+    'wBishop': '♗',
+    'wRook': '♖',
+    'wQueen': '♕',
+    'wKing': '♔'
 }
 
 
