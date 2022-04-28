@@ -1,0 +1,120 @@
+players = white, black;
+
+pieces = empty, bRook(black), bKnight(black), bBishop(black), bQueen(black), bKing(black), bPawn(black),
+                wRook(white), wKnight(white), wBishop(white), wQueen(white), wKing(white), wPawn(white);
+
+macro step(dx, dy) = [dx, dy, Empty] | [dx, dy, Opponent];
+macro line(dx, dy) = [dx, dy, Empty]*([dx, dy, Empty] | [dx, dy, Opponent]);
+
+macro pawnStep(dy) = [0, dy, Empty] | [0, 0, PawnInitialRow][0, dy, Empty][0, dy, Empty][0, 0, True]{SetEnPassantable} |
+                     [-1, dy, Opponent] | [1, dy, Opponent] |
+                     [-1, 0, EnPassantable][0, dy, Empty] | [1, 0, EnPassantable][0, dy, Empty];
+
+macro rookMoves() = line(1, 0) | line(-1, 0) | line(0, 1) | line(0, -1);
+
+macro bishopMoves() = line(1, 1) | line(1, -1) | line(-1, 1) | line(-1, -1);
+
+macro knightJump(dx, dy) = [dx, dy, Empty] | [dx, dy, Opponent];
+
+macro knightMoves() = knightJump(1,  2) | knightJump(-1,  2) |
+                      knightJump(1, -2) | knightJump(-1, -2) |
+                      knightJump(2,  1) | knightJump(-2,  1) |
+                      knightJump(2,  1) | knightJump(-2,  1) |
+                      knightJump(2, -1) | knightJump(-2, -1);
+
+macro kingMoves() = step(1,  1) | step(-1,  1) |
+                    step(1, -1) | step(-1, -1) |
+                    step(1,  0) | step(-1,  0) |
+                    step(0, -1) | step( 0,  1);
+
+macro castleMoves() = [0, 0, RightToCastleRight][0, 0, NotAttacked][1, 0, Empty][0, 0, NotAttacked][1, 0, Empty][0, 0, NotAttacked]{CastleRight} |
+                      [0, 0, RightToCastleLeft][0, 0, NotAttacked][-1, 0, Empty][0, 0, NotAttacked][-1, 0, Empty][0, 0, NotAttacked][-1, 0, Empty][1, 0, True][0, 0, True]{CastleLeft};
+
+macro promotePawn() = [0, 0, FinalRow]{PromoteToQueen} |
+                      [0, 0, FinalRow]{PromoteToRook} |
+                      [0, 0, FinalRow]{PromoteToBishop} |
+                      [0, 0, FinalRow]{PromoteToKnight};
+
+macro attackedByBPawn()   = [-1, -1, BPawn] | [1, -1, BPawn];
+macro attackedByBKnight() = [-1, -2, BKnight] | [ 1, -2, BKnight] |
+                            [ 2, -1, BKnight] | [ 2,  1, BKnight] |
+                            [ 1,  2, BKnight] | [-1,  2, BKnight] |
+                            [-2,  1, BKnight] | [-2, -1, BKnight];
+macro attackedByBBishop() = [ 1,  1, Empty]*[ 1,  1, BBishop] |
+                            [ 1, -1, Empty]*[ 1, -1, BBishop] |
+                            [-1, -1, Empty]*[-1, -1, BBishop] |
+                            [-1,  1, Empty]*[-1,  1, BBishop];
+macro attackedByBRook()   = [ 1,  0, Empty]*[ 1,  0, BRook] |
+                            [ 0, -1, Empty]*[ 0, -1, BRook] |
+                            [-1,  0, Empty]*[-1,  0, BRook] |
+                            [ 0,  1, Empty]*[ 0,  1, BRook];
+macro attackedByBQueen()  = [ 1,  1, Empty]*[ 1,  1, BQueen] |
+                            [ 1, -1, Empty]*[ 1, -1, BQueen] |
+                            [-1, -1, Empty]*[-1, -1, BQueen] |
+                            [-1,  1, Empty]*[-1,  1, BQueen] |
+                            [ 1,  0, Empty]*[ 1,  0, BQueen] |
+                            [ 0, -1, Empty]*[ 0, -1, BQueen] |
+                            [-1,  0, Empty]*[-1,  0, BQueen] |
+                            [ 0,  1, Empty]*[ 0,  1, BQueen];
+macro attackedByBKing()   = [ 1,  1, BKing] | [ 1, -1, BKing] |
+                            [-1, -1, BKing] | [-1,  1, BKing] |
+                            [ 1,  0, BKing] | [ 0, -1, BKing] |
+                            [-1,  0, BKing] | [ 0,  1, BKing];
+
+macro attackedByWPawn()   = [-1, -1, WPawn] | [1, -1, WPawn];
+macro attackedByWKnight() = [-1, -2, WKnight] | [ 1, -2, WKnight] |
+                            [ 2, -1, WKnight] | [ 2,  1, WKnight] |
+                            [ 1,  2, WKnight] | [-1,  2, WKnight] |
+                            [-2,  1, WKnight] | [-2, -1, WKnight];
+macro attackedByWBishop() = [ 1,  1, Empty]*[ 1,  1, WBishop] |
+                            [ 1, -1, Empty]*[ 1, -1, WBishop] |
+                            [-1, -1, Empty]*[-1, -1, WBishop] |
+                            [-1,  1, Empty]*[-1,  1, WBishop];
+macro attackedByWRook()   = [ 1,  0, Empty]*[ 1,  0, WRook] |
+                            [ 0, -1, Empty]*[ 0, -1, WRook] |
+                            [-1,  0, Empty]*[-1,  0, WRook] |
+                            [ 0,  1, Empty]*[ 0,  1, WRook];
+macro attackedByWQueen()  = [ 1,  1, Empty]*[ 1,  1, WQueen] |
+                            [ 1, -1, Empty]*[ 1, -1, WQueen] |
+                            [-1, -1, Empty]*[-1, -1, WQueen] |
+                            [-1,  1, Empty]*[-1,  1, WQueen] |
+                            [ 1,  0, Empty]*[ 1,  0, WQueen] |
+                            [ 0, -1, Empty]*[ 0, -1, WQueen] |
+                            [-1,  0, Empty]*[-1,  0, WQueen] |
+                            [ 0,  1, Empty]*[ 0,  1, WQueen];
+macro attackedByWKing()   = [ 1,  1, WKing] | [ 1, -1, WKing] |
+                            [-1, -1, WKing] | [-1,  1, WKing] |
+                            [ 1,  0, WKing] | [ 0, -1, WKing] |
+                            [-1,  0, WKing] | [ 0,  1, WKing];
+
+rule bRook   = rookMoves()[0, 0, True]{MarkMoved};
+rule bKnight = knightMoves();
+rule bBishop = bishopMoves();
+rule bQueen  = rookMoves() | bishopMoves();
+rule bKing   = (kingMoves() | castleMoves())[0, 0, True]{MarkMoved};
+rule bPawn   = pawnStep(-1)([0, 0, NotFinalRow] | promotePawn());
+
+rule wRook   = rookMoves()[0, 0, True]{MarkMoved};
+rule wKnight = knightMoves();
+rule wBishop = bishopMoves();
+rule wQueen  = rookMoves() | bishopMoves();
+rule wKing   = (kingMoves() | castleMoves())[0, 0, True]{MarkMoved};
+rule wPawn   = pawnStep(1)([0, 0, NotFinalRow] | promotePawn());
+
+post black bKing = attackedByWPawn()   | attackedByWKnight() |
+                   attackedByWBishop() | attackedByWRook() |
+                   attackedByWQueen()  | attackedByWKing();
+
+post white wKing = attackedByBPawn()   | attackedByBKnight() |
+                   attackedByBBishop() | attackedByBRook() |
+                   attackedByBQueen()  | attackedByBKing();
+
+board_size = 8, 8;
+board = bRook, bKnight, bBishop, bQueen, bKing, bBishop, bKnight, bRook,
+        bPawn, bPawn,   bPawn,   bPawn,  bPawn, bPawn,   bPawn,   bPawn,
+        empty, empty,   empty,   empty,  empty, empty,   empty,   empty,
+        empty, empty,   empty,   empty,  empty, empty,   empty,   empty,
+        empty, empty,   empty,   empty,  empty, empty,   empty,   empty,
+        empty, empty,   empty,   empty,  empty, empty,   empty,   empty,
+        wPawn, wPawn,   wPawn,   wPawn,  wPawn, wPawn,   wPawn,   wPawn,
+        wRook, wKnight, wBishop, wQueen, wKing, wBishop, wKnight, wRook;

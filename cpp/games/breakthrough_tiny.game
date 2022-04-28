@@ -3,8 +3,11 @@ players = white, black;
 pieces = empty, bPawn(black),
                 wPawn(white);
 
-rule bPawn   = [ 0, -1, empty] | [-1, -1, opponent] | [ 1, -1, opponent];
-rule wPawn   = [ 0,  1, empty] | [-1,  1, opponent] | [ 1,  1, opponent];
+macro forward(dy) = [0, dy, Empty] | [-1, dy, Empty] | [1, dy, Empty];
+macro capture(dy) = [-1, dy, Opponent] | [1, dy, Opponent];
+
+rule bPawn = forward(-1) | capture(-1);
+rule wPawn = forward( 1) | capture( 1);
 
 board_size = 3, 3;
 board = bPawn, bPawn, bPawn,

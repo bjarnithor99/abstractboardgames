@@ -8,24 +8,12 @@ DFAInput::DFAInput(int dx, int dy, std::shared_ptr<Predicate> predicate, std::sh
     : dx(dx), dy(dy), predicate(predicate), side_effect(side_effect) {}
 DFAInput::~DFAInput() {}
 bool DFAInput::operator<(const DFAInput &rhs) const {
-    if (this->dx < rhs.dx)
-        return true;
-    if (this->dx > rhs.dx)
-        return false;
-    if (this->dy < rhs.dy)
-        return true;
-    if (this->dy > rhs.dy)
-        return false;
-    if (this->predicate < rhs.predicate)
-        return true;
-    if (this->predicate > rhs.predicate)
-        return false;
-    if (this->side_effect < rhs.side_effect)
-        return true;
-    return this->side_effect > rhs.side_effect;
+    return std::tie(this->dx, this->dy, this->predicate, this->side_effect) <
+           std::tie(rhs.dx, rhs.dy, rhs.predicate, rhs.side_effect);
 }
 bool DFAInput::operator==(const DFAInput &rhs) const {
-    return this->dx == rhs.dx && this->dy == rhs.dy && this->predicate == rhs.predicate;
+    return std::tie(this->dx, this->dy, this->predicate, this->side_effect) ==
+           std::tie(rhs.dx, rhs.dy, rhs.predicate, rhs.side_effect);
 }
 
 DFAState::DFAState() : is_accepting(false) {}

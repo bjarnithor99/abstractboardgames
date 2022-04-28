@@ -143,17 +143,22 @@ class Environment
     /// @details
     ///  Automatically updates whose turn it is.
     ///
+    /// @param move the move to execute.
+    /// @param searching true if moves are being generated, false otherwise.
+    ///
     /// @warning \p move can have SideEffect and TerminalCondition that change
     ///  Environment::Variables.
     ///
     ///  @pre \p move is a legal move in the current state.
-    void execute_move(const std::vector<Step> &move);
+    void execute_move(const std::vector<Step> &move, bool searching = false);
     /// @brief Undos the last move.
     /// @details
     ///  Sets the game state to the state before the move.
     ///
+    /// @param searching true if moves are being generated, false otherwise.
+    ///
     /// @pre There is a move to undo.
-    void undo_move();
+    void undo_move(bool searching = false);
     /// @brief Checks all defined TerminalCondition.
     ///
     /// @warning TerminalCondition can update Environment#variables if they are satisfied.

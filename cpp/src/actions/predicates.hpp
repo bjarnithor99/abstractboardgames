@@ -43,6 +43,19 @@ class Predicate
     virtual std::string get_name() const = 0;
 };
 
+/// @brief A predicate that is always true.
+/// @details
+///  Useful for setting variables.
+/// @author Bjarni Dagur Thor Kárason
+class True : public Predicate
+{
+  public:
+    True();
+    ~True();
+    bool operator()(Environment *environment, int x, int y) override;
+    std::string get_name() const override;
+};
+
 /// @brief A predicate to check if (x, y) is empty.
 /// @author Bjarni Dagur Thor Kárason
 class Empty : public Predicate
@@ -195,6 +208,91 @@ class BlackKing : public Predicate
     ~BlackKing();
     bool operator()(Environment *environment, int x, int y) override;
     std::string get_name() const override;
+};
+
+/// @brief A predicate to check if (x, y) is a pawn's initial position.
+/// @author Bjarni Dagur Thor Kárason
+class PawnInitialRow : public Predicate
+{
+  public:
+    PawnInitialRow();
+    ~PawnInitialRow();
+    bool operator()(Environment *environment, int x, int y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A predicate to check if (x, y) is in a player's final row.
+/// @author Bjarni Dagur Thor Kárason
+class FinalRow : public Predicate
+{
+  public:
+    FinalRow();
+    ~FinalRow();
+    bool operator()(Environment *environment, int x, int y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A predicate to check if (x, y) is not in a player's final row.
+/// @author Bjarni Dagur Thor Kárason
+class NotFinalRow : public Predicate
+{
+  public:
+    NotFinalRow();
+    ~NotFinalRow();
+    bool operator()(Environment *environment, int x, int y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A predicate to check if (x, y) can be captured en passant.
+/// @author Bjarni Dagur Thor Kárason
+class EnPassantable : public Predicate
+{
+  public:
+    EnPassantable();
+    ~EnPassantable();
+    bool operator()(Environment *environment, int x, int y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A predicate to check if the current player has the right to castle to the left.
+/// @author Bjarni Dagur Thor Kárason
+class RightToCastleLeft : public Predicate
+{
+  public:
+    RightToCastleLeft();
+    ~RightToCastleLeft();
+    bool operator()(Environment *environment, int x, int y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A predicate to check if the current player has the right to castle to the right.
+/// @author Bjarni Dagur Thor Kárason
+class RightToCastleRight : public Predicate
+{
+  public:
+    RightToCastleRight();
+    ~RightToCastleRight();
+    bool operator()(Environment *environment, int x, int y) override;
+    std::string get_name() const override;
+};
+
+/// @brief A predicate to check if (x, y) is not being attacked by the opponent.
+/// @author Bjarni Dagur Thor Kárason
+class NotAttacked : public Predicate
+{
+  public:
+    NotAttacked();
+    ~NotAttacked();
+    bool operator()(Environment *environment, int x, int y) override;
+    std::string get_name() const override;
+
+  private:
+    bool attacked_by_pawn(Environment *environment, int x, int y);
+    bool attacked_by_knight(Environment *environment, int x, int y);
+    bool attacked_diagonally(Environment *environment, int x, int y);
+    bool attacked_straight(Environment *environment, int x, int y);
+    bool attacked_coef(Environment *environment, int x, int y, int x_coef, int y_coef,
+                       const std::vector<std::string> &opponents);
 };
 
 /// @brief Class to store all predicates to use in game descriptions.
