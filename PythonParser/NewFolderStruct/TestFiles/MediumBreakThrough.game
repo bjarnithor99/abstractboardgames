@@ -1,23 +1,23 @@
-Players = white, black;
-Pieces = WhitePawn(white), BlackPawn(black);
+players = white, black;
+pieces = WhitePawn(white), BlackPawn(black);
 
 #-- Piece rules --
-macro Step(dx, dy) = (dx,dy,empty) | (dx,dy,enemy);
-macro Pawn(dy) = Step(1,dy) | (0,dy,empty) | Step(-1,dy);
+macro Step(dx, dy) = [dx,dy,empty] | [dx,dy,enemy];
+macro Pawn(dy) = Step(1,dy) | [0,dy,empty] | Step(-1,dy);
 
 effect WEnd() {WPawnAtEnd = 1;};
-rule WhitePawn = Pawn(1)((0,0,this.y==3){WEnd()} | (0,0,this.y!=3));
+rule WhitePawn = Pawn(1)([0,0,this.y==3]{WEnd()} | [0,0,this.y!=3]);
 
 effect BEnd() {BPawnAtEnd = 1;};
-rule BlackPawn = Pawn(-1)((0,0,this.y==0){BEnd()} | (0,0,this.y!=0));
+rule BlackPawn = Pawn(-1)([0,0,this.y==0]{BEnd()} | [0,0,this.y!=0]);
 
 #-- Victory variables --
 variable WPawnAtEnd = 0; variable BPawnAtEnd = 0;
 victory white {return WPawnAtEnd == 1;};
 victory black {return BPawnAtEnd == 1;};
 
-BoardSize = 4, 4;
-Board =
+board_size = 4, 4;
+board =
     BlackPawn, BlackPawn, BlackPawn, BlackPawn, 
     None, None, None, None,
     None, None, None, None,

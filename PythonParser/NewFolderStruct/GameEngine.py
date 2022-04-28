@@ -455,6 +455,20 @@ class GameEngine:
         while len(self.moveStack) != 0:
             self.undoMove()
 
+    def jsonify(self: GameEngine):
+        gameEngine = self
+        board = [[piece.name if piece is not None else 'None' for piece in line] for line in gameEngine.variables["Board"]]
+        moves = '[' + ','.join([self.gameEngineMoveToJSON(move) for move in gameEngine.getPlayerMoves()]) + ']'
+        message = f'{{"board":  {str(board)}, "moves": {moves}}}'
+        return simpleObjToJson(message)
+
+    def gameEngineMoveToJSON(self, move: Move):
+        letters = '[' + ','.join([self.gameEngineLetterToJSON(letter) for letter in move.letterArr])+ ']'
+        return simpleObjToJson(f'{{"start":  {str(move.startPos)}, "letters": {letters}}}')
+
+    def gameEngineLetterToJSON(self, letter: Letter):
+        return simpleObjToJson({'dx': letter.dx, 'dy':letter.dy, 'effect': str(letter.effect).replace('(','').replace(')','')})
+
     def run(self, agents: list[Agent]) -> GameState:
         self.playersTurnIndex = 0
 
@@ -489,6 +503,18 @@ class GameEngine:
                     print(gameState)
                 return gameState
 
+def simpleObjToJson(simpleObj):
+    # simpleObj array[simpleObj], tuple[simpleObj], string or int
+    replaceInfo = {
+        '(': '[',
+        ')': ']',
+        "'": '"'
+    }
+
+    returnStr = str(simpleObj)
+    for key in replaceInfo:
+        returnStr = returnStr.replace(key, replaceInfo[key])
+    return returnStr
 
 class GameState:
     pass

@@ -68,7 +68,7 @@ class AgentService:
                 self.move = moves[moveIndex] #Storing the move
                 tempEngine = deepcopy(self.gameEngine)
                 tempEngine.playMove(self.move)
-                response_body['gameState'] = json.loads(gameEngineToJSON(tempEngine))
+                response_body['gameState'] = json.loads(tempEngine.jsonify())
                 return make_response(jsonify(response_body), 200)
 
 
@@ -111,47 +111,20 @@ class AgentService:
             http_server.start()
 
 
-    def getMove(self, gameEngine: GameEngine):
+    def getMove(self, gameEngine: GameEngine) -> Move:
         self.gameEngine: GameEngine = gameEngine
         while self.websocketClient is None: #Wait client to connect
             pass
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         self.move: Move = None
-        tasks = [self.websocketClient.send(gameEngineToJSON(gameEngine))]
+        tasks = [self.websocketClient.send(gameEngine.jsonify())]
         loop.run_until_complete(asyncio.wait(tasks))
         loop.close()
         while self.move is None: #Wait for move to come in
             pass
         return self.move
 
-
-def gameEngineToJSON(gameEngine: GameEngine):
-    board = [[piece.name if piece is not None else 'None' for piece in line] for line in gameEngine.variables["Board"]]
-    moves = '[' + ','.join([gameEngineMoveToJSON(move) for move in gameEngine.getPlayerMoves()]) + ']'
-    message = f'{{"board":  {str(board)}, "moves": {moves}}}'
-    return simpleObjToJson(message)
-
-def gameEngineMoveToJSON(move: Move):
-    letters = '[' + ','.join([gameEngineLetterToJSON(letter) for letter in move.letterArr])+ ']'
-    return simpleObjToJson(f'{{"start":  {str(move.startPos)}, "letters": {letters}}}')
-
-def gameEngineLetterToJSON(letter: Letter):
-    return simpleObjToJson({'dx': letter.dx, 'dy':letter.dy, 'effect': str(letter.effect).replace('(','').replace(')','')})
-
-
-def simpleObjToJson(simpleObj):
-    # simpleObj array[simpleObj], tuple[simpleObj], string or int
-    replaceInfo = {
-        '(': '[',
-        ')': ']',
-        "'": '"'
-    }
-
-    returnStr = str(simpleObj)
-    for key in replaceInfo:
-        returnStr = returnStr.replace(key, replaceInfo[key])
-    return returnStr
 
 
 

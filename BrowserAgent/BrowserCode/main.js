@@ -1,4 +1,4 @@
-import ChessService from "./ChessService.js"
+import ChessService from "./chessService.js"
 
 window.onload = () => {
     main();
@@ -167,6 +167,7 @@ async function main() {
     const socket = new WebSocket(`ws://${WEBSOCKET_UPDATER_URL}`);
     socket.onmessage = async (event) => {
         const response = JSON.parse(event.data);
+        console.log('fyrir bjarna', response);
         const moves = response.moves;
         const board = response.board;
         clearBoard();

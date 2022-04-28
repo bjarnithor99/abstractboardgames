@@ -113,8 +113,8 @@ C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m ru_final_pr
 '''
 if __name__ == '__main__':
     #gameFileName = 'SimpleBreakThrough.game'
-    #gameFileName = 'MediumBreakThrough.game'
-    gameFileName = 'chess.game'
+    gameFileName = 'MediumBreakThrough.game'
+    #gmeFileName = 'chess.game'
     gm = GameEngine(gameFileName, debug=True)
     result = gm.run([BrowserGUIAgent(port=8082), MinMaxAI(thinkingTime=1)])
     #result = gm.run([BrowserGUIAgent(port=8082), RandomAgent()])
