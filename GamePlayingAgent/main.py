@@ -53,7 +53,7 @@ if __name__ == "__main__":
     while True:
         env.reset()
         move_count = 0
-        while not env.variables.game_over:
+        while not env.game_over():
             print(f"\n\n\n{env.current_player}'s move")
             env.print()
 
@@ -61,15 +61,15 @@ if __name__ == "__main__":
             if move is not None:
                 env.execute_move(move)
                 move_count += 1
-        if env.variables.white_score == 1:
+        if env.white_score() == 1:
+            print("White win")
+            print("Black loss")
             win_cnt += 1
-        elif env.variables.white_score == 0:
+        elif env.white_score() == 0:
+            print("Draw")
             draw_cnt += 1
-        elif env.variables.white_score == -1:
+        elif env.white_score() == -1:
+            print("Black win")
+            print("White loss")
             loss_cnt += 1
-        # print("GAME OVER!")
-        # print("White score", env.variables.white_score)
-        # print("Black score", env.variables.black_score)
-        # env.print()
-        # break
     print(win_cnt, draw_cnt, loss_cnt)

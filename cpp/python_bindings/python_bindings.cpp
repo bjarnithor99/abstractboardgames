@@ -32,6 +32,10 @@ PYBIND11_MODULE(python_bindings, m) {
              py::arg("searching") = false)
         .def("undo_move", &Environment::undo_move, py::arg("searching") = false)
         .def("check_terminal_conditions", &Environment::check_terminal_conditions)
+        .def("get_first_player", &Environment::get_first_player)
+        .def("get_current_player", &Environment::get_current_player)
+        .def("game_over", &Environment::game_over)
+        .def("get_white_score", &Environment::get_white_score)
         .def("reset", &Environment::reset)
         .def("print", &Environment::print)
         .def("jsonify", &Environment::jsonify);

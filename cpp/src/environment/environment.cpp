@@ -179,6 +179,22 @@ void Environment::update_current_player() {
     current_player = players[move_count % players.size()];
 }
 
+std::string Environment::get_first_player() {
+    return players[0];
+}
+
+std::string Environment::get_current_player() {
+    return current_player;
+}
+
+bool Environment::game_over() {
+    return variables.game_over;
+}
+
+int Environment::get_white_score() {
+    return variables.white_score;
+}
+
 void Environment::reset() {
     if (move_stack.empty())
         return;

@@ -66,7 +66,11 @@ class BreakthroughAgent:
         for move in available_moves:
             env.execute_move(move)
             move_score = -self.negamax(
-                env, 4, float("-inf"), float("inf"), env.current_player == "white"
+                env,
+                4,
+                float("-inf"),
+                float("inf"),
+                env.current_player == env.first_player(),
             )
             # print("move_score", move_score)
             if move_score > best_move_score:
@@ -76,7 +80,7 @@ class BreakthroughAgent:
         return best_move
 
     def negamax(self, env, depth, alpha, beta, max_player):
-        if env.variables.game_over or depth == 0:
+        if env.game_over() or depth == 0:
             board_score = self.model.predict(
                 env.get_environment_representation()
             ).item()

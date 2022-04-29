@@ -163,6 +163,14 @@ class Environment
     ///
     /// @warning TerminalCondition can update Environment#variables if they are satisfied.
     bool check_terminal_conditions();
+    /// @brief Returns the name of the starting player.
+    std::string get_first_player();
+    /// @brief Returns the name of the current player.
+    std::string get_current_player();
+    /// @brief Checks if the game is over.
+    bool game_over();
+    /// @brief Returns white's score in the current state.
+    int get_white_score();
     /// @brief Resets the environment to its original state.
     void reset();
     /// @brief Prints the current game board state to standard out.
