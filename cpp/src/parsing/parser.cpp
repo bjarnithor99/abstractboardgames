@@ -124,7 +124,7 @@ void Parser::parse_piece() {
     if (match_if(Token::LParen)) {
         loc = tokenTuple.location;
         player = parse_string();
-        if (std::find(players.begin(), players.end(), player) == players.end()) {
+        if (player != "both" && std::find(players.begin(), players.end(), player) == players.end()) {
             std::ostringstream oss;
             oss << "Unrecognized player " << player << " in piece declaration in " << loc << ".";
             std::string error_msg = oss.str();

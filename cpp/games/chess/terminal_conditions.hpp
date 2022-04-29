@@ -53,21 +53,6 @@ class NoMovesLeft : public TerminalCondition
     std::string get_name() const override;
 };
 
-/// @brief A terminal condition that checks if the current player has 4 pieces connected.
-/// @author Bjarni Dagur Thor Kárason
-class FourConnected : public TerminalCondition
-{
-  public:
-    FourConnected();
-    ~FourConnected();
-    bool operator()(Environment *environment) override;
-    std::string get_name() const override;
-
-  private:
-    bool four_straight(Environment *environment);
-    bool four_vertical(Environment *environment);
-};
-
 /// @brief Class to store all terminal conditions to use in game descriptions.
 /// @author Bjarni Dagur Thor Kárason
 class TerminalConditions

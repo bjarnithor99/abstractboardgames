@@ -57,17 +57,6 @@ class Default : public SideEffect
     std::string get_name() const override;
 };
 
-/// @brief A side effect to place a player's piece.
-/// @author Bjarni Dagur Thor Kárason
-class Place : public SideEffect
-{
-  public:
-    Place();
-    ~Place();
-    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
-    std::string get_name() const override;
-};
-
 /// @brief Class to store all side effects to use in game descriptions.
 /// @author Bjarni Dagur Thor Kárason
 class SideEffects

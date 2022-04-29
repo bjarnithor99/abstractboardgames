@@ -60,7 +60,7 @@ std::vector<std::vector<Step>> Environment::generate_moves() {
     found_moves.clear();
     for (int i = 0; i < board_size_x; i++) {
         for (int j = 0; j < board_size_y; j++) {
-            if (board[i][j].player == current_player) {
+            if (board[i][j].player == current_player || board[i][j].player == "both") {
                 candidate_move.clear();
                 candidate_move.push_back(Step(i, j, SideEffects::get_side_effect["Default"]));
                 generate_moves(board[i][j].state, i, j);
@@ -225,11 +225,11 @@ void Environment::print() {
 
 std::string Environment::jsonify() {
     std::string json = "{\"board\": [";
-    for (size_t i = 0; i < board.size(); i++) {
+    for (size_t i = 0; i < board[0].size(); i++) {
         if (i != 0)
             json += ", ";
         json += "[";
-        for (size_t j = 0; j < board[0].size(); j++) {
+        for (size_t j = 0; j < board.size(); j++) {
             if (j != 0)
                 json += ", ";
             json += "\"" + board[board.size() - 1 - j][i].piece + "\"";

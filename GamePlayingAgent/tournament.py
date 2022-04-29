@@ -22,7 +22,7 @@ class Tournament:
             if move is not None:
                 self.env.execute_move(move)
                 move_count += 1
-        return self.env.white_score()
+        return self.env.get_white_score()
 
     def play(self, n_games):
         new_white_wins = 0

@@ -30,11 +30,14 @@ class Coach:
             if move is not None:
                 self.env.execute_move(move)
                 states.append(
-                    (self.env.get_environment_representation(), self.env.current_player)
+                    (
+                        self.env.get_environment_representation(),
+                        self.env.get_current_player(),
+                    )
                 )
-        score = self.env.white_score()
+        score = self.env.get_white_score()
         return [
-            (state[0], [score * ((-1) ** (self.env.first_player() != state[1]))])
+            (state[0], [score * ((-1) ** (self.env.get_first_player() != state[1]))])
             for state in states
         ]
 
