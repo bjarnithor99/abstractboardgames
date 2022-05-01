@@ -121,18 +121,37 @@ void Parser::parse_piece() {
         throw std::runtime_error(error_msg);
     }
     std::string player = "";
+    std::vector<std::string> owners;
     if (match_if(Token::LParen)) {
         loc = tokenTuple.location;
         player = parse_string();
-        if (player != "both" && std::find(players.begin(), players.end(), player) == players.end()) {
+        if (std::find(players.begin(), players.end(), player) == players.end()) {
             std::ostringstream oss;
             oss << "Unrecognized player " << player << " in piece declaration in " << loc << ".";
             std::string error_msg = oss.str();
             throw std::runtime_error(error_msg);
         }
+        owners.push_back(player);
+        while (match_if(Token::Comma)) {
+            loc = tokenTuple.location;
+            player = parse_string();
+            if (std::find(players.begin(), players.end(), player) == players.end()) {
+                std::ostringstream oss;
+                oss << "Unrecognized player " << player << " in piece declaration in " << loc << ".";
+                std::string error_msg = oss.str();
+                throw std::runtime_error(error_msg);
+            }
+            if (std::find(owners.begin(), owners.end(), player) != owners.end()) {
+                std::ostringstream oss;
+                oss << "Duplicate piece owner " << player << " in piece declaration in " << loc << ".";
+                std::string error_msg = oss.str();
+                throw std::runtime_error(error_msg);
+            }
+            owners.push_back(player);
+        }
         match(Token::RParen);
     }
-    pieces[piece] = {player, nullptr};
+    pieces[piece] = {owners, nullptr};
 }
 
 void Parser::parse_board_size() {
@@ -177,7 +196,7 @@ void Parser::parse_board() {
         std::string error_msg = oss.str();
         throw std::runtime_error(error_msg);
     }
-    if (pieces[piece].second == nullptr && pieces[piece].first != "") {
+    if (pieces[piece].second == nullptr && !pieces[piece].first.empty()) {
         std::ostringstream oss;
         oss << "Rule for piece " << piece << " must be declared before board declaration.";
         std::string error_msg = oss.str();
@@ -199,7 +218,7 @@ void Parser::parse_board() {
             std::string error_msg = oss.str();
             throw std::runtime_error(error_msg);
         }
-        if (pieces[piece].second == nullptr && pieces[piece].first != "") {
+        if (pieces[piece].second == nullptr && !pieces[piece].first.empty()) {
             std::ostringstream oss;
             oss << "Rule for piece " << piece << " must be declared before board declaration.";
             std::string error_msg = oss.str();

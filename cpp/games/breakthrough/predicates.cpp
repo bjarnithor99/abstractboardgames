@@ -7,7 +7,7 @@
 Empty::Empty() {}
 Empty::~Empty() {}
 bool Empty::operator()(Environment *environment, int x, int y) {
-    return environment->board[x][y].player == "";
+    return environment->board[x][y].owners.empty();
 }
 std::string Empty::get_name() const {
     return "Empty";
@@ -16,7 +16,8 @@ std::string Empty::get_name() const {
 Opponent::Opponent() {}
 Opponent::~Opponent() {}
 bool Opponent::operator()(Environment *environment, int x, int y) {
-    return environment->board[x][y].player != "" && environment->board[x][y].player != environment->current_player;
+    return !environment->board[x][y].owners.empty() &&
+           environment->board[x][y].owners[0] != environment->current_player;
 }
 std::string Opponent::get_name() const {
     return "Opponent";

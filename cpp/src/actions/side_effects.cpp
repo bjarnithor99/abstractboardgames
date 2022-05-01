@@ -16,7 +16,7 @@ Place::~Place() {}
 void Place::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
     std::string players_piece = environment->current_player == "black" ? "bPawn" : "wPawn";
     Cell &cell = environment->board[new_x][new_y];
-    cell.player = environment->current_player;
+    cell.owners = environment->pieces[players_piece].first;
     cell.piece = players_piece;
     cell.state = environment->pieces[players_piece].second.get();
 }

@@ -1,6 +1,6 @@
 players = white, black;
 
-pieces = empty(both), bPawn(black), wPawn(white);
+pieces = empty(black, white), bPawn(black), wPawn(white);
 
 rule empty = [0, 0, Empty][0, 0, LowestUnoccupied]{Place};
 rule bPawn = [0, 0, False];

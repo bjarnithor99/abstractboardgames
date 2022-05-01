@@ -45,7 +45,7 @@ PYBIND11_MODULE(python_bindings, m) {
         .def_readonly("white_score", &Variables::white_score)
         .def_readonly("game_over", &Variables::game_over);
 
-    py::class_<Cell>(m, "Cell").def_readonly("piece", &Cell::piece).def_readonly("player", &Cell::player);
+    py::class_<Cell>(m, "Cell").def_readonly("piece", &Cell::piece).def_readonly("owners", &Cell::owners);
 
     py::class_<Step>(m, "Step")
         .def_readonly("x", &Step::x)

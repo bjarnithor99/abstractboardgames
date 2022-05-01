@@ -16,7 +16,7 @@ std::string True::get_name() const {
 Empty::Empty() {}
 Empty::~Empty() {}
 bool Empty::operator()(Environment *environment, int x, int y) {
-    return environment->board[x][y].player == "";
+    return environment->board[x][y].owners.empty();
 }
 std::string Empty::get_name() const {
     return "Empty";
@@ -25,7 +25,8 @@ std::string Empty::get_name() const {
 Opponent::Opponent() {}
 Opponent::~Opponent() {}
 bool Opponent::operator()(Environment *environment, int x, int y) {
-    return environment->board[x][y].player != "" && environment->board[x][y].player != environment->current_player;
+    return !environment->board[x][y].owners.empty() &&
+           environment->board[x][y].owners[0] != environment->current_player;
 }
 std::string Opponent::get_name() const {
     return "Opponent";
@@ -152,8 +153,8 @@ std::string PawnInitialRow::get_name() const {
 FinalRow::FinalRow() {}
 FinalRow::~FinalRow() {}
 bool FinalRow::operator()(Environment *environment, int x, int y) {
-    return (environment->board[x][y].player == "black" && x == 7) ||
-           (environment->board[x][y].player == "white" && x == 0);
+    return (!environment->board[x][y].owners.empty() && environment->board[x][y].owners[0] == "black" && x == 7) ||
+           (!environment->board[x][y].owners.empty() && environment->board[x][y].owners[0] == "white" && x == 0);
 }
 std::string FinalRow::get_name() const {
     return "FinalRow";
@@ -162,8 +163,8 @@ std::string FinalRow::get_name() const {
 NotFinalRow::NotFinalRow() {}
 NotFinalRow::~NotFinalRow() {}
 bool NotFinalRow::operator()(Environment *environment, int x, int y) {
-    return !((environment->board[x][y].player == "black" && x == 7) ||
-             (environment->board[x][y].player == "white" && x == 0));
+    return !((!environment->board[x][y].owners.empty() && environment->board[x][y].owners[0] == "black" && x == 7) ||
+             (!environment->board[x][y].owners.empty() && environment->board[x][y].owners[0] == "white" && x == 0));
 }
 std::string NotFinalRow::get_name() const {
     return "NotFinalRow";
@@ -260,7 +261,7 @@ bool NotAttacked::attacked_coef(Environment *environment, int x, int y, int x_co
             if (environment->board[x + x_coef * i][y + y_coef * i].piece == opponent)
                 return true;
         }
-        if (environment->board[x + x_coef * i][y + y_coef * i].player != "")
+        if (!environment->board[x + x_coef * i][y + y_coef * i].owners.empty())
             break;
     }
     return false;

@@ -11,6 +11,7 @@
 
 #include "dfa.hpp"
 #include "variables.hpp"
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <stack>
@@ -27,15 +28,15 @@ class Cell
     /// @brief Cell constructor from cell state information.
     ///
     /// @param piece the name of the piece on this Cell.
-    /// @param player the name of the player who owns the \p piece on this Cell.
+    /// @param owners the list of players who own the \p piece on this Cell.
     /// @param state a DFA that generates legal moves for the \p piece on this Cell.
-    Cell(std::string piece, std::string player, DFAState *state);
+    Cell(std::string piece, std::vector<std::string> owners, DFAState *state);
     /// @brief Cell destructor.
     ~Cell();
     /// @brief The name of the piece on this Cell.
     std::string piece;
-    /// @brief The name of the player who owns the \p piece on this Cell.
-    std::string player;
+    /// @brief The list of players who own the \p piece on this Cell.
+    std::vector<std::string> owners;
     /// @brief A DFA that generates legal moves for the \p piece on this Cell.
     DFAState *state;
 };
@@ -97,9 +98,11 @@ class Environment
     /// @brief The pieces defined in the game description, which player they
     ///  belong to, and how they can move.
     /// @details
+    ///  A map that takes a piece's name and returns a list of the players it
+    ///  belongs to, and a state machine to generate legal moves for it.
     ///  A map that takes a piece's name and returns the name of the player it
     ///  belongs to, and a state machine to generate legal moves for it.
-    std::map<std::string, std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
+    std::map<std::string, std::pair<std::vector<std::string>, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
     /// @brief The post conditions defined in the game description that must
     ///  hold after a player makes a move.
     /// @details

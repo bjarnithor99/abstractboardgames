@@ -63,9 +63,9 @@ class Parser
     /// @brief The pieces defined in the game description, which player they
     ///  belong to, and how they can move.
     /// @details
-    ///  A map that takes a piece's name and returns the name of the player it
+    ///  A map that takes a piece's name and returns a list of the players it
     ///  belongs to, and a state machine to generate legal moves for it.
-    std::map<std::string, std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
+    std::map<std::string, std::pair<std::vector<std::string>, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
     /// @brief The macros defined in the game description, and the names of their arguments.
     /// @details
     ///  A map that takes a macro's name and returns the root of its abstract

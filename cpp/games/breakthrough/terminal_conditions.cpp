@@ -23,7 +23,8 @@ BlackReachedEnd::BlackReachedEnd() {}
 BlackReachedEnd::~BlackReachedEnd() {}
 bool BlackReachedEnd::operator()(Environment *environment) {
     for (size_t i = 0; i < environment->board[0].size(); i++) {
-        if (environment->board[environment->board.size() - 1][i].player == "black") {
+        const std::vector<std::string> &owners = environment->board[environment->board.size() - 1][i].owners;
+        if (!owners.empty() && owners[0] == "black") {
             environment->variables.black_score = 1;
             environment->variables.white_score = -1;
             environment->variables.game_over = true;
@@ -40,7 +41,8 @@ WhiteReachedEnd::WhiteReachedEnd() {}
 WhiteReachedEnd::~WhiteReachedEnd() {}
 bool WhiteReachedEnd::operator()(Environment *environment) {
     for (size_t i = 0; i < environment->board[0].size(); i++) {
-        if (environment->board[0][i].player == "white") {
+        const std::vector<std::string> &owners = environment->board[0][i].owners;
+        if (!owners.empty() && owners[0] == "white") {
             environment->variables.black_score = -1;
             environment->variables.white_score = 1;
             environment->variables.game_over = true;

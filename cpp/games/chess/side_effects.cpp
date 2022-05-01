@@ -12,10 +12,10 @@ void Default::operator()(Environment *environment, int old_x, int old_y, int new
     Cell &old_cell = environment->board[old_x][old_y];
     Cell &new_cell = environment->board[new_x][new_y];
     new_cell.piece = old_cell.piece;
-    new_cell.player = old_cell.player;
+    new_cell.owners = old_cell.owners;
     new_cell.state = old_cell.state;
     old_cell.piece = "empty";
-    old_cell.player = "";
+    old_cell.owners = std::vector<std::string>();
     old_cell.state = nullptr;
 }
 std::string Default::get_name() const {
@@ -26,7 +26,7 @@ PromoteToQueen::PromoteToQueen() {}
 PromoteToQueen::~PromoteToQueen() {}
 void PromoteToQueen::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
     Cell &cell = environment->board[new_x][new_y];
-    if (cell.player == "white") {
+    if (!cell.owners.empty() && cell.owners[0] == "white") {
         cell.piece = "wQueen";
         cell.state = environment->pieces["wQueen"].second.get();
     }
@@ -43,7 +43,7 @@ PromoteToRook::PromoteToRook() {}
 PromoteToRook::~PromoteToRook() {}
 void PromoteToRook::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
     Cell &cell = environment->board[new_x][new_y];
-    if (cell.player == "white") {
+    if (!cell.owners.empty() && cell.owners[0] == "white") {
         cell.piece = "wRook";
         cell.state = environment->pieces["wRook"].second.get();
     }
@@ -60,7 +60,7 @@ PromoteToBishop::PromoteToBishop() {}
 PromoteToBishop::~PromoteToBishop() {}
 void PromoteToBishop::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
     Cell &cell = environment->board[new_x][new_y];
-    if (cell.player == "white") {
+    if (!cell.owners.empty() && cell.owners[0] == "white") {
         cell.piece = "wBishop";
         cell.state = environment->pieces["wBishop"].second.get();
     }
@@ -77,7 +77,7 @@ PromoteToKnight::PromoteToKnight() {}
 PromoteToKnight::~PromoteToKnight() {}
 void PromoteToKnight::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
     Cell &cell = environment->board[new_x][new_y];
-    if (cell.player == "white") {
+    if (!cell.owners.empty() && cell.owners[0] == "white") {
         cell.piece = "wKnight";
         cell.state = environment->pieces["wKnight"].second.get();
     }
@@ -105,10 +105,10 @@ void CastleLeft::operator()(Environment *environment, int old_x, int old_y, int 
     Cell &rook_src = environment->board[new_x][new_y - 2];
     Cell &rook_dst = environment->board[new_x][new_y + 1];
     rook_dst.piece = rook_src.piece;
-    rook_dst.player = rook_src.player;
+    rook_dst.owners = rook_src.owners;
     rook_dst.state = rook_src.state;
     rook_src.piece = "empty";
-    rook_src.player = "";
+    rook_src.owners = std::vector<std::string>();
     rook_src.state = nullptr;
 }
 std::string CastleLeft::get_name() const {
@@ -121,10 +121,10 @@ void CastleRight::operator()(Environment *environment, int old_x, int old_y, int
     Cell &rook_src = environment->board[new_x][new_y + 1];
     Cell &rook_dst = environment->board[new_x][new_y - 1];
     rook_dst.piece = rook_src.piece;
-    rook_dst.player = rook_src.player;
+    rook_dst.owners = rook_src.owners;
     rook_dst.state = rook_src.state;
     rook_src.piece = "empty";
-    rook_src.player = "";
+    rook_src.owners = std::vector<std::string>();
     rook_src.state = nullptr;
 }
 std::string CastleRight::get_name() const {

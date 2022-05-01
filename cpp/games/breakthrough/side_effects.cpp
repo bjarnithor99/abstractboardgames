@@ -12,10 +12,10 @@ void Default::operator()(Environment *environment, int old_x, int old_y, int new
     Cell &old_cell = environment->board[old_x][old_y];
     Cell &new_cell = environment->board[new_x][new_y];
     new_cell.piece = old_cell.piece;
-    new_cell.player = old_cell.player;
+    new_cell.owners = old_cell.owners;
     new_cell.state = old_cell.state;
     old_cell.piece = "empty";
-    old_cell.player = "";
+    old_cell.owners = std::vector<std::string>();
     old_cell.state = nullptr;
 }
 std::string Default::get_name() const {

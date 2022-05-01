@@ -18,7 +18,8 @@
 #define COUTBLUE "\033[1m\033[34m"
 
 Cell::Cell() {}
-Cell::Cell(std::string piece, std::string player, DFAState *state) : piece(piece), player(player), state(state) {}
+Cell::Cell(std::string piece, std::vector<std::string> owners, DFAState *state)
+    : piece(piece), owners(owners), state(state) {}
 Cell::~Cell() {}
 
 Step::Step(int x, int y, std::shared_ptr<SideEffect> side_effect) : x(x), y(y), side_effect(side_effect) {}
@@ -60,7 +61,8 @@ std::vector<std::vector<Step>> Environment::generate_moves() {
     found_moves.clear();
     for (int i = 0; i < board_size_x; i++) {
         for (int j = 0; j < board_size_y; j++) {
-            if (board[i][j].player == current_player || board[i][j].player == "both") {
+            const std::vector<std::string> &owners = board[i][j].owners;
+            if (std::find(owners.begin(), owners.end(), current_player) != owners.end()) {
                 candidate_move.clear();
                 candidate_move.push_back(Step(i, j, SideEffects::get_side_effect["Default"]));
                 generate_moves(board[i][j].state, i, j);
@@ -211,9 +213,9 @@ void Environment::print() {
         for (size_t j = 0; j < board[0].size(); j++) {
             if (j != 0)
                 std::cout << " ";
-            if (board[i][j].player == "white")
+            if (board[i][j].owners.size() == 1 && board[i][j].owners[0] == "white")
                 std::cout << COUTBLUE << std::setw(8) << board[i][j].piece << COUTRESET;
-            else if (board[i][j].player == "black")
+            else if (board[i][j].owners.size() == 1 && board[i][j].owners[0] == "black")
                 std::cout << COUTRED << std::setw(8) << board[i][j].piece << COUTRESET;
             else
                 std::cout << std::setw(8) << board[i][j].piece;
