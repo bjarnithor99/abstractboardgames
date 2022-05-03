@@ -69,11 +69,17 @@ std::vector<std::vector<Step>> Environment::generate_moves() {
             }
         }
     }
-    return prune_illegal_moves();
+
+    variables.n_moves_found = found_moves.size();
+
+    if (found_moves.empty())
+        check_terminal_conditions();
+
+    return found_moves;
 }
 
 void Environment::generate_moves(DFAState *state, int x, int y) {
-    if (state->is_accepting)
+    if (state->is_accepting && verify_post_conditions())
         found_moves.push_back(candidate_move);
     for (auto &p : state->transition) {
         const DFAInput &input = p.first;
@@ -93,6 +99,23 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
     }
 }
 
+bool Environment::verify_post_conditions() {
+    for (auto &p : post_conditions[current_player]) {
+        const std::string &piece = p.first;
+        const std::unique_ptr<DFAState, DFAStateDeleter> &post_condition = p.second;
+        for (size_t i = 0; i < board.size(); i++) {
+            for (size_t j = 0; j < board[0].size(); j++) {
+                if (board[i][j].piece == piece) {
+                    if (!verify_post_condition(post_condition.get(), i, j)) {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
 bool Environment::verify_post_condition(DFAState *state, int x, int y) {
     if (state->is_accepting)
         return false;
@@ -110,39 +133,7 @@ bool Environment::verify_post_condition(DFAState *state, int x, int y) {
     return res;
 }
 
-std::vector<std::vector<Step>> Environment::prune_illegal_moves() {
-    std::vector<std::vector<Step>> legal_moves;
-    for (const std::vector<Step> &move : found_moves) {
-        execute_move(move, true);
-        bool legal_move = true;
-        for (auto &p : post_conditions[current_player]) {
-            const std::string &piece = p.first;
-            const std::unique_ptr<DFAState, DFAStateDeleter> &post_condition = p.second;
-            for (int i = 0; i < board_size_x; i++) {
-                for (int j = 0; j < board_size_y; j++) {
-                    if (board[i][j].piece == piece) {
-                        if (!verify_post_condition(post_condition.get(), i, j)) {
-                            legal_move = false;
-                        }
-                    }
-                }
-            }
-        }
-        if (legal_move)
-            legal_moves.push_back(std::move(move));
-        undo_move(true);
-    }
-    found_moves.clear();
-    variables.n_moves_found = legal_moves.size();
-
-    if (legal_moves.empty())
-        check_terminal_conditions();
-
-    return legal_moves;
-}
-
 void Environment::execute_move(const std::vector<Step> &move, bool searching) {
-    move_stack.push({board, variables});
     int n_steps = move.size();
     for (int i = 1; i < n_steps; i++) {
         int old_x = move[i - 1].x;
@@ -150,7 +141,9 @@ void Environment::execute_move(const std::vector<Step> &move, bool searching) {
         int new_x = move[i].x;
         int new_y = move[i].y;
         (*(move[i].side_effect))(this, old_x, old_y, new_x, new_y);
+        side_effect_stack.push(move[i].side_effect);
     }
+    side_effect_cnt.push(n_steps - 1);
     if (!searching) {
         move_count++;
         check_terminal_conditions();
@@ -159,8 +152,11 @@ void Environment::execute_move(const std::vector<Step> &move, bool searching) {
 }
 
 void Environment::undo_move(bool searching) {
-    std::tie(board, variables) = move_stack.top();
-    move_stack.pop();
+    for (int i = 0; i < side_effect_cnt.top(); i++) {
+        (*(side_effect_stack.top()))(this);
+        side_effect_stack.pop();
+    }
+    side_effect_cnt.pop();
     if (!searching) {
         move_count--;
         update_current_player();
@@ -198,12 +194,10 @@ int Environment::get_white_score() {
 }
 
 void Environment::reset() {
-    if (move_stack.empty())
-        return;
-    while (move_stack.size() != 1)
-        move_stack.pop();
-    move_count = 1;
-    undo_move();
+    while (!side_effect_cnt.empty()) {
+        undo_move();
+    }
+    variables = Variables();
 }
 
 void Environment::print() {

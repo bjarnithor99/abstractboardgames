@@ -4,35 +4,26 @@
  */
 #include "predicates.hpp"
 
-False::False() {}
-False::~False() {}
-bool False::operator()(Environment *environment, int x, int y) {
-    return false;
-}
-std::string False::get_name() const {
-    return "False";
-}
-
 Empty::Empty() {}
 Empty::~Empty() {}
 bool Empty::operator()(Environment *environment, int x, int y) {
-    return environment->board[x][y].piece == "empty";
+    return environment->board[x][y].owners.empty();
 }
 std::string Empty::get_name() const {
     return "Empty";
 }
 
-LowestUnoccupied::LowestUnoccupied() {}
-LowestUnoccupied::~LowestUnoccupied() {}
-bool LowestUnoccupied::operator()(Environment *environment, int x, int y) {
-    return !environment->contains_cell(x + 1, y) || environment->board[x + 1][y].piece != "empty";
+Opponent::Opponent() {}
+Opponent::~Opponent() {}
+bool Opponent::operator()(Environment *environment, int x, int y) {
+    return !environment->board[x][y].owners.empty() &&
+           environment->board[x][y].owners[0] != environment->current_player;
 }
-std::string LowestUnoccupied::get_name() const {
-    return "LowestUnoccupied";
+std::string Opponent::get_name() const {
+    return "Opponent";
 }
 
 std::map<std::string, std::shared_ptr<Predicate>> Predicates::get_predicate = {
-    {"False", std::make_shared<False>()},
     {"Empty", std::make_shared<Empty>()},
-    {"LowestUnoccupied", std::make_shared<LowestUnoccupied>()},
+    {"Opponent", std::make_shared<Opponent>()},
 };
