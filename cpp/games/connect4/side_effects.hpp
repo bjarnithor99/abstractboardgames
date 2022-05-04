@@ -41,9 +41,6 @@ class SideEffect
     /// @param new_y the y coordinate the piece is going to.
     /// @return void
     virtual void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) = 0;
-    /// @brief Reverses the changes made when this side effect was last
-    ///  executed.
-    virtual void operator()(Environment *environment) = 0;
     /// @brief Returns the name of the predicate. Useful for debugging.
     /// @return the name of the predicate as std::string.
     virtual std::string get_name() const = 0;
@@ -57,13 +54,18 @@ class Default : public SideEffect
     Default();
     ~Default();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
-    void operator()(Environment *environment) override;
     std::string get_name() const override;
+};
 
-  private:
-    /// @brief Stores the state of the cells and their location before this side
-    ///  effect was executed.
-    std::stack<std::tuple<Cell, int, int>> cell_stack;
+/// @brief A side effect to place a player's piece.
+/// @author Bjarni Dagur Thor Kárason
+class Place : public SideEffect
+{
+  public:
+    Place();
+    ~Place();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    std::string get_name() const override;
 };
 
 /// @brief Class to store all side effects to use in game descriptions.

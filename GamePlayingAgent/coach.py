@@ -24,17 +24,21 @@ class Coach:
         states.append(
             (self.env.get_environment_representation(), self.env.current_player)
         )
-        while not self.env.variables.game_over:
+        while not self.env.game_over():
             # move = self.training_agent.get_move(self.env, random_prop=0.20)
             move = self.training_agent.get_move(self.env, temperature=1)
             if move is not None:
                 self.env.execute_move(move)
                 states.append(
-                    (self.env.get_environment_representation(), self.env.current_player)
+                    (
+                        self.env.get_environment_representation(),
+                        self.env.get_current_player(),
+                    )
                 )
-        score = self.env.variables.white_score
+        score = self.env.get_white_score()
         return [
-            (state[0], [score * ((-1) ** ("white" != state[1]))]) for state in states
+            (state[0], [score * ((-1) ** (self.env.get_first_player() != state[1]))])
+            for state in states
         ]
 
     def train_agent(self, n_iterations, episodes_per_iteration):

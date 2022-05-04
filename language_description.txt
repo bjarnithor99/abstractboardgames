@@ -13,7 +13,8 @@ player:          string
 
 // Piece declaration syntax
 piece_list:      "pieces" "=" piece ("," piece)*
-piece:           string ("(" player ")")?
+piece:           string ("(" piece_owners ")")?
+piece_owner:     player, ("," player)*
 
 // Board declaration syntax
 board_size:      "board_size" "=" int "," int

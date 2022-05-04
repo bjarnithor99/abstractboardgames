@@ -97,13 +97,12 @@ class MCTS:
                     search_path.append(node)
                     self.env.execute_move(move)
 
-            if not self.env.variables.game_over and node is not None:
+            if not self.env.game_over() and node is not None:
                 node.expand(self.env)
 
             score = self.model.predict(self.env.get_environment_representation())
             self.backpropagate(search_path, score)
 
-            # TODO: Copy environment at start instead?
             while search_path[-1] != root:
                 self.env.undo_move()
                 search_path.pop()

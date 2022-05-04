@@ -17,12 +17,12 @@ class Tournament:
         move_count = 0
         players = [white_agent, black_agent]
         self.env.reset()
-        while not self.env.variables.game_over:
+        while not self.env.game_over():
             move = players[move_count % 2].get_move(self.env)
             if move is not None:
                 self.env.execute_move(move)
                 move_count += 1
-        return self.env.variables.white_score
+        return self.env.get_white_score()
 
     def play(self, n_games):
         new_white_wins = 0

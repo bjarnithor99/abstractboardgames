@@ -35,7 +35,7 @@ macro promotePawn() = [0, 0, FinalRow]{PromoteToQueen} |
                       [0, 0, FinalRow]{PromoteToBishop} |
                       [0, 0, FinalRow]{PromoteToKnight};
 
-macro attackedByBPawn()   = [-1, -1, BPawn] | [1, -1, BPawn];
+macro attackedByBPawn()   = [-1,  1, BPawn]   | [ 1,  1, BPawn];
 macro attackedByBKnight() = [-1, -2, BKnight] | [ 1, -2, BKnight] |
                             [ 2, -1, BKnight] | [ 2,  1, BKnight] |
                             [ 1,  2, BKnight] | [-1,  2, BKnight] |

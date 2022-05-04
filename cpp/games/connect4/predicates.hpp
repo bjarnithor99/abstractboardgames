@@ -43,6 +43,17 @@ class Predicate
     virtual std::string get_name() const = 0;
 };
 
+/// @brief A predicate that is always false.
+/// @author Bjarni Dagur Thor Kárason
+class False : public Predicate
+{
+  public:
+    False();
+    ~False();
+    bool operator()(Environment *environment, int x, int y) override;
+    std::string get_name() const override;
+};
+
 /// @brief A predicate to check if (x, y) is empty.
 /// @author Bjarni Dagur Thor Kárason
 class Empty : public Predicate
@@ -54,13 +65,14 @@ class Empty : public Predicate
     std::string get_name() const override;
 };
 
-/// @brief A predicate to check if (x, y) contains an opponent piece.
+/// @brief A predicate to check if (x, y) is the lowest unoccupied row in its
+///  column.
 /// @author Bjarni Dagur Thor Kárason
-class Opponent : public Predicate
+class LowestUnoccupied : public Predicate
 {
   public:
-    Opponent();
-    ~Opponent();
+    LowestUnoccupied();
+    ~LowestUnoccupied();
     bool operator()(Environment *environment, int x, int y) override;
     std::string get_name() const override;
 };

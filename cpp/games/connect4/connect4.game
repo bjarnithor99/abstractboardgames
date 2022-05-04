@@ -1,0 +1,15 @@
+players = white, black;
+
+pieces = empty(black, white), bPawn(black), wPawn(white);
+
+rule empty = [0, 0, Empty][0, 0, LowestUnoccupied]{Place};
+rule bPawn = [0, 0, False];
+rule wPawn = [0, 0, False];
+
+board_size = 7, 6;
+board = empty, empty, empty, empty, empty, empty, empty,
+        empty, empty, empty, empty, empty, empty, empty,
+        empty, empty, empty, empty, empty, empty, empty,
+        empty, empty, empty, empty, empty, empty, empty,
+        empty, empty, empty, empty, empty, empty, empty,
+        empty, empty, empty, empty, empty, empty, empty;

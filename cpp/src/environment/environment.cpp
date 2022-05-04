@@ -18,7 +18,8 @@
 #define COUTBLUE "\033[1m\033[34m"
 
 Cell::Cell() {}
-Cell::Cell(std::string piece, std::string player, DFAState *state) : piece(piece), player(player), state(state) {}
+Cell::Cell(std::string piece, std::vector<std::string> owners, DFAState *state)
+    : piece(piece), owners(owners), state(state) {}
 Cell::~Cell() {}
 
 Step::Step(int x, int y, std::shared_ptr<SideEffect> side_effect) : x(x), y(y), side_effect(side_effect) {}
@@ -60,18 +61,25 @@ std::vector<std::vector<Step>> Environment::generate_moves() {
     found_moves.clear();
     for (int i = 0; i < board_size_x; i++) {
         for (int j = 0; j < board_size_y; j++) {
-            if (board[i][j].player == current_player) {
+            const std::vector<std::string> &owners = board[i][j].owners;
+            if (std::find(owners.begin(), owners.end(), current_player) != owners.end()) {
                 candidate_move.clear();
                 candidate_move.push_back(Step(i, j, SideEffects::get_side_effect["Default"]));
                 generate_moves(board[i][j].state, i, j);
             }
         }
     }
-    return prune_illegal_moves();
+
+    variables.n_moves_found = found_moves.size();
+
+    if (found_moves.empty())
+        check_terminal_conditions();
+
+    return found_moves;
 }
 
 void Environment::generate_moves(DFAState *state, int x, int y) {
-    if (state->is_accepting)
+    if (state->is_accepting && verify_post_conditions())
         found_moves.push_back(candidate_move);
     for (auto &p : state->transition) {
         const DFAInput &input = p.first;
@@ -91,6 +99,23 @@ void Environment::generate_moves(DFAState *state, int x, int y) {
     }
 }
 
+bool Environment::verify_post_conditions() {
+    for (auto &p : post_conditions[current_player]) {
+        const std::string &piece = p.first;
+        const std::unique_ptr<DFAState, DFAStateDeleter> &post_condition = p.second;
+        for (size_t i = 0; i < board.size(); i++) {
+            for (size_t j = 0; j < board[0].size(); j++) {
+                if (board[i][j].piece == piece) {
+                    if (!verify_post_condition(post_condition.get(), i, j)) {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
 bool Environment::verify_post_condition(DFAState *state, int x, int y) {
     if (state->is_accepting)
         return false;
@@ -108,39 +133,7 @@ bool Environment::verify_post_condition(DFAState *state, int x, int y) {
     return res;
 }
 
-std::vector<std::vector<Step>> Environment::prune_illegal_moves() {
-    std::vector<std::vector<Step>> legal_moves;
-    for (const std::vector<Step> &move : found_moves) {
-        execute_move(move, true);
-        bool legal_move = true;
-        for (auto &p : post_conditions[current_player]) {
-            const std::string &piece = p.first;
-            const std::unique_ptr<DFAState, DFAStateDeleter> &post_condition = p.second;
-            for (int i = 0; i < board_size_x; i++) {
-                for (int j = 0; j < board_size_y; j++) {
-                    if (board[i][j].piece == piece) {
-                        if (!verify_post_condition(post_condition.get(), i, j)) {
-                            legal_move = false;
-                        }
-                    }
-                }
-            }
-        }
-        if (legal_move)
-            legal_moves.push_back(std::move(move));
-        undo_move(true);
-    }
-    found_moves.clear();
-    variables.n_moves_found = legal_moves.size();
-
-    if (legal_moves.empty())
-        check_terminal_conditions();
-
-    return legal_moves;
-}
-
 void Environment::execute_move(const std::vector<Step> &move, bool searching) {
-    move_stack.push({board, variables});
     int n_steps = move.size();
     for (int i = 1; i < n_steps; i++) {
         int old_x = move[i - 1].x;
@@ -148,7 +141,9 @@ void Environment::execute_move(const std::vector<Step> &move, bool searching) {
         int new_x = move[i].x;
         int new_y = move[i].y;
         (*(move[i].side_effect))(this, old_x, old_y, new_x, new_y);
+        side_effect_stack.push(move[i].side_effect);
     }
+    side_effect_cnt.push(n_steps - 1);
     if (!searching) {
         move_count++;
         check_terminal_conditions();
@@ -157,8 +152,11 @@ void Environment::execute_move(const std::vector<Step> &move, bool searching) {
 }
 
 void Environment::undo_move(bool searching) {
-    std::tie(board, variables) = move_stack.top();
-    move_stack.pop();
+    for (int i = 0; i < side_effect_cnt.top(); i++) {
+        (*(side_effect_stack.top()))(this);
+        side_effect_stack.pop();
+    }
+    side_effect_cnt.pop();
     if (!searching) {
         move_count--;
         update_current_player();
@@ -179,13 +177,27 @@ void Environment::update_current_player() {
     current_player = players[move_count % players.size()];
 }
 
+std::string Environment::get_first_player() {
+    return players[0];
+}
+
+std::string Environment::get_current_player() {
+    return current_player;
+}
+
+bool Environment::game_over() {
+    return variables.game_over;
+}
+
+int Environment::get_white_score() {
+    return variables.white_score;
+}
+
 void Environment::reset() {
-    if (move_stack.empty())
-        return;
-    while (move_stack.size() != 1)
-        move_stack.pop();
-    move_count = 1;
-    undo_move();
+    while (!side_effect_cnt.empty()) {
+        undo_move();
+    }
+    variables = Variables();
 }
 
 void Environment::print() {
@@ -195,9 +207,9 @@ void Environment::print() {
         for (size_t j = 0; j < board[0].size(); j++) {
             if (j != 0)
                 std::cout << " ";
-            if (board[i][j].player == "white")
+            if (board[i][j].owners.size() == 1 && board[i][j].owners[0] == "white")
                 std::cout << COUTBLUE << std::setw(8) << board[i][j].piece << COUTRESET;
-            else if (board[i][j].player == "black")
+            else if (board[i][j].owners.size() == 1 && board[i][j].owners[0] == "black")
                 std::cout << COUTRED << std::setw(8) << board[i][j].piece << COUTRESET;
             else
                 std::cout << std::setw(8) << board[i][j].piece;
@@ -209,11 +221,11 @@ void Environment::print() {
 
 std::string Environment::jsonify() {
     std::string json = "{\"board\": [";
-    for (size_t i = 0; i < board.size(); i++) {
+    for (size_t i = 0; i < board[0].size(); i++) {
         if (i != 0)
             json += ", ";
         json += "[";
-        for (size_t j = 0; j < board[0].size(); j++) {
+        for (size_t j = 0; j < board.size(); j++) {
             if (j != 0)
                 json += ", ";
             json += "\"" + board[board.size() - 1 - j][i].piece + "\"";

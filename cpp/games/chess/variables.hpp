@@ -49,4 +49,20 @@ class Variables
     /// @brief Keeps track of the current state of the game.
     /// @details True if the game is over, false otherwise.
     bool game_over;
+    /// @brief Keeps track of pawn that can be captured en passant and in which move it became available.
+    /// @details
+    ///  The tuple contains (move number, x, y) where x, y are array indices.
+    std::tuple<int, int, int> en_passant_pawn;
+    /// @brief Keeps track whether the black king has moved;
+    bool black_king_moved;
+    /// @brief Keeps track whether the left black rook has moved;
+    bool black_rook_left_moved;
+    /// @brief Keeps track whether the right black rook has moved;
+    bool black_rook_right_moved;
+    /// @brief Keeps track whether the white king has moved;
+    bool white_king_moved;
+    /// @brief Keeps track whether the left white rook has moved;
+    bool white_rook_left_moved;
+    /// @brief Keeps track whether the right white rook has moved;
+    bool white_rook_right_moved;
 };

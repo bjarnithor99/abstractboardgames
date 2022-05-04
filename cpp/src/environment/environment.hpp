@@ -11,6 +11,7 @@
 
 #include "dfa.hpp"
 #include "variables.hpp"
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <stack>
@@ -27,15 +28,15 @@ class Cell
     /// @brief Cell constructor from cell state information.
     ///
     /// @param piece the name of the piece on this Cell.
-    /// @param player the name of the player who owns the \p piece on this Cell.
+    /// @param owners the list of players who own the \p piece on this Cell.
     /// @param state a DFA that generates legal moves for the \p piece on this Cell.
-    Cell(std::string piece, std::string player, DFAState *state);
+    Cell(std::string piece, std::vector<std::string> owners, DFAState *state);
     /// @brief Cell destructor.
     ~Cell();
     /// @brief The name of the piece on this Cell.
     std::string piece;
-    /// @brief The name of the player who owns the \p piece on this Cell.
-    std::string player;
+    /// @brief The list of players who own the \p piece on this Cell.
+    std::vector<std::string> owners;
     /// @brief A DFA that generates legal moves for the \p piece on this Cell.
     DFAState *state;
 };
@@ -97,9 +98,11 @@ class Environment
     /// @brief The pieces defined in the game description, which player they
     ///  belong to, and how they can move.
     /// @details
+    ///  A map that takes a piece's name and returns a list of the players it
+    ///  belongs to, and a state machine to generate legal moves for it.
     ///  A map that takes a piece's name and returns the name of the player it
     ///  belongs to, and a state machine to generate legal moves for it.
-    std::map<std::string, std::pair<std::string, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
+    std::map<std::string, std::pair<std::vector<std::string>, std::unique_ptr<DFAState, DFAStateDeleter>>> pieces;
     /// @brief The post conditions defined in the game description that must
     ///  hold after a player makes a move.
     /// @details
@@ -163,6 +166,14 @@ class Environment
     ///
     /// @warning TerminalCondition can update Environment#variables if they are satisfied.
     bool check_terminal_conditions();
+    /// @brief Returns the name of the starting player.
+    std::string get_first_player();
+    /// @brief Returns the name of the current player.
+    std::string get_current_player();
+    /// @brief Checks if the game is over.
+    bool game_over();
+    /// @brief Returns white's score in the current state.
+    int get_white_score();
     /// @brief Resets the environment to its original state.
     void reset();
     /// @brief Prints the current game board state to standard out.
@@ -171,6 +182,11 @@ class Environment
     std::string jsonify();
 
   private:
+    /// @brief Verifies that all post condition hold.
+    ///
+    /// @returns true if all post conditions holds.
+    /// @returns false if some post condition does not hold.
+    bool verify_post_conditions();
     /// @brief Verifies that a post condition holds.
     ///
     /// @param state the root of the post condition's DFA to check.
@@ -186,16 +202,15 @@ class Environment
     /// @param x the current x coordinate of the piece.
     /// @param y the current y coordinate of the piece.
     void generate_moves(DFAState *state, int x, int y);
-    /// @brief Prunes moves after which all post conditions do not hold.
-    ///
-    /// @returns a vector of legal moves.
-    std::vector<std::vector<Step>> prune_illegal_moves();
     /// @brief Updates whose turn it is.
     void update_current_player();
     /// @brief Stores found moves during move generation.
     std::vector<std::vector<Step>> found_moves;
     /// @brief Stores intermediate moves during move generation.
     std::vector<Step> candidate_move;
-    /// @brief Stores the state of the Environment before each move was executed.
-    std::stack<std::pair<std::vector<std::vector<Cell>>, Variables>> move_stack;
+    /// @brief Stores the side effects executed in the environment in a reverse
+    ///  order.
+    std::stack<std::shared_ptr<SideEffect>> side_effect_stack;
+    /// @brief Stores how many side effects were executed in each move.
+    std::stack<int> side_effect_cnt;
 };

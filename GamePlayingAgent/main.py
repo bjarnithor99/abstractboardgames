@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     log.info("Parsing game")
     parser = python_bindings.Parser(
-        "/home/bjarni/HR/T-404-LOKA/cpp/games/breakthrough_small.game"
+        "/home/bjarni/HR/T-404-LOKA/cpp/games/connect4/connect4.game"
     )
     parser.parse()
     env = parser.get_environment()
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     log.info("Creating agent and coach")
     sample_input = torch.tensor(env.get_environment_representation(), dtype=torch.float)
     agent = BreakthroughAgent(sample_input)
-    agent.load_checkpoint("/home/bjarni/HR/T-404-LOKA/GamePlayingAgent/best_mcts.pth")
+    # agent.load_checkpoint("/home/bjarni/HR/T-404-LOKA/GamePlayingAgent/best_mcts.pth")
     # coach = Coach(env, agent)
 
     # log.info("Beginning training")
@@ -39,37 +39,36 @@ if __name__ == "__main__":
 
     browser_agent = BrowserGUIAgent(port=8002)
     browser_agent.get_move = browser_agent.getMove
-    # players = [browser_agent, agent]
     players = [agent, browser_agent]
 
     # players = [agent, RandomAgent()]
-    # players = [TUIAgent(), agent]
     # players = [TUIAgent(), agent]
     # players = [agent, TUIAgent()]
     win_cnt = 0
     loss_cnt = 0
     draw_cnt = 0
     # for _ in tqdm(range(50)):
-    while True:
-        env.reset()
-        move_count = 0
-        while not env.variables.game_over:
-            print(f"\n\n\n{env.current_player}'s move")
-            env.print()
+    # while True:
+    env.reset()
+    move_count = 0
+    while not env.game_over():
+        print(f"\n\n\n{env.current_player}'s move")
+        env.print()
 
-            move = players[move_count % 2].get_move(env)
-            if move is not None:
-                env.execute_move(move)
-                move_count += 1
-        if env.variables.white_score == 1:
-            win_cnt += 1
-        elif env.variables.white_score == 0:
-            draw_cnt += 1
-        elif env.variables.white_score == -1:
-            loss_cnt += 1
-        # print("GAME OVER!")
-        # print("White score", env.variables.white_score)
-        # print("Black score", env.variables.black_score)
-        # env.print()
-        # break
+        move = players[move_count % 2].get_move(env)
+        if move is not None:
+            env.execute_move(move)
+            move_count += 1
+    env.print()
+    if env.get_white_score() == 1:
+        print("White win")
+        print("Black loss")
+        win_cnt += 1
+    elif env.get_white_score() == 0:
+        print("Draw")
+        draw_cnt += 1
+    elif env.get_white_score() == -1:
+        print("Black win")
+        print("White loss")
+        loss_cnt += 1
     print(win_cnt, draw_cnt, loss_cnt)
