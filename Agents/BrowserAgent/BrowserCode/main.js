@@ -65,6 +65,8 @@ function clearBoard() {
 
 }
 
+var indexQueryCame = false;
+
 async function createChessBoard(moves, board) {
     let selectedSquare = null;
     let X, Y;X = board.length; Y = board[0].length;
@@ -81,6 +83,7 @@ async function createChessBoard(moves, board) {
         if(effectStr == '')effectStr='Ɛ';
         movesBoard[x][y].push({i, dPos: {dx, dy}, effect: effectStr});
     });
+    console.log('updating moves', movesBoard)
 
     const boardElement = document.getElementById('chess-board');
     [...Array(X).keys()].forEach(x => {
@@ -104,10 +107,13 @@ async function createChessBoard(moves, board) {
         const playMove = (async (move) => {
                         const {i, dPos, effect} = move;
                         // Move played
+                        indexQueryCame = false;
                         let gameState = await ChessService.playMove(i);
                         board = gameState.board;
-                        clearBoard();
-                        createChessBoard([], board);
+                        if (!indexQueryCame) {
+                            clearBoard();
+                            createChessBoard([], board);
+                        }
                     });
 
                     if(possibleMoves.length == 1) playMove(possibleMoves[0]);
@@ -181,9 +187,9 @@ async function main() {
     const socket = new WebSocket(`ws://${WEBSOCKET_UPDATER_URL}`);
     socket.onmessage = async (event) => {
         const response = JSON.parse(event.data);
-        console.log('fyrir bjarna', response);
         const moves = response.moves;
         const board = response.board;
+        indexQueryCame = true;
         clearBoard();
         createChessBoard(moves, board);
     };

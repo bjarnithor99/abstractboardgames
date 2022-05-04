@@ -1,6 +1,6 @@
 import time
 from typing import Tuple
-from .GameEngine import GameEngine, Move, Unresolved, Won
+from ..GameEngine.GameEngineType import GameEngine, Move, Unresolved, Win
 
 class Agent:
     def __init__(self) -> None:
@@ -33,7 +33,7 @@ class TUIAgent(Agent):
     
         return moves[int(userInput)] if userInput.isdigit() else userInput
 
-from ...BrowserAgent.AgentService import AgentService
+from .BrowserAgent.AgentService import AgentService
 class BrowserGUIAgent(Agent):
     def __init__(self, port: int) -> None:
         self.agentService = AgentService(port)
@@ -94,8 +94,8 @@ class MinMaxAI(Agent):
     def evalBoard(self, gameEngine: GameEngine) -> int:
         self.count += 1
         gameState = gameEngine.getGameState()
-        if type(gameState) == Won:
-            win: Won = gameState
+        if type(gameState) == Win:
+            win: Win = gameState
             if win.playerName == gameEngine.playersTurn():
                 score = 100
             else:
@@ -114,9 +114,9 @@ C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m ru_final_pr
 if __name__ == '__main__':
     #gameFileName = 'SimpleBreakThrough.game'
     gameFileName = 'MediumBreakThrough.game'
-    #gmeFileName = 'chess.game'
+    #gameFileName = 'chess.game'
     gm = GameEngine(gameFileName, debug=True)
-    result = gm.run([BrowserGUIAgent(port=8082), MinMaxAI(thinkingTime=1)])
+    result = gm.run([MinMaxAI(thinkingTime=1), BrowserGUIAgent(port=8082)])
     #result = gm.run([BrowserGUIAgent(port=8082), RandomAgent()])
     #result = gm.run([BrowserGUIAgent(port=8082), BrowserGUIAgent(port=8081)])
     #result = gm.run([MinMaxAI(thinkingTime=5), MinMaxAI(thinkingTime=5)])

@@ -13,14 +13,8 @@ import websockets
 import threading
 from websockets import exceptions
 from websockets import server
-import logging
 from typing import Dict, List, Tuple
-
-from ..PythonParser.NewFolderStruct.Parser.ASTType import Board
-from ..PythonParser.NewFolderStruct.Parser.RegexParser.ASTType import (
-    Letter,
-)
-from ..PythonParser.NewFolderStruct.GameEngine import GameEngine, Move
+from ...GameEngine.GameEngineType import GameEngine, Move
 
 HOST_IP = "localhost"
 HOST_DOMAIN = "localhost"
@@ -28,7 +22,7 @@ DEBUG_MODE = True
 
 BROWSER_CODE_ABS_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "BrowserCode"
-)
+) + '\\'
 
 
 class AgentService:

@@ -40,7 +40,7 @@ abstract-board-games
 # Python
 PythonParser/Old
 PythonParser/ProjectData
-PythonParser/NewFolderStruct/DebugInfo/*.txt
+GameEngine/DebugInfo/*.txt
 *__pycache__
 Pipfile
 Pipfile.lock

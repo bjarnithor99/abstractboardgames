@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from .Parser.IntegerExpressionParser.ASTType import SyntaxTreeNode as IntegerExpressionTreeNode
-from .Parser.IntegerExpressionParser.ASTType import Variable as IntegerExpressionVariable
-from .IntegerExpression.Evaluator import evaluateIntegerExpression
-from .Parser.Parser import Parser
-from .Parser.ASTType import *
-from .StateMachine.Types import *
-from .Lexer.TokenTypes import *
-from .StateMachine.Main import RegexToDFA
+from ..PythonParser.Parser.IntegerExpressionParser.ASTType import SyntaxTreeNode as IntegerExpressionTreeNode
+from ..PythonParser.Parser.IntegerExpressionParser.ASTType import Variable as IntegerExpressionVariable
+from ..PythonParser.IntegerExpression.Evaluator import evaluateIntegerExpression
+from ..PythonParser.Parser.Parser import Parser
+from ..PythonParser.Parser.ASTType import *
+from ..PythonParser.StateMachine.Types import *
+from ..PythonParser.Lexer.TokenTypes import *
+from ..PythonParser.StateMachine.Main import RegexToDFA
 from copy import deepcopy
 
 Position = tuple[int, int]
@@ -32,12 +32,19 @@ class BoardPiece:
 
 EngineBoard = list[list[BoardPiece | None]]
 
+DebugFolder = './DebugInfo/'
+import os
+TestFileFolder = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),"../PythonParser/TestFiles/"
+)
 
 #The variable names 'this', 'Board', 'enemy', 'empty' and 'true' have special meaning, don't write
 #them if you don't know what you are doing
-NewFolderAbs = 'C:/Users/gudmu/Desktop/Lokaverkefni/lokaverkefniCode/ru_final_project/PythonParser/NewFolderStruct/'
-DebugFolder = NewFolderAbs +'DebugInfo/'
-class GameEngine:
+
+#Implements GameEngine
+from .GameEngineType import GameEngine, Win, Draw, Unresolved, GameState
+class PythonGameEngine(GameEngine):
+
     
     def __hash__(self):
         player = self.playersTurn()
@@ -72,7 +79,7 @@ class GameEngine:
 
     def __init__(self, fileName, debug=False) -> None:
         self.debug = debug
-        f = open(NewFolderAbs+f'TestFiles/{fileName}')
+        f = open(TestFileFolder + fileName)
         txt = ''.join(f.readlines())
         program: Program = Parser(txt).generateAST().root
 
@@ -248,8 +255,15 @@ class GameEngine:
             else:
                 playerName = self.piecesToPlayer[pieceName]
                 return BoardPiece(dfa, pieceName, playerName)
-
-        return evaluateIntegerExpression(integerExpression, self.variables)
+        
+        try:
+            return evaluateIntegerExpression(integerExpression, self.variables)
+        except Exception as error:
+            print('Error evaluating integer expression:')
+            print(integerExpression)
+            print('Reason:')
+            print(error)
+            raise error
 
     def setThis(self, thisVariables: dict[str: int]):
         self.variables['this'] = thisVariables
@@ -354,15 +368,24 @@ class GameEngine:
 
 
     def runAssignment(self, assignment: Assignment):
-        variables = self.variables
+        print('heewrwe')
+        try:
+            print('running assignment', assignment)
+            variables = self.variables
 
-        indexes = [assignment.variableName, *[self.resolveIntegerExpression(indexExpr) for indexExpr in assignment.indexes]]
-        indexes = indexes[::-1]
+            indexes = [assignment.variableName, *[self.resolveIntegerExpression(indexExpr) for indexExpr in assignment.indexes]]
+            indexes = indexes[::-1]
 
-        while len(indexes) > 1:
-            variables = variables[indexes.pop()]
+            while len(indexes) > 1:
+                variables = variables[indexes.pop()]
 
-        variables[indexes.pop()] = self.resolveIntegerExpression(assignment.newValue)
+            variables[indexes.pop()] = self.resolveIntegerExpression(assignment.newValue)
+        except Exception as error:
+            print('Error running assignment:')
+            print(assignment)
+            print('Reason:')
+            print(error)
+            raise error
      #--- Functions for calculating move effect end ---
 
 
@@ -442,7 +465,7 @@ class GameEngine:
                 winner = player
         
         if numberOfWins == 1:
-            return Won(winner)
+            return Win(winner)
         elif numberOfWins > 1 or len(self.getPlayerMoves()) == 0:
             return Draw()
         elif numberOfWins == 0:
@@ -498,7 +521,7 @@ class GameEngine:
             #print(self)
 
             gameState = self.getGameState()
-            if type(gameState) in (Draw, Won):
+            if type(gameState) in (Draw, Win):
                 if self.debug:
                     print(gameState)
                 return gameState
@@ -516,24 +539,16 @@ def simpleObjToJson(simpleObj):
         returnStr = returnStr.replace(key, replaceInfo[key])
     return returnStr
 
-class GameState:
-    pass
-
-class Won(GameState):
-    def __init__(self, playerName: str) -> None:
-        self.playerName: str = playerName
-
-    def __str__(self) -> str:
-        return f'Player {self.playerName} won!'
-
-class Draw(GameState):
-    def __str__(self) -> str:
-        return 'Draw'
-
-class Unresolved:
-    def __str__(self) -> str:
-        return 'Unresolved'
-
-
+'''
+python -m ru_final_project.GameEngine.PythonGameEngine
+'''
+from ..Agents.Agents import BrowserGUIAgent, RandomAgent, TUIAgent
 if __name__ == '__main__':
-    pass
+    print('hello world')
+    ge = PythonGameEngine('chess.game')
+    agents = []
+    agents.append(BrowserGUIAgent(8080))
+    #agents.append(TUIAgent())
+    agents.append(RandomAgent())
+    result = ge.run(agents)
+    print(result)
