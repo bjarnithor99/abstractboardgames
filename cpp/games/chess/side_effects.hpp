@@ -41,9 +41,17 @@ class SideEffect
     /// @param new_y the y coordinate the piece is going to.
     /// @return void
     virtual void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) = 0;
+    /// @brief Reverses the changes made when this side effect was last
+    ///  executed.
+    virtual void operator()(Environment *environment) = 0;
     /// @brief Returns the name of the predicate. Useful for debugging.
     /// @return the name of the predicate as std::string.
     virtual std::string get_name() const = 0;
+
+  protected:
+    /// @brief Stores the state of the cells and their location before this side
+    ///  effect was executed.
+    std::stack<std::tuple<Cell, int, int>> cell_stack;
 };
 
 /// @brief A default side effect that captures the piece at (new_x, new_y) if any.
@@ -54,6 +62,7 @@ class Default : public SideEffect
     Default();
     ~Default();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
 };
 
@@ -66,6 +75,7 @@ class PromoteToQueen : public SideEffect
     PromoteToQueen();
     ~PromoteToQueen();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
 };
 
@@ -78,6 +88,7 @@ class PromoteToRook : public SideEffect
     PromoteToRook();
     ~PromoteToRook();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
 };
 
@@ -90,6 +101,7 @@ class PromoteToBishop : public SideEffect
     PromoteToBishop();
     ~PromoteToBishop();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
 };
 
@@ -102,6 +114,7 @@ class PromoteToKnight : public SideEffect
     PromoteToKnight();
     ~PromoteToKnight();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
 };
 
@@ -113,7 +126,11 @@ class SetEnPassantable : public SideEffect
     SetEnPassantable();
     ~SetEnPassantable();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
+
+  private:
+    std::stack<std::tuple<int, int, int>> en_passant_stack;
 };
 
 /// @brief A side effect to castle to the right.
@@ -124,6 +141,7 @@ class CastleLeft : public SideEffect
     CastleLeft();
     ~CastleLeft();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
 };
 
@@ -135,6 +153,7 @@ class CastleRight : public SideEffect
     CastleRight();
     ~CastleRight();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
 };
 
@@ -146,7 +165,11 @@ class MarkMoved : public SideEffect
     MarkMoved();
     ~MarkMoved();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
+
+  private:
+    std::stack<std::pair<bool *, bool>> moved_stack;
 };
 
 /// @brief Class to store all side effects to use in game descriptions.

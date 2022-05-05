@@ -53,28 +53,6 @@ class NoMovesLeft : public TerminalCondition
     std::string get_name() const override;
 };
 
-/// @brief A terminal condition that checks if the white player has reached the opposite end of the board.
-/// @author Bjarni Dagur Thor Kárason
-class WhiteReachedEnd : public TerminalCondition
-{
-  public:
-    WhiteReachedEnd();
-    ~WhiteReachedEnd();
-    bool operator()(Environment *environment) override;
-    std::string get_name() const override;
-};
-
-/// @brief A terminal condition that checks if the black player has reached the opposite end of the board.
-/// @author Bjarni Dagur Thor Kárason
-class BlackReachedEnd : public TerminalCondition
-{
-  public:
-    BlackReachedEnd();
-    ~BlackReachedEnd();
-    bool operator()(Environment *environment) override;
-    std::string get_name() const override;
-};
-
 /// @brief Class to store all terminal conditions to use in game descriptions.
 /// @author Bjarni Dagur Thor Kárason
 class TerminalConditions

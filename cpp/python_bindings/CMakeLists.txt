@@ -4,7 +4,7 @@ project(python_bindings)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "-Wall -Ofast")
 
 file(GLOB_RECURSE abg_SOURCES CONFIGURE_DEDPENDS "../src/*.cpp")
 file(GLOB_RECURSE abg_HEADERS CONFIGURE_DEDPENDS "../src/*.hpp")

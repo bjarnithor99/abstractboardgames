@@ -75,7 +75,7 @@ std::vector<std::vector<Step>> Environment::generate_moves() {
     if (found_moves.empty())
         check_terminal_conditions();
 
-    return found_moves;
+    return std::move(found_moves);
 }
 
 void Environment::generate_moves(DFAState *state, int x, int y) {
@@ -143,7 +143,7 @@ void Environment::execute_move(const std::vector<Step> &move, bool searching) {
         (*(move[i].side_effect))(this, old_x, old_y, new_x, new_y);
         side_effect_stack.push(move[i].side_effect);
     }
-    side_effect_cnt.push(n_steps - 1);
+    counter_stack.push({n_steps - 1, variables.n_moves_found});
     if (!searching) {
         move_count++;
         check_terminal_conditions();
@@ -152,14 +152,17 @@ void Environment::execute_move(const std::vector<Step> &move, bool searching) {
 }
 
 void Environment::undo_move(bool searching) {
-    for (int i = 0; i < side_effect_cnt.top(); i++) {
+    int n_side_effects;
+    std::tie(n_side_effects, variables.n_moves_found) = counter_stack.top();
+    counter_stack.pop();
+    for (int i = 0; i < n_side_effects; i++) {
         (*(side_effect_stack.top()))(this);
         side_effect_stack.pop();
     }
-    side_effect_cnt.pop();
     if (!searching) {
         move_count--;
         update_current_player();
+        variables.game_over = false;
     }
 }
 
@@ -194,7 +197,7 @@ int Environment::get_white_score() {
 }
 
 void Environment::reset() {
-    while (!side_effect_cnt.empty()) {
+    while (!counter_stack.empty()) {
         undo_move();
     }
     variables = Variables();

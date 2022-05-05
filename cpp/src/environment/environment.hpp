@@ -211,6 +211,8 @@ class Environment
     /// @brief Stores the side effects executed in the environment in a reverse
     ///  order.
     std::stack<std::shared_ptr<SideEffect>> side_effect_stack;
-    /// @brief Stores how many side effects were executed in each move.
-    std::stack<int> side_effect_cnt;
+    /// @brief Stores how many side effects were executed in each move, and how
+    ///  many legal moves were possible.
+    /// @details Required to correctly undo a move and search the game tree.
+    std::stack<std::pair<int, int>> counter_stack;
 };

@@ -4,7 +4,7 @@ project(abstract-board-games)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "-Wall -Ofast -march=native")
 
 add_subdirectory(python_bindings)
 

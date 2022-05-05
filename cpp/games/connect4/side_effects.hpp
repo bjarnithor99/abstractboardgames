@@ -41,9 +41,17 @@ class SideEffect
     /// @param new_y the y coordinate the piece is going to.
     /// @return void
     virtual void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) = 0;
+    /// @brief Reverses the changes made when this side effect was last
+    ///  executed.
+    virtual void operator()(Environment *environment) = 0;
     /// @brief Returns the name of the predicate. Useful for debugging.
     /// @return the name of the predicate as std::string.
     virtual std::string get_name() const = 0;
+
+  protected:
+    /// @brief Stores the state of the cells and their location before this side
+    ///  effect was executed.
+    std::stack<std::tuple<Cell, int, int>> cell_stack;
 };
 
 /// @brief A default side effect that captures the piece at (new_x, new_y) if any.
@@ -54,6 +62,7 @@ class Default : public SideEffect
     Default();
     ~Default();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
 };
 
@@ -65,6 +74,7 @@ class Place : public SideEffect
     Place();
     ~Place();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
     std::string get_name() const override;
 };
 

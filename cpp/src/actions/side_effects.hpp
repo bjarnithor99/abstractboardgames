@@ -47,6 +47,11 @@ class SideEffect
     /// @brief Returns the name of the predicate. Useful for debugging.
     /// @return the name of the predicate as std::string.
     virtual std::string get_name() const = 0;
+
+  protected:
+    /// @brief Stores the state of the cells and their location before this side
+    ///  effect was executed.
+    std::stack<std::tuple<Cell, int, int>> cell_stack;
 };
 
 /// @brief A default side effect that captures the piece at (new_x, new_y) if any.
@@ -59,11 +64,112 @@ class Default : public SideEffect
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
     void operator()(Environment *environment) override;
     std::string get_name() const override;
+};
+
+/// @brief A side effect that promotes a Pawn to a Queen once it reaches the end
+///  of the board.
+/// @author Bjarni Dagur Thor Kárason
+class PromoteToQueen : public SideEffect
+{
+  public:
+    PromoteToQueen();
+    ~PromoteToQueen();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect that promotes a Pawn to a Rook once it reaches the end
+///  of the board.
+/// @author Bjarni Dagur Thor Kárason
+class PromoteToRook : public SideEffect
+{
+  public:
+    PromoteToRook();
+    ~PromoteToRook();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect that promotes a Pawn to a Bishop once it reaches the end
+///  of the board.
+/// @author Bjarni Dagur Thor Kárason
+class PromoteToBishop : public SideEffect
+{
+  public:
+    PromoteToBishop();
+    ~PromoteToBishop();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect that promotes a Pawn to a Knight once it reaches the end
+///  of the board.
+/// @author Bjarni Dagur Thor Kárason
+class PromoteToKnight : public SideEffect
+{
+  public:
+    PromoteToKnight();
+    ~PromoteToKnight();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect to indicate that a pawn is can be captured en passant.
+/// @author Bjarni Dagur Thor Kárason
+class SetEnPassantable : public SideEffect
+{
+  public:
+    SetEnPassantable();
+    ~SetEnPassantable();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
+    std::string get_name() const override;
 
   private:
-    /// @brief Stores the state of the cells and their location before this side
-    ///  effect was executed.
-    std::stack<std::tuple<Cell, int, int>> cell_stack;
+    std::stack<std::tuple<int, int, int>> en_passant_stack;
+};
+
+/// @brief A side effect to castle to the right.
+/// @author Bjarni Dagur Thor Kárason
+class CastleLeft : public SideEffect
+{
+  public:
+    CastleLeft();
+    ~CastleLeft();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect to castle to the right.
+/// @author Bjarni Dagur Thor Kárason
+class CastleRight : public SideEffect
+{
+  public:
+    CastleRight();
+    ~CastleRight();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
+    std::string get_name() const override;
+};
+
+/// @brief A side effect castle to mark a piece as moved.
+/// @author Bjarni Dagur Thor Kárason
+class MarkMoved : public SideEffect
+{
+  public:
+    MarkMoved();
+    ~MarkMoved();
+    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
+    void operator()(Environment *environment) override;
+    std::string get_name() const override;
+
+  private:
+    std::stack<std::pair<bool *, bool>> moved_stack;
 };
 
 /// @brief Class to store all side effects to use in game descriptions.
