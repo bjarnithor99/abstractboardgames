@@ -75,9 +75,10 @@ class AgentService:
                 moveIndex = int(dataDict["moveIndex"])
                 moves = self.gameEngine.getPlayerMoves()
                 self.move = moves[moveIndex]  # Storing the move
-                tempEngine = deepcopy(self.gameEngine)
-                tempEngine.playMove(self.move)
-                response_body["gameState"] = json.loads(tempEngine.jsonify())
+
+                self.gameEngine.playMove(self.move)
+                response_body["gameState"] = json.loads(self.gameEngine.jsonify())
+                self.gameEngine.undo_move()
                 return make_response(jsonify(response_body), 200)
 
         @self.app.route("/<path:filename>")

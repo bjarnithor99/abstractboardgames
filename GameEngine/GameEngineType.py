@@ -9,7 +9,7 @@ class GameEngine:
         pass
 
     def undo_move(self):
-        pass
+        return self.undoMove()
 
     def game_over(self):
         pass
