@@ -16,11 +16,6 @@ macro QueenMacro() = BishopMacro() | RookMacro();
 macro KingSteps() = Step(1,0) | Step(0,1) | Step(-1,0) | Step(0,-1) |
                 Step(1,1) | Step(-1,1) | Step(1,-1) | Step(-1,-1);
 
-effect Move(x, y, dx, dy) {
-    Board[x+dx][y+dy] = jon;
-    Board[x][y] = None;
-};
-
 variable blackLeftRookMoved = 0;
 variable blackRightRookMoved = 0;
 variable blackKingMoved = 0;
@@ -29,19 +24,24 @@ variable whiteLeftRookMoved = 0;
 variable whiteRightRookMoved = 0;
 variable whiteKingMoved = 0;
 
-#predicate WhiteRightPiecesUnmoved() {return (not whiteRightRookMoved) and (not whiteKingMoved);};
-
-
+effect Move(x, y, dx, dy) {
+    Board[x+dx][y+dy] = Board[x][y];
+    Board[x][y] = None;
+};
 
 macro Castling(y) = [1,0,empty][1,0,empty][0,0,not whiteRightRookMoved and not whiteKingMoved]{Move(7, y, -2, 0)};
 
 macro KingMacro(y) = KingSteps() | Castling(y);
 
+effect WKMoved() {whiteKingMoved = 1;};
+rule WhiteKing = KingMacro(0)[0,0,true]{WKMoved()}; 
+effect BKMoved() {blackKingMoved = 1;};
+rule BlackKing = KingMacro(7)[0,0,true]{BKMoved()};
+
 macro T(dx, dy) = Step(dx*2,dy) | Step(dx,dy*2);
 macro KnightMacro() = T(1, 1) | T(-1, 1)| T(1, -1)| T(-1, -1);
 
 
-rule WhiteKing = KingMacro(0); rule BlackKing = KingMacro(7);
 rule WhiteQueen = QueenMacro(); rule BlackQueen = QueenMacro();
 rule WhiteRook = RookMacro(); rule BlackRook = RookMacro();
 rule WhiteBishop = BishopMacro(); rule BlackBishop = BishopMacro();
@@ -102,12 +102,12 @@ victory black {return 0;};
 
 board_size = 8, 8;
 board = 
-    BlackRook, BlackKnight, BlackBishop, BlackKing, BlackQueen, BlackBishop, BlackKnight, BlackRook,
+    BlackRook, BlackKnight, BlackBishop, BlackQueen, BlackKing, BlackBishop, BlackKnight, BlackRook,
     BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn,
     None, None, None, None, None, None, None, None,
     None, None, None, None, None, None, None, None,
     None, None, None, None, None, None, None, None,
     None, None, None, None, None, None, None, None,
     WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn,
-    WhiteRook, WhiteKnight, WhiteBishop, WhiteKing, WhiteQueen, WhiteBishop, WhiteKnight, WhiteRook
+    WhiteRook, WhiteKnight, WhiteBishop, WhiteQueen, WhiteKing, WhiteBishop, WhiteKnight, WhiteRook
 ;

@@ -1,4 +1,4 @@
-from .ASTType import Concatination, FunctionCall, Letter, Union, Star, Plus, QuestionMark, IntegerExpression
+from .ASTType import Concatination, FunctionCall, Letter, Union, Star, Plus, QuestionMark
 from ...Lexer.TokenTypes import *
 from .ASTType import RegexTree
 from ...Lexer.Lexer import Lexer
@@ -175,37 +175,6 @@ class Parser(IntegerExpressionParser):
         except MatchFailed as error:
             self.i = backupI
             raise error
-
-    def DELETETHIS(self):
-        numberOfOpenScopes = 0
-        def validExpToken(token: Token):
-            nonlocal numberOfOpenScopes
-            if token.value in ('(', ')'):
-                numberOfOpenScopes += {'(':1, ')':-1}[token.value]
-            return (isinstance(token, Word) or\
-            isinstance(token, Integer) or\
-            isinstance(token, Operator) or\
-            token.value in '!=+-*/().' or\
-            token.value == '==') and\
-            numberOfOpenScopes != -1
-        i = 1
-        token = self.peak(i)
-        expression = []
-        if validExpToken(token):
-            expression.append(token)
-            i += 1
-            token = self.peak(i)
-        else:
-            raise MatchFailed(token.pos)
-
-        while validExpToken(token):
-            expression.append(token)
-            i += 1
-            token = self.peak(i)
-        if numberOfOpenScopes > 0:
-            raise MatchFailed(token.pos)
-        self.skip(i-1)
-        return IntegerExpression(expression)
         
 
 #C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m NewFolderStruct.Parser.RegexParser.Parser

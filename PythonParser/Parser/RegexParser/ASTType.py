@@ -68,11 +68,13 @@ class QuestionMark(UnarySymbol):
 class Plus(UnarySymbol):
     pass
 
+
+from ..IntegerExpressionParser.ASTType import IntegerExpressionTree
 class Letter(SyntaxTreeNode):
     def __init__(self, dx, dy, pre, effect=None) -> None:
-        self.dx = dx
-        self.dy = dy
-        self.pre: FunctionCall | IntegerExpression = pre
+        self.dx: int = dx
+        self.dy: int = dy
+        self.pre: FunctionCall | IntegerExpressionTree = pre
         self.effect: FunctionCall = effect
 
     def __str__(self) -> str:
@@ -87,13 +89,6 @@ class Letter(SyntaxTreeNode):
 
     def __hash__(self):
         return hash(str(self))
-
-class IntegerExpression(SyntaxTreeNode):
-    def __init__(self, tokenList: list[Token]) -> None:
-        self.tokenList: list[Token] = tokenList
-
-    def __str__(self) -> str:
-        return '{' + ''.join([str(token.value) for token in self.tokenList]) + '}'
 
 class Variable(SyntaxTreeNode):
     def __init__(self, name: str) -> None:

@@ -17,6 +17,7 @@ unary_stmt :=
 core_stmt := 
     <int> | 
     <variable> ('.' <variable>)? | 
+    <variable> ('['<integer_expression>']')* |
     '('<integer_expression>')'
 
 binary_op := ['*', '+', '-', '//', '/', '%', 'and', 'or', '!=', '==', '&&', '||']

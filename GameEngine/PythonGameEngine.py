@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from ..PythonParser.Parser.IntegerExpressionParser.ASTType import SyntaxTreeNode as IntegerExpressionTreeNode
+from ..PythonParser.Parser.IntegerExpressionParser.ASTType import IntegerExpressionTree
 from ..PythonParser.Parser.IntegerExpressionParser.ASTType import Variable as IntegerExpressionVariable
 from ..PythonParser.IntegerExpression.Evaluator import evaluateIntegerExpression
 from ..PythonParser.Parser.Parser import Parser
@@ -8,6 +9,8 @@ from ..PythonParser.Parser.ASTType import *
 from ..PythonParser.StateMachine.Types import *
 from ..PythonParser.Lexer.TokenTypes import *
 from ..PythonParser.StateMachine.Main import RegexToDFA
+
+from ..PythonParser.IntegerExpression.Preprocessor import resolveConstants, writeVariablesToConstants
 from copy import deepcopy
 
 Position = tuple[int, int]
@@ -32,8 +35,10 @@ class BoardPiece:
 
 EngineBoard = list[list[BoardPiece | None]]
 
-DebugFolder = './DebugInfo/'
 import os
+DebugFolder = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),'./DebugInfo/'
+)
 TestFileFolder = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),"../PythonParser/TestFiles/"
 )
@@ -106,16 +111,25 @@ class PythonGameEngine(GameEngine):
 
         #Resolving rules
         self.debugRegexStr = ''
+
+        variableDeclarations = []
         for rule in program.rules.ruleArr:
-            visitFunc = {
-                Predicate: self.visitPredicate,
-                Effect: self.visitEffect,
-                Macro: self.visitMacro,
-                PieceRule: self.visitPieceRule,
-                VariableDeclaration: self.visitVariableDeclaration,
-                Victory: self.visitVictory
-            }[type(rule)]
-            visitFunc(rule)
+            if type(rule) == VariableDeclaration:
+                #load globals after compile
+                variableDeclarations.append(rule)
+            else:
+                visitFunc = {
+                    Predicate: self.visitPredicate,
+                    Effect: self.visitEffect,
+                    Macro: self.visitMacro,
+                    PieceRule: self.visitPieceRule,
+                    Victory: self.visitVictory
+                }[type(rule)]
+                visitFunc(rule)
+
+
+        for variableDeclaration in variableDeclarations:
+            self.visitVariableDeclaration(variableDeclaration)
 
         if self.debug:
             self.debugRegexCompiling()
@@ -159,11 +173,17 @@ class PythonGameEngine(GameEngine):
 
     def visitMacro(self, macro: Macro):
         self.macros[macro.name] = macro
+
+    def visitIntegerExpression(self, integerExpression: IntegerExpressionTree, env: list[str:int] = {}):
+        intExp = writeVariablesToConstants(integerExpression, self.variables)
+        intExp = resolveConstants(intExp)
+        integerExpression.rootNode = intExp.rootNode
     
     def visitPieceRule(self, pieceRule: PieceRule):
         try:
             compiledRegex = self.compileRegex(pieceRule.regex)
         except Exception as e:
+            print(e)
             raise Exception(f'{str(e)}\nFailed to compile regex for {pieceRule.pieceName}:\n{str(pieceRule.regex)}')
         dfa, debugStr = RegexToDFA(compiledRegex, debug=True)
         if self.debug:
@@ -191,7 +211,17 @@ class PythonGameEngine(GameEngine):
                 # Resolve integer expression
                 letter: Letter = regexNode
                 dx = self.resolveIntegerExpression(letter.dx)
-                dy = self.resolveIntegerExpression(letter.dy) #Predicates and effects need to be compiled too
+                dy = self.resolveIntegerExpression(letter.dy) 
+                #Predicates and effects arguments need to be compiled too
+                if isinstance(letter.pre, IntegerExpressionTree):
+                    self.visitIntegerExpression(letter.pre)
+                elif isinstance(letter.pre, Predicate):
+                    for arg in letter.pre.arguments:
+                        self.visitIntegerExpression(letter.pre)
+                if letter.effect is not None:
+                    for arg in letter.effect.arguments:
+                        self.visitIntegerExpression(arg)
+
                 return Letter(dx, dy, letter.pre, effect=letter.effect)
             elif type(regexNode) == FunctionCall:
                 funCall: FunctionCall = regexNode
@@ -245,10 +275,11 @@ class PythonGameEngine(GameEngine):
         return argumentVariables
 
 
-    def resolveIntegerExpression(self, integerExpression: IntegerExpressionTreeNode) -> int | BoardPiece:
+    def resolveIntegerExpression(self, integerExpression: IntegerExpressionTree) -> int | BoardPiece:
         #If integer expression is loading a state machine
-        if type(integerExpression) == IntegerExpressionVariable and integerExpression.name in self.pieceRules:
-            pieceName = integerExpression.name
+        rootNode = integerExpression.rootNode
+        if type(rootNode) == IntegerExpressionVariable and rootNode.name in self.pieceRules:
+            pieceName = rootNode.name
             dfa = self.pieceRules[pieceName]
             if dfa is None:
                 return None
@@ -257,7 +288,7 @@ class PythonGameEngine(GameEngine):
                 return BoardPiece(dfa, pieceName, playerName)
         
         try:
-            return evaluateIntegerExpression(integerExpression, self.variables)
+            return evaluateIntegerExpression(integerExpression.rootNode, self.variables)
         except Exception as error:
             print('Error evaluating integer expression:')
             print(integerExpression)
@@ -337,7 +368,7 @@ class PythonGameEngine(GameEngine):
             argumentVariables = self.matchFunCallWithArguments(preCall, predicateType)
             f = lambda: self.resolveIntegerExpression(predicateType.expression)
             returnValue = self.runFunctionInEnvironment(f, argumentVariables)
-        elif isinstance(predicate, IntegerExpressionTreeNode):
+        elif isinstance(predicate, IntegerExpressionTree):
             specialPredicates = {
                 'enemy': (self.getTile(x,y) is not None) and (self.getTile(x,y).player!=player),
                 'empty': self.getTile(x,y) is None,
@@ -368,9 +399,7 @@ class PythonGameEngine(GameEngine):
 
 
     def runAssignment(self, assignment: Assignment):
-        print('heewrwe')
         try:
-            print('running assignment', assignment)
             variables = self.variables
 
             indexes = [assignment.variableName, *[self.resolveIntegerExpression(indexExpr) for indexExpr in assignment.indexes]]
@@ -409,6 +438,9 @@ class PythonGameEngine(GameEngine):
         def getStateMoves(state: State, location: Position) -> list[list[Letter]]:
             x, y = location
             boardPiece = self.getTile(x,y)
+            if boardPiece is None:
+                #Effect killed its own piece, abort!!!! >:(
+                return []
             player = boardPiece.player
             moveList = []
             
@@ -545,7 +577,7 @@ python -m ru_final_project.GameEngine.PythonGameEngine
 from ..Agents.Agents import BrowserGUIAgent, RandomAgent, TUIAgent
 if __name__ == '__main__':
     print('hello world')
-    ge = PythonGameEngine('chess.game')
+    ge = PythonGameEngine('chess.game', debug=True)
     agents = []
     agents.append(BrowserGUIAgent(8080))
     #agents.append(TUIAgent())

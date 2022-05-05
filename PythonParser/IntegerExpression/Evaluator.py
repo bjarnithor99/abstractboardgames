@@ -49,6 +49,19 @@ def visitor(node: SyntaxTreeNode, environment: Environment) -> int:
             return environment[variable.name][variable.secondName]
         else:
             return environment[variable.name]
+    
+    elif type(node) == IndexedVariable:
+        indexedVariable: IndexedVariable = node
+        name = indexedVariable.name
+        indexableObjToValue = environment[name]
+        indices = indexedVariable.indices[::-1]
+        while len(indices) != 0:
+            indexableObjToValue = indexableObjToValue[visitor(indices.pop(), environment)]
+        return indexableObjToValue
+            
+
+    else:
+        raise Exception(f"Invalid type in integer expression! {type(node)}")
 
 
 def evaluateIntegerExpression(intExpr: SyntaxTreeNode, environment: Environment):

@@ -25,12 +25,10 @@ class Parser():
     def generateAST(self, debug=False) -> IntegerExpressionTree:
         self.tokens: list[Token] = Lexer(self.text).lex(debug=debug)
         self.i = 0
+        return self.matchIntegerExpression()
 
-        integerExpression: SyntaxTreeNode = self.matchIntegerExpression()
-        return IntegerExpressionTree(integerExpression)
-
-    def matchIntegerExpression(self) -> SyntaxTreeNode:
-        return self.matchBinaryStatement()
+    def matchIntegerExpression(self) -> IntegerExpressionTree:
+        return IntegerExpressionTree(self.matchBinaryStatement())
 
     def matchBinaryStatement(self, priorityLevel=0) -> SyntaxTreeNode:
         leftStmt = {
@@ -90,22 +88,37 @@ class Parser():
         bakcupI = self.i
         if isinstance(token, Word):
             name = self.next().value
-            token = self.peak(1)
-            if isinstance(token, Operator) and token.value == '.':
-                self.next()
-                token = self.peak(1)
-                if isinstance(token, Word):
-                    return Variable(name, secondName=self.next().value)
-                else:
-                    self.i = bakcupI
-                    raise MatchFailed
-            else:
-                return Variable(name)
 
+            bakcupI2 = self.i
+            try:
+                self.matchToken(Operator, '.')
+                name2 = self.matchToken(Word).value
+                return Variable(name, secondName=name2)
+                
+            except MatchFailed:
+                self.i = bakcupI2
+
+
+            indices = []
+            while True:
+                bakcupI2 = self.i
+                try:
+                    self.matchToken(Symbol, '[')
+                    expr = self.matchIntegerExpression().rootNode
+                    self.matchToken(Symbol, ']')
+                    indices.append(expr)
+                except MatchFailed:
+                    self.i = bakcupI2
+                    break
+
+            if len(indices) != 0:
+                return IndexedVariable(name, indices)
+
+            return Variable(name)
 
         try:
             self.matchToken(Symbol, '(')
-            integerExpression = self.matchIntegerExpression()
+            integerExpression = self.matchIntegerExpression().rootNode
             self.matchToken(Symbol, ')')
             return integerExpression
         except MatchFailed as error:
