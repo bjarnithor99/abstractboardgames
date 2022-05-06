@@ -63,6 +63,7 @@ PromoteToRook::PromoteToRook() {}
 PromoteToRook::~PromoteToRook() {}
 void PromoteToRook::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
     Cell &cell = environment->board[new_x][new_y];
+    cell_stack.push({cell, new_x, new_y});
     if (!cell.owners.empty() && cell.owners[0] == "white") {
         cell.piece = "wRook";
         cell.state = environment->pieces["wRook"].second.get();
@@ -86,6 +87,7 @@ PromoteToBishop::PromoteToBishop() {}
 PromoteToBishop::~PromoteToBishop() {}
 void PromoteToBishop::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
     Cell &cell = environment->board[new_x][new_y];
+    cell_stack.push({cell, new_x, new_y});
     if (!cell.owners.empty() && cell.owners[0] == "white") {
         cell.piece = "wBishop";
         cell.state = environment->pieces["wBishop"].second.get();
@@ -109,6 +111,7 @@ PromoteToKnight::PromoteToKnight() {}
 PromoteToKnight::~PromoteToKnight() {}
 void PromoteToKnight::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
     Cell &cell = environment->board[new_x][new_y];
+    cell_stack.push({cell, new_x, new_y});
     if (!cell.owners.empty() && cell.owners[0] == "white") {
         cell.piece = "wKnight";
         cell.state = environment->pieces["wKnight"].second.get();
@@ -201,7 +204,7 @@ std::string CastleRight::get_name() const {
 MarkMoved::MarkMoved() {}
 MarkMoved::~MarkMoved() {}
 void MarkMoved::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
-    bool *var_ptr, val;
+    bool *var_ptr = nullptr, val;
     if (environment->board[new_x][new_y].piece == "bKing") {
         var_ptr = &environment->variables.black_king_moved;
         val = environment->variables.black_king_moved;
@@ -242,7 +245,9 @@ void MarkMoved::operator()(Environment *environment) {
     bool *var_ptr, val;
     std::tie(var_ptr, val) = moved_stack.top();
     moved_stack.pop();
-    *var_ptr = val;
+    if (var_ptr) {
+        *var_ptr = val;
+    }
 }
 std::string MarkMoved::get_name() const {
     return "MarkMoved";

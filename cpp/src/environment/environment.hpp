@@ -130,7 +130,7 @@ class Environment
     ///
     /// @returns true if Environment#board[\p x][\p y] exists.
     /// @returns false if Environment#board[\p x][\p y] does not exist.
-    bool contains_cell(int x, int y);
+    bool contains_cell(size_t x, size_t y);
     /// @brief Returns a 3-dimensional representation of the current environment
     ///  for a neural network.
     ///

@@ -29,8 +29,8 @@ Environment::Environment(int board_size_x, int board_size_y)
     : board_size_x(board_size_x), board_size_y(board_size_y), move_count(0), variables(Variables()) {}
 Environment::~Environment() {}
 
-bool Environment::contains_cell(int x, int y) {
-    return 0 <= x && x < board_size_x && 0 <= y && y < board_size_y;
+bool Environment::contains_cell(size_t x, size_t y) {
+    return 0 <= x && x < board.size() && 0 <= y && y < board[0].size();
 }
 
 std::vector<std::vector<std::vector<int>>> Environment::get_environment_representation() {
@@ -59,8 +59,8 @@ std::vector<std::vector<std::vector<int>>> Environment::get_environment_represen
 
 std::vector<std::vector<Step>> Environment::generate_moves() {
     found_moves.clear();
-    for (int i = 0; i < board_size_x; i++) {
-        for (int j = 0; j < board_size_y; j++) {
+    for (size_t i = 0; i < board.size(); i++) {
+        for (size_t j = 0; j < board[0].size(); j++) {
             const std::vector<std::string> &owners = board[i][j].owners;
             if (std::find(owners.begin(), owners.end(), current_player) != owners.end()) {
                 candidate_move.clear();
