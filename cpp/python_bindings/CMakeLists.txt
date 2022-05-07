@@ -9,6 +9,11 @@ set(CMAKE_CXX_FLAGS "-Wall -Ofast")
 file(GLOB_RECURSE abg_SOURCES CONFIGURE_DEDPENDS "../src/*.cpp")
 file(GLOB_RECURSE abg_HEADERS CONFIGURE_DEDPENDS "../src/*.hpp")
 
+list(FILTER abg_SOURCES EXCLUDE REGEX ".*/src/main.cpp")
+list(FILTER abg_SOURCES EXCLUDE REGEX ".*/src/perft.cpp")
+list(FILTER abg_SOURCES EXCLUDE REGEX ".*/src/flatmc.cpp")
+get_filename_component(main_file ../src/main.cpp ABSOLUTE)
+
 set(abg_INCLUDE_DIRS "")
 foreach(_header_file ${abg_HEADERS})
   get_filename_component(_dir ${_header_file} PATH)
@@ -17,7 +22,7 @@ endforeach()
 
 list(REMOVE_DUPLICATES abg_INCLUDE_DIRS)
 
-add_library(abg_lib SHARED ${abg_SOURCES})
+add_library(abg_lib SHARED ${main_file} ${abg_SOURCES})
 
 include_directories(abg_lib PRIVATE ${abg_INCLUDE_DIRS})
 
