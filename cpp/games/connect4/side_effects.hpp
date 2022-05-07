@@ -54,25 +54,13 @@ class SideEffect
     std::stack<std::tuple<Cell, int, int>> cell_stack;
 };
 
-/// @brief A default side effect that captures the piece at (new_x, new_y) if any.
+/// @brief A default side effect that places a player's piece at (new_x, new_y).
 /// @author Bjarni Dagur Thor Kárason
 class Default : public SideEffect
 {
   public:
     Default();
     ~Default();
-    void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
-    void operator()(Environment *environment) override;
-    std::string get_name() const override;
-};
-
-/// @brief A side effect to place a player's piece.
-/// @author Bjarni Dagur Thor Kárason
-class Place : public SideEffect
-{
-  public:
-    Place();
-    ~Place();
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
     void operator()(Environment *environment) override;
     std::string get_name() const override;

@@ -54,17 +54,6 @@ class False : public Predicate
     std::string get_name() const override;
 };
 
-/// @brief A predicate to check if (x, y) is empty.
-/// @author Bjarni Dagur Thor Kárason
-class Empty : public Predicate
-{
-  public:
-    Empty();
-    ~Empty();
-    bool operator()(Environment *environment, int x, int y) override;
-    std::string get_name() const override;
-};
-
 /// @brief A predicate to check if (x, y) is the lowest unoccupied row in its
 ///  column.
 /// @author Bjarni Dagur Thor Kárason

@@ -13,15 +13,6 @@ std::string False::get_name() const {
     return "False";
 }
 
-Empty::Empty() {}
-Empty::~Empty() {}
-bool Empty::operator()(Environment *environment, int x, int y) {
-    return environment->board[x][y].piece == "empty";
-}
-std::string Empty::get_name() const {
-    return "Empty";
-}
-
 LowestUnoccupied::LowestUnoccupied() {}
 LowestUnoccupied::~LowestUnoccupied() {}
 bool LowestUnoccupied::operator()(Environment *environment, int x, int y) {
@@ -33,6 +24,5 @@ std::string LowestUnoccupied::get_name() const {
 
 std::map<std::string, std::shared_ptr<Predicate>> Predicates::get_predicate = {
     {"False", std::make_shared<False>()},
-    {"Empty", std::make_shared<Empty>()},
     {"LowestUnoccupied", std::make_shared<LowestUnoccupied>()},
 };
