@@ -13,16 +13,16 @@ std::string False::get_name() const {
     return "False";
 }
 
-LowestUnoccupied::LowestUnoccupied() {}
-LowestUnoccupied::~LowestUnoccupied() {}
-bool LowestUnoccupied::operator()(Environment *environment, int x, int y) {
-    return !environment->contains_cell(x + 1, y) || environment->board[x + 1][y].piece != "empty";
+True::True() {}
+True::~True() {}
+bool True::operator()(Environment *environment, int x, int y) {
+    return true;
 }
-std::string LowestUnoccupied::get_name() const {
-    return "LowestUnoccupied";
+std::string True::get_name() const {
+    return "True";
 }
 
 std::map<std::string, std::shared_ptr<Predicate>> Predicates::get_predicate = {
     {"False", std::make_shared<False>()},
-    {"LowestUnoccupied", std::make_shared<LowestUnoccupied>()},
+    {"True", std::make_shared<True>()},
 };

@@ -255,7 +255,7 @@ bool NotAttacked::attacked_straight(Environment *environment, int x, int y) {
 bool NotAttacked::attacked_coef(Environment *environment, int x, int y, int x_coef, int y_coef,
                                 const std::vector<std::string> &opponents) {
     for (int i = 1; i < 8; i++) {
-        if (!environment->contains_cell(x + x_coef * i, y + x_coef * i))
+        if (!environment->contains_cell(x + x_coef * i, y + y_coef * i))
             break;
         for (const std::string &opponent : opponents) {
             if (environment->board[x + x_coef * i][y + y_coef * i].piece == opponent)

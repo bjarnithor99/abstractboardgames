@@ -54,14 +54,13 @@ class False : public Predicate
     std::string get_name() const override;
 };
 
-/// @brief A predicate to check if (x, y) is the lowest unoccupied row in its
-///  column.
+/// @brief A predicate that is always true.
 /// @author Bjarni Dagur Thor Kárason
-class LowestUnoccupied : public Predicate
+class True : public Predicate
 {
   public:
-    LowestUnoccupied();
-    ~LowestUnoccupied();
+    True();
+    ~True();
     bool operator()(Environment *environment, int x, int y) override;
     std::string get_name() const override;
 };

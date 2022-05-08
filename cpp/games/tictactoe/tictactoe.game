@@ -1,0 +1,12 @@
+players = white, black;
+
+pieces = empty(black, white), o(black), x(white);
+
+rule empty = [0, 0, True];
+rule x     = [0, 0, False];
+rule o     = [0, 0, False];
+
+board_size = 3, 3;
+board = empty, empty, empty,
+        empty, empty, empty,
+        empty, empty, empty;

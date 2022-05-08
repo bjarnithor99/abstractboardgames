@@ -9,7 +9,7 @@ Default::~Default() {}
 void Default::operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) {
     Cell &cell = environment->board[new_x][new_y];
     cell_stack.push({environment->board[new_x][new_y], new_x, new_y});
-    std::string players_piece = environment->current_player == "black" ? "bPawn" : "wPawn";
+    std::string players_piece = environment->current_player == "white" ? "x" : "o";
     cell.owners = environment->pieces[players_piece].first;
     cell.piece = players_piece;
     cell.state = environment->pieces[players_piece].second.get();
