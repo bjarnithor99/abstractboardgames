@@ -18,9 +18,15 @@ class SyntaxTreeNode:
     pass
 
 class FunctionCall(SyntaxTreeNode):
-    def __init__(self, name: str, arguments: list[IntegerExpression]) -> None:
+    def __init__(self, name: str, arguments: list[IntegerExpressionTree]) -> None:
         self.name: str = name
-        self.arguments: list[IntegerExpression] = arguments
+        self.arguments: list[IntegerExpressionTree] = arguments
+
+    def getChildren(self) -> list[IntegerExpressionTree]:
+        return self.arguments
+
+    def setChildren(self, children: list[IntegerExpressionTree]):
+        self.arguments = children
 
     def __str__(self) -> str:
         return f'{self.name}({",".join([str(intExp) for intExp in self.arguments])})'

@@ -157,7 +157,7 @@ class Parser(RegexParser):
                 if not isinstance(token, Word):
                     raise MatchFailed(token.pos)
                 keyword = token.value
-                if keyword not in ('rule', 'macro', 'predicate', 'effect', 'variable', 'victory'):
+                if keyword not in ('rule', 'macro', 'function', 'effect', 'variable', 'victory'):
                     raise MatchFailed(token.pos)
             except MatchFailed:
                 break
@@ -178,7 +178,7 @@ class Parser(RegexParser):
             keywordToMatchFunc = {
                 'rule': self.matchPieceRule,
                 'macro': self.matchMacro,
-                'predicate': self.matchPredicate,
+                'function': self.matchFunction,
                 'effect': self.matchEffect,
                 'variable': self.matchVariable,
                 'victory': self.matchVictory
@@ -220,7 +220,7 @@ class Parser(RegexParser):
             raise error
         
 
-    def matchPredicate(self) -> ASTType.Predicate:
+    def matchFunction(self) -> ASTType.Function:
         backupI = self.i
         try:
             name = self.matchToken(Word).value
@@ -231,13 +231,35 @@ class Parser(RegexParser):
             except MatchFailed:
                 pass
             self.matchToken(Symbol, ")")
-            self.matchToken(Symbol, "{")
-            self.matchToken(Word, "return")
-            exp = self.matchIntegerExpression()
+
+
+            expOrRegex = None
+            backupI2 = self.i
+            try:
+                self.matchToken(Symbol, "{")
+                self.matchToken(Word, "return")
+                exp = self.matchIntegerExpression()
+                self.matchToken(EOL)
+                self.matchToken(Symbol, "}")
+
+                expOrRegex = exp
+            except MatchFailed:
+                self.i = backupI2
+
+            backupI2 = self.i
+            try:
+                self.matchToken(Operator, "=")
+                regex = RegexTree(self.matchRegex())
+
+                expOrRegex = regex
+            except MatchFailed:
+                self.i = backupI2
+
+            if expOrRegex is None:
+                raise MatchFailed(self.peak(1).pos)
+
             self.matchToken(EOL)
-            self.matchToken(Symbol, "}")
-            self.matchToken(EOL)
-            return ASTType.Predicate(name, arguments, exp)
+            return ASTType.Function(name, arguments, expOrRegex)
         except MatchFailed as error:
             self.i = backupI
             raise error

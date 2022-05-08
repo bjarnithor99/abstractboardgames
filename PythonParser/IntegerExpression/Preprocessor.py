@@ -1,3 +1,4 @@
+from ru_final_project.PythonParser.Parser.RegexParser.ASTType import FunctionCall
 from ..Parser.IntegerExpressionParser.ASTType import *
 def writeVariablesToConstants(integerExpression: IntegerExpressionTree, env: dict[str: int]) -> IntegerExpressionTree:
     def visitor(node: SyntaxTreeNode, env: dict[str: int]):
@@ -18,7 +19,7 @@ def resolveConstants(integerExpression: IntegerExpressionTree) -> IntegerExpress
         for child in node.getChildren():
             children.append(visitor(child))
         node.setChildren(children)
-        if all([isinstance(child, Integer) for child in node.getChildren()]) and not isinstance(node, Variable):
+        if all([isinstance(child, Integer) for child in node.getChildren()]) and not (isinstance(node, Variable) or isinstance(node, FunctionCall)):
             return Integer(evaluateIntegerExpression(node, {}))
         return node
     return IntegerExpressionTree(visitor(integerExpression.rootNode))

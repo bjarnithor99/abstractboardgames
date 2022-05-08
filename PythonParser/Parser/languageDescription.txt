@@ -1,0 +1,38 @@
+program := 
+    <players_description>
+    <pieces_description>
+    <rule_description>
+    <board_info>
+
+board_info := <board_size> <board>
+board_size := "BoardSize" "=" <int> "," <int> ";"
+board := "Board" "=" <word> ("," <word>)* ";"
+
+players_description := "Players" "=" <word> ("," <word>)* ";"
+pieces_description := <piece_description> ("," <piece_description>)* ";"
+piece_description := <word>"("<word>")"
+
+
+rule_description := (<predicate>|<effect>|<macro>|<piece_rule>)+
+
+#The four rules defined
+predicate := 
+    "predicate" <word> "(" <arguments>? ")" 
+        ("{"<predicate_body>"}") |
+        ("=" <regex_with_variables>)
+    ";")
+
+predicate_body := "return" <expression> ";"
+
+effect := "effect" <word> "(" <arguments>? ")" "{"<effect_body>"}" ";"
+effect_body := <assignment>*
+assignment := <word> ("["<expression>"]")* "=" <word> ("["<expression>"]")* ";"
+expression := <I don't know some string?? ehhhh>
+
+macro := "macro" <word> "(" <arguments>? ")" <regex_with_variables> ";"
+
+piece_rule := "rule" <word> "=" <regex_with_variables> ";"
+
+
+#Helpers
+arguments := <word> ("," <word>)*

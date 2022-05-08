@@ -5,12 +5,22 @@ from ...Lexer.TokenTypes import Token
 def indent(string: str) -> str:
     return '\t' + '\n\t'.join(string.split('\n'))
 
+
+
+INDENT = False
+
 class IntegerExpressionTree:
     def __init__(self, rootNode: SyntaxTreeNode) -> None:
         self.rootNode = rootNode
 
+    def getChildren(self) -> list[SyntaxTreeNode]:
+        return self.rootNode
+
+    def setChildren(self, children: list[SyntaxTreeNode]):
+        self.rootNode = children[0]
+
     def __str__(self) -> str:
-        return 'Integer Expression Tree:\n'+indent(str(self.rootNode))
+        return ('Integer Expression Tree:\n'+indent(str(self.rootNode))) if INDENT else f'EXP[{str(self.rootNode)}]'
 
 class SyntaxTreeNode:
     def getChildren(self) -> list[SyntaxTreeNode]:
@@ -35,6 +45,8 @@ class BinaryOperator(SyntaxTreeNode):
         self.child2 = children[1]
 
     def __str__(self) -> str:
+        if not INDENT:
+            return f'{str(self.child1)} {self.operator} {str(self.child2)}'
         returnStr = ''
         returnStr +=  self.operator + '\n'
         childStr =  str(self.child1) + '\n'
@@ -54,6 +66,8 @@ class UnaryOperator(SyntaxTreeNode):
         self.child = children[0]
 
     def __str__(self) -> str:
+        if not INDENT:
+            return f'{self.operator} {str(self.child)}'
         returnStr = ''
         returnStr +=  self.operator + '\n'
         childStr =  str(self.child)

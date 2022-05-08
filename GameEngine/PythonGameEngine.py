@@ -13,6 +13,30 @@ from ..PythonParser.StateMachine.Main import RegexToDFA
 from ..PythonParser.IntegerExpression.Preprocessor import resolveConstants, writeVariablesToConstants
 from copy import deepcopy
 
+from ..PythonParser.Parser.ASTType import Function, FunctionCall
+from ..PythonParser.Parser.IntegerExpressionParser.ASTType import *
+
+binaryOpToFunc = {
+    'and': lambda a, b: a and b,
+    'or': lambda a, b: a or b,
+    '&&': lambda a, b: a and b,
+    '||': lambda a, b: a or b,
+    '!=': lambda a, b: a != b,
+    '==': lambda a, b: a == b,
+    '+': lambda a, b: a + b,
+    '-': lambda a, b: a - b,
+    '*': lambda a, b: a * b,
+    '/':lambda a, b: a / b,
+    '//':lambda a, b: a // b, 
+    '%':lambda a, b: a % b
+}
+
+unaryOpToFunc = {
+    'not': lambda a: not a,
+    '!': lambda a: not a,
+    '-': lambda a: -a
+}
+
 Position = tuple[int, int]
 class Move:
     def __init__(self, letterArr: list[Letter], startPost: Position) -> None:
@@ -102,8 +126,11 @@ class PythonGameEngine(GameEngine):
 
         #resolve variables/ stateMachines/ macros/ preds/ effects
         self.effects: dict[str, Effect] = dict()
-        self.predicates: dict[str, Predicate] = dict()
-        self.variables: dict[str, int] = dict()
+        self.functions: dict[str, Function] = dict()
+
+        self.variables: dict[str, int] = dict(); self.setThis({'x':0, 'y':0, 'playerName':None})
+        self.variables['Board'] = [[None for _ in range(program.board.y)] for _ in range(program.board.x)]
+
         self.macros: dict[str, Macro] = dict()
         self.pieceRules: dict[str, DFAStateMachine] = dict(); self.pieceRules['None'] = None
         self.boardPieces: dict[str, BoardPiece] = dict()
@@ -119,7 +146,7 @@ class PythonGameEngine(GameEngine):
                 variableDeclarations.append(rule)
             else:
                 visitFunc = {
-                    Predicate: self.visitPredicate,
+                    Function: self.visitFunction,
                     Effect: self.visitEffect,
                     Macro: self.visitMacro,
                     PieceRule: self.visitPieceRule,
@@ -135,7 +162,6 @@ class PythonGameEngine(GameEngine):
             self.debugRegexCompiling()
 
         #Load pieces into board
-        self.variables['Board'] = [[None for _ in range(program.board.y)] for _ in range(program.board.x)]
         for y in range(program.board.y):
             for x in range(program.board.x):
                 pieceName = program.board.board[x+program.board.x*y]
@@ -165,8 +191,16 @@ class PythonGameEngine(GameEngine):
             raise Exception(f'Invalid victory condition:\n{str(victoryCondition)}\n Player {victoryCondition.name} does not exist!')
         self.victoryConditions[victoryCondition.name] = victoryCondition
 
-    def visitPredicate(self, predicate: Predicate):
-        self.predicates[predicate.name] = predicate
+    def visitFunction(self, function: Function):
+        if type(function.logic) == RegexTree:
+            regex = self.compileRegex(function.logic) #DOES NOT ALLOW FOR ARGUMENTS FOR THOSE PREDICATES
+            dfa = RegexToDFA(regex)
+            function.logic = dfa
+            self.functions[function.name] = function
+        elif type(function.logic) == IntegerExpressionTree:
+            self.functions[function.name] = function
+        else:
+            raise Exception(f"Invalid type! {type(function.logic)}")
 
     def visitEffect(self, effect: Effect):
         self.effects[effect.name] = effect
@@ -213,11 +247,7 @@ class PythonGameEngine(GameEngine):
                 dx = self.resolveIntegerExpression(letter.dx)
                 dy = self.resolveIntegerExpression(letter.dy) 
                 #Predicates and effects arguments need to be compiled too
-                if isinstance(letter.pre, IntegerExpressionTree):
-                    self.visitIntegerExpression(letter.pre)
-                elif isinstance(letter.pre, Predicate):
-                    for arg in letter.pre.arguments:
-                        self.visitIntegerExpression(letter.pre)
+                self.visitIntegerExpression(letter.pre)
                 if letter.effect is not None:
                     for arg in letter.effect.arguments:
                         self.visitIntegerExpression(arg)
@@ -232,7 +262,6 @@ class PythonGameEngine(GameEngine):
                 return self.runFunctionInEnvironment(lambda: self.compileRegex(macro.regex).rootNode, argumentVariables)
             else:
                 raise Exception(f'uncaught regexNode type {type(regexNode)}')
-
 
         # clean regex
         return RegexTree(visitor(regex.rootNode))
@@ -266,7 +295,7 @@ class PythonGameEngine(GameEngine):
 
         return value
 
-    def matchFunCallWithArguments(self, funCall: FunctionCall, funType: Macro | Predicate | Effect) -> dict[str, int]:
+    def matchFunCallWithArguments(self, funCall: FunctionCall, funType: Macro | Effect) -> dict[str, int]:
         if len(funType.arguments) != len(funCall.arguments):
             raise Exception(f'{str(funType)} {funCall.name} called with incorrect number of paramaters')
         argumentVariables = dict()
@@ -275,10 +304,10 @@ class PythonGameEngine(GameEngine):
         return argumentVariables
 
 
-    def resolveIntegerExpression(self, integerExpression: IntegerExpressionTree) -> int | BoardPiece:
+    def resolveIntegerExpression(self, integerExpression: IntegerExpressionTree, lookUpPiece = True) -> int | BoardPiece:
         #If integer expression is loading a state machine
         rootNode = integerExpression.rootNode
-        if type(rootNode) == IntegerExpressionVariable and rootNode.name in self.pieceRules:
+        if lookUpPiece and type(rootNode) == IntegerExpressionVariable and rootNode.name in self.pieceRules:
             pieceName = rootNode.name
             dfa = self.pieceRules[pieceName]
             if dfa is None:
@@ -287,55 +316,123 @@ class PythonGameEngine(GameEngine):
                 playerName = self.piecesToPlayer[pieceName]
                 return BoardPiece(dfa, pieceName, playerName)
         
-        try:
-            return evaluateIntegerExpression(integerExpression.rootNode, self.variables)
-        except Exception as error:
-            print('Error evaluating integer expression:')
-            print(integerExpression)
-            print('Reason:')
-            print(error)
-            raise error
+        this = self.getThis()
+        x = this['x']; y = this['y']
+        playerName = this['playerName']
+
+        specialPredicates = {
+            'enemy': (self.getTile(x,y) is not None) and (self.getTile(x,y).player!=playerName),
+            'empty': self.getTile(x,y) is None,
+            'true': True
+        }
+        for pieceName in self.piecesToPlayer:
+            specialPredicates[pieceName] = (self.getTile(x,y) is not None) and (self.getTile(x,y).name == pieceName)
+
+        def visit(node: SyntaxTreeNode) -> int:
+            if type(node) == BinaryOperator:
+                binaryOp: BinaryOperator = node
+                a: int = visit(binaryOp.child1)
+                b: int = visit(binaryOp.child2)
+                return binaryOpToFunc[binaryOp.operator](a, b)
+            
+            elif type(node) == UnaryOperator:
+                unaryOp: UnaryOperator = node
+                a: int = visit(unaryOp.child)
+                return unaryOpToFunc[unaryOp.operator](a)
+            
+            elif type(node) == Integer:
+                integer: Integer = node
+                return integer.value
+
+            elif type(node) == Variable:
+                variable: Variable = node
+                if variable.secondName is not None:
+                    return self.variables[variable.name][variable.secondName]
+                else:
+                    return self.variables[variable.name]
+            
+            elif type(node) == IndexedVariable:
+                indexedVariable: IndexedVariable = node
+                name = indexedVariable.name
+                indexableObjToValue = self.variables[name]
+                indices = indexedVariable.indices[::-1]
+                while len(indices) != 0:
+                    indexableObjToValue = indexableObjToValue[visit(indices.pop())]
+                return indexableObjToValue
+
+            elif type(node) == FunctionCall:
+                funCall: FunctionCall = node
+                name = funCall.name
+                args = funCall.arguments
+
+                function: Function = self.functions[name]
+
+                if len(function.arguments) != len(funCall.arguments):
+                    raise Exception(f'{str(function)} {funCall.name} called with incorrect number of paramaters')
+                argumentVariables = dict()
+                for i, key in enumerate(function.arguments):
+                    argumentVariables[key] = visit(funCall.arguments[i])
+
+
+                f = lambda: visit(function.logic)
+                return self.runFunctionInEnvironment(f, argumentVariables)
+            elif type(node) == DFAStateMachine:
+                dfa: DFAStateMachine = node
+                return len(self.getStateMachineMoves(dfa, (x,y), walkPiece=False)) != 0
+            elif type(node) == IntegerExpressionTree:
+                expr: IntegerExpressionTree = node
+                return self.resolveIntegerExpression(expr, lookUpPiece=lookUpPiece)
+            else:
+                raise Exception(f'Invalid type: {type(node)}!')
+
+        f = lambda: visit(integerExpression.rootNode)
+        value = self.runFunctionInEnvironment(f, specialPredicates)
+        #print(integerExpression.rootNode, value)
+        return value
+        #return visit(integerExpression.rootNode)
+        
 
     def setThis(self, thisVariables: dict[str: int]):
         self.variables['this'] = thisVariables
+
+    def getThis(self):
+        return self.variables['this']
 
     #--- Helper functions end ---
 
 
 
     #--- Functions for calculating move effect ---
-    def playLetter(self, letter: Letter, location: Position):
+    def playLetter(self, letter: Letter, location: Position, walkPiece=True):
         x, y = location
         dx, dy = letter.dx, letter.dy
 
-        self.setThis({'x': x+dx, 'y': y+dy})
-
         thingUnderMoveLocation = self.getTile(x+dx, y+dy)
-
         piece = self.getTile(x, y)
-        self.setTile(x,y,None)
-        self.setTile(x+dx, y+dy, piece)
+        if walkPiece:
+            self.setTile(x,y,None)
+            self.setTile(x+dx, y+dy, piece)
 
         currentVariables: dict[str: int] = None
         if letter.effect is not None:
             currentVariables = deepcopy(self.variables)
+            self.setThis({'x':x+dx, 'y':y+dy, 'playerName':piece.player})
             self.runEffect(letter.effect)
 
         self.changesStack.append((letter, location, thingUnderMoveLocation, currentVariables))
     
 
-    def undoLetter(self):
+    def undoLetter(self, walkPiece=True):
         letter, location, thingUnderMoveLocation, oldVariables = self.changesStack.pop()
 
         if oldVariables is not None:
             self.variables = oldVariables
 
-        x, y = location
-        dx, dy = letter.dx, letter.dy
-        self.setTile(x,y, self.getTile(x+dx, y+dy))
-        self.setTile(x+dx, y+dy, thingUnderMoveLocation)
-
-        self.setThis({'x': x, 'y': y})
+        if walkPiece:
+            x, y = location
+            dx, dy = letter.dx, letter.dy
+            self.setTile(x,y, self.getTile(x+dx, y+dy))
+            self.setTile(x+dx, y+dy, thingUnderMoveLocation)
 
 
     def playMove(self, move: Move):
@@ -354,32 +451,6 @@ class PythonGameEngine(GameEngine):
             self.undoLetter()
         self.playersTurnIndex = (self.playersTurnIndex-1)%len(self.players)
 
-
-    def evaluatePredicate(self, predicate: FunctionCall | IntegerExpressionTreeNode, location: Position, player: str):
-        x, y = location
-        inRange = (0<=x<len(self.variables['Board'])) and (0<=y<len(self.variables['Board'][0]))
-        if not inRange:
-            return False
-        if type(predicate) == FunctionCall:
-            preCall: FunctionCall = predicate
-            if preCall.name not in self.predicates:
-                raise Exception(f'Predicate {preCall.name} called but does not exist')
-            predicateType = self.predicates[preCall.name]
-            argumentVariables = self.matchFunCallWithArguments(preCall, predicateType)
-            f = lambda: self.resolveIntegerExpression(predicateType.expression)
-            returnValue = self.runFunctionInEnvironment(f, argumentVariables)
-        elif isinstance(predicate, IntegerExpressionTree):
-            specialPredicates = {
-                'enemy': (self.getTile(x,y) is not None) and (self.getTile(x,y).player!=player),
-                'empty': self.getTile(x,y) is None,
-                'true': True
-            }
-            f = lambda: self.resolveIntegerExpression(predicate)
-            returnValue = self.runFunctionInEnvironment(f, specialPredicates)
-        else:
-            raise Exception(f"Invalid predicate type {type(predicate)}!")
-
-        return returnValue 
 
     def runEffect(self, effectCall: FunctionCall):
         EffectName = effectCall.name
@@ -429,39 +500,47 @@ class PythonGameEngine(GameEngine):
                 if tile is None or tile.player != player:
                     continue
                 piece: BoardPiece = tile
-                pieceMoves = self.getBoardPieceMoves(piece.stateMachine, (x,y))
+                #self.setThis({'x':x, 'y':y, 'playerName': player})
+                pieceMoves = self.getStateMachineMoves(piece.stateMachine, (x,y))
                 moves.extend(pieceMoves)
         return moves
 
 
-    def getBoardPieceMoves(self, stateMachine: DFAStateMachine, location: Position) -> list[Move]:
+    def getStateMachineMoves(self, stateMachine: DFAStateMachine, location: Position, walkPiece=True) -> list[Move]:
+        x, y = location
+        boardPiece = self.getTile(x,y)
+        player = boardPiece.player
+        self.setThis({'x':x, 'y':y, 'playerName': player})
         def getStateMoves(state: State, location: Position) -> list[list[Letter]]:
             x, y = location
             boardPiece = self.getTile(x,y)
-            if boardPiece is None:
+            if boardPiece is not None:
                 #Effect killed its own piece, abort!!!! >:(
-                return []
-            player = boardPiece.player
+                player = boardPiece.player
+            else:
+                player = self.getThis()['playerName']
             moveList = []
             
             for transition in state.outTransitions:
                 letter = transition.letter
                 dx, dy = letter.dx, letter.dy
-                self.setThis({'x': x+dx, 'y': y+dy})
                 newLocation = (x+dx, y+dy)
 
-                if not self.evaluatePredicate(letter.pre, newLocation, player):
+
+                inRange = (0<=x+dx<len(self.variables['Board'])) and (0<=y+dy<len(self.variables['Board'][0]))
+                self.setThis({'x':x+dx, 'y':y+dy, 'playerName': player})
+                if not (inRange and self.resolveIntegerExpression(letter.pre, lookUpPiece=False)):
                     continue
 
                 if transition.end.final:
                     moveList.append([letter])
 
-                self.playLetter(letter, location)
+                self.playLetter(letter, location, walkPiece=walkPiece)
 
                 movesFromThisTransition = [[letter, *move] for move in getStateMoves(transition.end, newLocation)]
                 moveList.extend(movesFromThisTransition)
 
-                self.undoLetter()
+                self.undoLetter(walkPiece=walkPiece)
 
             return moveList
 
@@ -492,6 +571,7 @@ class PythonGameEngine(GameEngine):
         numberOfWins = 0
         for player in self.players:
             victoryCondition = self.victoryConditions[player]
+            self.setThis({'x':0, 'y':0, 'playerName':None})
             if self.resolveIntegerExpression(victoryCondition.expression):
                 numberOfWins += 1
                 winner = player

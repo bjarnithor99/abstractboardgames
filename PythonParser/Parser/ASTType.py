@@ -71,16 +71,16 @@ class Rules(ASTNode):
 class Rule(ASTNode):
     pass
 
-class Predicate(Rule):
-    def __init__(self, name: str, arguments: list[str], expression: str) -> None:
+class Function(Rule):
+    def __init__(self, name: str, arguments: list[str], logic: IntegerExpressionTree | RegexTree) -> None:
         self.name: str = name
         self.arguments: list[str] = arguments
-        self.expression: str = expression
+        self.logic: IntegerExpressionTree | RegexTree = logic
 
     def __str__(self) -> str:
         argumentStr = ",".join(self.arguments)
-        returnStr = f'PREDICATE {self.name}({argumentStr}):\n\t'
-        returnStr += str(self.expression)
+        returnStr = f'FUNCTION {self.name}({argumentStr}):\n\t'
+        returnStr += str(self.logic)
         return returnStr
 
 class Victory(Rule):
@@ -107,10 +107,10 @@ class Effect(Rule):
         return returnStr[:-1]
 
 class Assignment(ASTNode):
-    def __init__(self, variableName: str, indexes: list[IntegerExpression], newValue: IntegerExpression) -> None:
+    def __init__(self, variableName: str, indexes: list[IntegerExpressionTree], newValue: IntegerExpressionTree) -> None:
         self.variableName: str = variableName
-        self.indexes: list[IntegerExpression] = indexes
-        self.newValue: IntegerExpression = newValue
+        self.indexes: list[IntegerExpressionTree] = indexes
+        self.newValue: IntegerExpressionTree = newValue
 
     def __str__(self):
         indexStr = ''.join([f'[{expr}]' for expr in self.indexes])
@@ -144,9 +144,9 @@ class PieceRule(Rule):
         return returnStr
 
 class VariableDeclaration(Rule):
-    def __init__(self, name:str, value: IntegerExpression) -> None:
+    def __init__(self, name:str, value: IntegerExpressionTree) -> None:
         self.name: str = name
-        self.value: IntegerExpression = value
+        self.value: IntegerExpressionTree = value
 
     def __str__(self):
         returnStr = f'VARIABLE {self.name} = {str(self.value)}'

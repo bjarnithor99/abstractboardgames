@@ -7,14 +7,16 @@ pieces =
     WhiteQueen(white), BlackQueen(black),
     WhiteKing(white), BlackKing(black);
 
-macro Ray(dx,dy) = [dx, dy, empty]*Step(dx, dy);
 macro Step(dx, dy) = [dx, dy, empty] | [dx, dy, enemy];
+macro Ray(dx,dy) = [dx, dy, empty]*Step(dx, dy);
 
 macro BishopMacro() = Ray(-1,1) | Ray(1,-1) | Ray(1,1) | Ray(-1,-1);
 macro RookMacro() = Ray(0,1) | Ray(0,-1) | Ray(1,0) | Ray(-1,0);
 macro QueenMacro() = BishopMacro() | RookMacro();
 macro KingSteps() = Step(1,0) | Step(0,1) | Step(-1,0) | Step(0,-1) |
                 Step(1,1) | Step(-1,1) | Step(1,-1) | Step(-1,-1);
+macro T(dx, dy) = Step(dx*2,dy) | Step(dx,dy*2);
+macro KnightMacro() = T(1, 1) | T(-1, 1)| T(1, -1)| T(-1, -1);
 
 variable blackLeftRookMoved = 0;
 variable blackRightRookMoved = 0;
@@ -29,17 +31,25 @@ effect Move(x, y, dx, dy) {
     Board[x][y] = None;
 };
 
-macro Castling(y) = [1,0,empty][1,0,empty][0,0,not whiteRightRookMoved and not whiteKingMoved]{Move(7, y, -2, 0)};
 
+function UnderAttack() = 
+    BishopMacro()[0,0,BlackBishop or WhiteBishop] |
+    RookMacro()[0,0,BlackRook or WhiteRook] |
+    QueenMacro()[0,0,BlackQueen or WhiteQueen] |
+    KnightMacro()[0,0,BlackKnight or WhiteKnight] |
+    KingSteps()[0,0,BlackKing or WhiteKing] |
+        ([1,1,enemy and BlackPawn] | [-1,1,enemy and BlackPawn]) |
+        ([1,-1,enemy and WhitePawn] | [-1,-1,enemy and WhitePawn])
+    ;
+
+
+macro Castling(y) = [0,0,not UnderAttack()][1,0,empty and not UnderAttack()][1,0,empty][0,0,not whiteRightRookMoved and not whiteKingMoved]{Move(7, y, -2, 0)};
 macro KingMacro(y) = KingSteps() | Castling(y);
 
 effect WKMoved() {whiteKingMoved = 1;};
-rule WhiteKing = KingMacro(0)[0,0,true]{WKMoved()}; 
+rule WhiteKing = KingMacro(0)[0,0,not UnderAttack()]{WKMoved()};
 effect BKMoved() {blackKingMoved = 1;};
-rule BlackKing = KingMacro(7)[0,0,true]{BKMoved()};
-
-macro T(dx, dy) = Step(dx*2,dy) | Step(dx,dy*2);
-macro KnightMacro() = T(1, 1) | T(-1, 1)| T(1, -1)| T(-1, -1);
+rule BlackKing = KingMacro(7)[0,0,not UnderAttack()]{BKMoved()};
 
 
 rule WhiteQueen = QueenMacro(); rule BlackQueen = QueenMacro();
@@ -91,7 +101,7 @@ rule WhitePawn =
 
 rule BlackPawn = 
     (
-        [0,-1,empty] |
+        [0,-1, empty] |
         [1,-1, enemy] | 
         [-1,-1, enemy]
     )BlackPromotePossibility() |

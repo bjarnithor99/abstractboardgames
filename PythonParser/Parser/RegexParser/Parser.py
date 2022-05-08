@@ -145,30 +145,17 @@ class Parser(IntegerExpressionParser):
             self.matchToken(Delimiter)
             dy = self.matchIntegerExpression()
             self.matchToken(Delimiter)
-
-
-            exprOrFunCall = None
-            try:
-                funCall = self.matchFunctionCall()
-                exprOrFunCall = funCall
-            except MatchFailed:
-                try:
-                    predicateExpr = self.matchIntegerExpression()
-                    exprOrFunCall = predicateExpr
-                except MatchFailed:
-                    pass
-            if exprOrFunCall is None:
-                raise MatchFailed
+            expr = self.matchIntegerExpression()
             self.matchToken(Symbol, ']')
 
             try:
                 self.matchToken(Symbol, '{')
             except MatchFailed:
-                return Letter(dx, dy, exprOrFunCall)
+                return Letter(dx, dy, expr)
 
             effect = self.matchFunctionCall()
             self.matchToken(Symbol, '}')
-            return Letter(dx, dy, exprOrFunCall, effect)
+            return Letter(dx, dy, expr, effect)
 
 
 

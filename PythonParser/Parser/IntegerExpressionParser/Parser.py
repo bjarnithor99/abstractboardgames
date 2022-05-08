@@ -1,3 +1,5 @@
+from ru_final_project.PythonParser.Lexer.TokenTypes import Delimiter
+from ru_final_project.PythonParser.Parser.RegexParser.ASTType import FunctionCall
 from ..ASTType import MatchFailed
 from .ASTType import *
 from ...Lexer.Lexer import Lexer, EOI, TextPosition, Token, Operator, Word, Symbol
@@ -80,6 +82,26 @@ class Parser():
         raise MatchFailed(token.pos)
 
     def matchCoreStatment(self) -> SyntaxTreeNode:
+
+        bakcupI = self.i
+        try:
+            name = self.matchToken(Word).value
+            self.matchToken(Symbol, '(')
+            args = []
+            bakcupI2 = self.i
+            while True:
+                try:
+                    args.append(self.matchIntegerExpression())
+                    bakcupI2 = self.i
+                    self.matchToken(Delimiter)
+                except MatchFailed:
+                    self.i = bakcupI2
+                    break
+            self.matchToken(Symbol, ')')
+            return FunctionCall(name, args)
+        except MatchFailed:
+            self.i = bakcupI
+    
         token = self.peak(1)
         if isinstance(token, LexerAPI.Integer):
             return Integer(int(self.next().value))
@@ -116,13 +138,16 @@ class Parser():
 
             return Variable(name)
 
+        bakcupI = self.i
         try:
             self.matchToken(Symbol, '(')
             integerExpression = self.matchIntegerExpression().rootNode
             self.matchToken(Symbol, ')')
             return integerExpression
-        except MatchFailed as error:
-            raise error
+        except MatchFailed:
+            self.i = bakcupI
+        
+        raise MatchFailed(self.peak(1).pos)
 
 
     def matchToken(self, tokenType, value=None):
@@ -136,12 +161,14 @@ class Parser():
 
 
 '''
-C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m ru_final_project.PythonParser.NewFolderStruct.Parser.IntegerExpressionParser.Parser
+python -m ru_final_project.PythonParser.Parser.IntegerExpressionParser.Parser
 '''      
 
 
 if __name__ == "__main__":
-    ast1 = Parser('1*2+3*---jon.y and 3*x==4').generateAST()
+    txt = '1*2+3*---jon.y and 3*x==4'
+    txt = 'not jon(bob(), 3*4+2)*2 '
+    ast1 = Parser(txt).generateAST()
     print(ast1)
 
 

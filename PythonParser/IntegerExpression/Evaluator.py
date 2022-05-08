@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+from ...PythonParser.Parser.ASTType import Function, FunctionCall
+
 from ..Parser.IntegerExpressionParser.ASTType import *
 from ..Parser.IntegerExpressionParser.Parser import Parser
 
@@ -27,16 +30,16 @@ Environment = dict[str, int]
 Environment = dict[str, int | Environment]
 
 
-def visitor(node: SyntaxTreeNode, environment: Environment) -> int:
+def visit(node: SyntaxTreeNode, environment: Environment) -> int:
     if type(node) == BinaryOperator:
         binaryOp: BinaryOperator = node
-        a: int = visitor(binaryOp.child1, environment)
-        b: int = visitor(binaryOp.child2, environment)
+        a: int = visit(binaryOp.child1, environment)
+        b: int = visit(binaryOp.child2, environment)
         return binaryOpToFunc[binaryOp.operator](a, b)
     
     elif type(node) == UnaryOperator:
         unaryOp: UnaryOperator = node
-        a: int = visitor(unaryOp.child, environment)
+        a: int = visit(unaryOp.child, environment)
         return unaryOpToFunc[unaryOp.operator](a)
     
     elif type(node) == Integer:
@@ -56,16 +59,18 @@ def visitor(node: SyntaxTreeNode, environment: Environment) -> int:
         indexableObjToValue = environment[name]
         indices = indexedVariable.indices[::-1]
         while len(indices) != 0:
-            indexableObjToValue = indexableObjToValue[visitor(indices.pop(), environment)]
+            indexableObjToValue = indexableObjToValue[visit(indices.pop(), environment)]
         return indexableObjToValue
-            
 
+    elif type(node) == FunctionCall:
+        raise Exception(f"Cant compile FunctionCall {str(node)}")
     else:
         raise Exception(f"Invalid type in integer expression! {type(node)}")
 
 
+
 def evaluateIntegerExpression(intExpr: SyntaxTreeNode, environment: Environment):
-    return visitor(intExpr, environment)
+    return visit(intExpr, environment)
     
 '''
 C:/Users/gudmu/AppData/Local/Programs/Python/Python310/python.exe -m ru_final_project.PythonParser.NewFolderStruct.IntegerExpression.Evaluator
