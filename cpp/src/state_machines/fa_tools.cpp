@@ -71,8 +71,8 @@ void FATools::to_dot(DFAState *initial_state, std::string output_path) {
         for (const auto &p : state->transition) {
             const DFAInput &input = p.first;
             DFAState *next_state = p.second;
-            std::string label = "(" + std::to_string(input.dx) + ", " + std::to_string(input.dy) + ", " +
-                                input.predicate->get_name() + ") {" + input.side_effect->get_name() + "}";
+            std::string label = "[" + std::to_string(input.dx) + ", " + std::to_string(input.dy) + ", " +
+                                input.predicate->get_name() + "] {" + input.side_effect->get_name() + "}";
             output_file << "\t\"" << state2name[state] << "\" -> \"" << state2name[next_state] << "\" [label=\""
                         << label << "\"]\n";
         }
@@ -111,8 +111,8 @@ void FATools::to_dot(NFAState *initial_state, std::string output_path) {
             if (input.is_epsilon)
                 label = "epsilon";
             else
-                label = "(" + std::to_string(input.dx) + ", " + std::to_string(input.dy) + ", " +
-                        input.predicate->get_name() + ") {" + input.side_effect->get_name() + "}";
+                label = "[" + std::to_string(input.dx) + ", " + std::to_string(input.dy) + ", " +
+                        input.predicate->get_name() + "] {" + input.side_effect->get_name() + "}";
             const std::vector<NFAState *> &next_states = p.second;
             for (NFAState *next_state : next_states) {
                 output_file << "\t\"" << state2name[state] << "\" -> \"" << state2name[next_state] << "\" [label=\""

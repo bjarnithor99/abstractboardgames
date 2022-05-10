@@ -12,9 +12,6 @@
  */
 #pragma once
 
-#include <tuple>
-#include <utility>
-
 /// @brief Class to keep track of user-defined variables.
 /// @details
 ///  The following variables are necessary to facilitate learning and in

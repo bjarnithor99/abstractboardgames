@@ -31,6 +31,8 @@
 *.out
 *.app
 abstract-board-games
+flatmc-abstract-board-games
+perft-abstract-board-games
 
 # Configs/caches
 .ccls-cache/

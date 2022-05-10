@@ -1,19 +1,40 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ *  Copyright (C) 2022 Bjarni Dagur Thor Kárason <bjarni@bjarnithor.com>
+ */
+/**
+ *  @file flatmc.cpp
+ *  @brief A benchmarking tool using the flat Monte-Carlo measure.
+ *  @author Bjarni Dagur Thor Kárason
+ */
 #include "parser.hpp"
+#include <cassert>
 #include <chrono>
 #include <climits>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <random>
 #include <string>
 
-const int N_MS = 10000;
-
+/// @brief Takes an Abstract Boardgame description and timelimit in
+///  milliseconds, and runs flat Monte-Carlo rollouts until the time runs out.
+///  Prints relevant statistics.
+/// @author Bjarni Dagur Thor Kárason
 int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <gamefile> <timelimit>" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    int n_ms = std::stoi(argv[2]);
+    assert(n_ms > 0);
+
     std::random_device rd;
     std::mt19937 rng(rd());
 
-    Parser parser("/home/bjarni/HR/T-404-LOKA/cpp/games/tictactoe/tictactoe.game");
+    Parser parser(argv[1]);
     parser.parse();
     std::unique_ptr<Environment> env = parser.get_environment();
 
@@ -28,7 +49,7 @@ int main(int argc, char *argv[]) {
             state_count++;
 
             if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start_time)
-                    .count() > N_MS) {
+                    .count() > n_ms) {
                 time_left = false;
                 break;
             }
@@ -50,5 +71,5 @@ int main(int argc, char *argv[]) {
     std::cout << "States visited: " << state_count << std::endl;
     std::cout << "States/s: " << state_count / running_time * 1000 << std::endl;
 
-    return 0;
+    return EXIT_SUCCESS;
 }
