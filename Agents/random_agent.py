@@ -7,6 +7,7 @@ import numpy as np
 from .agent import Agent
 
 
+# An agent that plays randomly.
 @Agent.register
 class RandomAgent:
     def __init__(self):

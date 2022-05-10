@@ -32,8 +32,7 @@ class GameEngine:
     def generate_moves(self) -> list[Move]:
         pass
 
-
-    #CamelCaseFunctions
+    # CamelCaseFunctions
     def getPlayerMoves(self):
         return self.generate_moves()
 
@@ -46,25 +45,28 @@ class GameEngine:
     def playersTurn(self):
         return self.get_current_player()
 
+
 class Move:
     pass
 
+
 class GameState:
     pass
+
 
 class Win(GameState):
     def __init__(self, playerName: str) -> None:
         self.playerName: str = playerName
 
     def __str__(self) -> str:
-        return f'Player {self.playerName} won!'
+        return f"Player {self.playerName} won!"
+
 
 class Draw(GameState):
     def __str__(self) -> str:
-        return 'Draw'
+        return "Draw"
+
 
 class Unresolved:
     def __str__(self) -> str:
-        return 'Unresolved'
-    
-        
+        return "Unresolved"

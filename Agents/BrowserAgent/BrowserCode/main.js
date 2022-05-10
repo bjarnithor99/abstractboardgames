@@ -31,7 +31,10 @@ const IDToEmojiSymbol = {
     'wBishop': '♗',
     'wRook': '♖',
     'wQueen': '♕',
-    'wKing': '♔'
+    'wKing': '♔',
+
+    'x': '❌',
+    'o': '⭕',
 }
 
 

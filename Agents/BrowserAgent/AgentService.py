@@ -22,7 +22,7 @@ DEBUG_MODE = True
 
 BROWSER_CODE_ABS_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "BrowserCode"
-) + '\\'
+)
 
 
 class AgentService:
@@ -98,15 +98,15 @@ class AgentService:
 
             file_extension = filename.split(".")[-1]
             if file_extension in ("jpg", "png"):
-                return send_file(BROWSER_CODE_ABS_PATH + filename, mimetype="image/gif")
+                return send_file(os.path.join(BROWSER_CODE_ABS_PATH, filename), mimetype="image/gif")
             elif file_extension in ("ico"):
                 return send_file(
-                    BROWSER_CODE_ABS_PATH + filename,
+                    os.path.join(BROWSER_CODE_ABS_PATH, filename),
                     mimetype="image/vnd.microsoft.icon",
                 )
             elif file_extension in ("m4a"):
                 return send_file(
-                    BROWSER_CODE_ABS_PATH + filename,
+                    os.path.join(BROWSER_CODE_ABS_PATH, filename),
                     mimetype="audio/m4a",
                     as_attachment=True,
                     attachment_filename="test.wav",

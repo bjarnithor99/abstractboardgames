@@ -6,22 +6,27 @@
 from abc import ABCMeta, abstractmethod
 
 
+# Defines an abstract base class that all agents inherit.
 class Agent(metaclass=ABCMeta):
     def __init__(self):
-        pass
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_move(self, env):
+        raise NotImplementedError
 
     @abstractmethod
     def train(self, samples):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def predict(self, state):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def save_checkpoint(self, checkpoint_path):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def load_checkpoint(self, checkpoint_path):
-        pass
+        raise NotImplementedError

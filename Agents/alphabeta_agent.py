@@ -3,18 +3,21 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2022 Bjarni Dagur Thor Karason <bjarni@bjarnithor.com>
 
+import os
 import logging
+import numpy as np
 import random
 import torch
 from torch import nn
 from torchsummary import summary
-from .model import Model
-from agent import Agent
+from .neural_network_model import Model
+from .agent import Agent
 
 
+# A simple minimax-based agent with alpha-beta pruning.
 @Agent.register
-class BreakthroughAgent:
-    def __init__(self, sample_input):
+class AlphaBetaAgent:
+    def __init__(self, sample_input, depth=4):
         self.device = (
             torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         )
@@ -24,6 +27,7 @@ class BreakthroughAgent:
         self.BATCH_SIZE = 32
         self.LEARNING_RATE = 0.0002
         self.criterion = nn.MSELoss()
+        self.DEPTH = depth
 
     def process_samples_to_dataloader(self, samples):
         X, y = map(lambda x: torch.tensor(x, dtype=torch.float), list(zip(*samples)))
@@ -37,6 +41,7 @@ class BreakthroughAgent:
         self.log.info("Training on %d sample(s)", len(samples))
         dataloader = self.process_samples_to_dataloader(samples)
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.LEARNING_RATE)
+        best_loss = np.inf
         for epoch in range(n_epochs):
             self.model.train()
             epoch_loss = 0.0
@@ -51,14 +56,19 @@ class BreakthroughAgent:
             self.log.info(
                 "Epoch %d/%d total loss: %f", epoch + 1, n_epochs, round(epoch_loss, 7)
             )
+            if best_loss > epoch_loss:
+                best_loss = epoch_loss
+                self.save_checkpoint("./checkpoints/best_alphabeta.pth")
 
-    def get_move(self, env, random_prop=0.0):
+        self.load_checkpoint("./checkpoints/best_alphabeta.pth")
+
+    def get_move(self, env, temperature=0.0):
         available_moves = env.generate_moves()
 
         if not available_moves:
             return None
 
-        if random.random() < random_prop:
+        if random.random() < temperature:
             chosen_move_idx = random.randrange(len(available_moves))
             return available_moves[chosen_move_idx]
 
@@ -67,12 +77,11 @@ class BreakthroughAgent:
             env.execute_move(move)
             move_score = -self.negamax(
                 env,
-                4,
+                self.DEPTH - 1,
                 float("-inf"),
                 float("inf"),
-                env.current_player == env.first_player(),
+                env.get_current_player() == env.get_first_player(),
             )
-            # print("move_score", move_score)
             if move_score > best_move_score:
                 best_move_score = move_score
                 best_move = move
@@ -108,6 +117,8 @@ class BreakthroughAgent:
             return best_score
 
     def save_checkpoint(self, checkpoint_path):
+        if not os.path.exists(os.path.split(checkpoint_path)[0]):
+            os.makedirs(os.path.split(checkpoint_path)[0])
         torch.save(self.model.state_dict(), checkpoint_path)
 
     def load_checkpoint(self, checkpoint_path):

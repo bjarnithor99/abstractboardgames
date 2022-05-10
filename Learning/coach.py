@@ -6,9 +6,9 @@
 import logging
 import copy
 from tqdm import tqdm
-from .tournament import Tournament
 
 
+# A coach that generates training data and trains AI agents.
 class Coach:
     def __init__(self, env, agent):
         self.log = logging.getLogger(__name__)
@@ -25,7 +25,6 @@ class Coach:
             (self.env.get_environment_representation(), self.env.current_player)
         )
         while not self.env.game_over():
-            # move = self.training_agent.get_move(self.env, random_prop=0.20)
             move = self.training_agent.get_move(self.env, temperature=1)
             if move is not None:
                 self.env.execute_move(move)
@@ -56,23 +55,4 @@ class Coach:
             training_samples = []
             for iteration_samples in self.iteration_store:
                 training_samples.extend(iteration_samples)
-
-            self.training_agent.save_checkpoint("./before_training.pth")
-            # self.old_agent.load_checkpoint("./before_training.pth")
             self.training_agent.train(training_samples, n_epochs=25)
-
-            self.log.info("Starting tournament between new agent and old agent")
-            tournament = Tournament(self.env, self.training_agent, self.old_agent)
-            (
-                new_white_wins,
-                new_black_wins,
-                draws,
-                old_white_wins,
-                old_black_wins,
-            ) = tournament.play(2)
-
-            print(f"{new_white_wins=}")
-            print(f"{new_black_wins=}")
-            print(f"{draws=}")
-            print(f"{old_white_wins=}")
-            print(f"{old_black_wins=}")
