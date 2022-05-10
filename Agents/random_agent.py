@@ -9,7 +9,7 @@ from .agent import Agent
 
 # An agent that plays randomly.
 @Agent.register
-class RandomAgent:
+class RandomAgent(Agent):
     def __init__(self):
         pass
 

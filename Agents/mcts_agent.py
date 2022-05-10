@@ -123,7 +123,7 @@ class MCTS:
 
 # A simple AlphaZero-like MCTS agent.
 @Agent.register
-class MCTSAgent:
+class MCTSAgent(Agent):
     def __init__(self, sample_input, n_simulations=50):
         self.device = (
             torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")

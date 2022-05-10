@@ -12,15 +12,3 @@ class BrowserGUIAgent(Agent):
 
     def get_move(self, env):
         return self.agent_service.getMove(env)
-
-    def train(self, samples):
-        pass
-
-    def predict(self, state):
-        pass
-
-    def save_checkpoint(self, checkpoint_path):
-        pass
-
-    def load_checkpoint(self, checkpoint_path):
-        pass

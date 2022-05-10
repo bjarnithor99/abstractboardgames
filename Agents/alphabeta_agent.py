@@ -16,7 +16,7 @@ from .agent import Agent
 
 # A simple minimax-based agent with alpha-beta pruning.
 @Agent.register
-class AlphaBetaAgent:
+class AlphaBetaAgent(Agent):
     def __init__(self, sample_input, depth=4):
         self.device = (
             torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")

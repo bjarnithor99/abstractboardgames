@@ -15,18 +15,17 @@ class Agent(metaclass=ABCMeta):
     def get_move(self, env):
         raise NotImplementedError
 
-    @abstractmethod
     def train(self, samples):
         raise NotImplementedError
 
-    @abstractmethod
     def predict(self, state):
         raise NotImplementedError
 
-    @abstractmethod
     def save_checkpoint(self, checkpoint_path):
         raise NotImplementedError
 
-    @abstractmethod
     def load_checkpoint(self, checkpoint_path):
         raise NotImplementedError
+
+    def getMove(self, env):
+        return self.get_move(env)
