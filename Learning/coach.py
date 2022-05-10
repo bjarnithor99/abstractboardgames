@@ -22,7 +22,7 @@ class Coach:
         self.env.reset()
         states = []
         states.append(
-            (self.env.get_environment_representation(), self.env.current_player)
+            (self.env.get_environment_representation(), self.env.get_current_player())
         )
         while not self.env.game_over():
             move = self.training_agent.get_move(self.env, temperature=1)
