@@ -3,16 +3,8 @@ from ...Lexer.TokenTypes import *
 from .ASTType import RegexTree
 from ...Lexer.Lexer import Lexer
 from ..IntegerExpressionParser.Parser import Parser as IntegerExpressionParser
-from ..ASTType import MatchFailed
+from ..ParserType import MatchFailed
 class Parser(IntegerExpressionParser):
-    def __init__(self, regex: str | list[Token]) -> None:
-        self.tokens: list[Token] = []
-        if type(regex) == str:
-            self.tokens = Lexer(regex).lex()
-        else:
-            self.tokens = regex
-        self.i = 0
-
     def peak(self, peakLength: int) -> Token:
         if self.i + peakLength -1 >= len(self.tokens):
             return EOI(None, TextPosition(-1,-1))
@@ -20,13 +12,6 @@ class Parser(IntegerExpressionParser):
 
     def skip(self, skipLength: int) -> None:
         self.i += skipLength
-
-    def matchToken(self, tokenType, value=None):
-        token: Token = self.peak(1)
-        if not(type(token) == tokenType and (token.value == value or value is None)):
-            raise MatchFailed()
-        self.skip(1)
-        return token
 
     def parse(self) -> RegexTree:
         regex = self.matchRegex()

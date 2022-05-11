@@ -7,16 +7,16 @@ pieces =
     WhiteQueen(white), BlackQueen(black),
     WhiteKing(white), BlackKing(black);
 
-macro Step(dx, dy) = [dx, dy, empty] | [dx, dy, enemy];
-macro Ray(dx,dy) = [dx, dy, empty]*Step(dx, dy);
+regex Step(dx, dy) = [dx, dy, empty] | [dx, dy, enemy];
+regex Ray(dx,dy) = [dx, dy, empty]*Step(dx, dy);
 
-macro BishopMacro() = Ray(-1,1) | Ray(1,-1) | Ray(1,1) | Ray(-1,-1);
-macro RookMacro() = Ray(0,1) | Ray(0,-1) | Ray(1,0) | Ray(-1,0);
-macro QueenMacro() = BishopMacro() | RookMacro();
-macro KingSteps() = Step(1,0) | Step(0,1) | Step(-1,0) | Step(0,-1) |
+regex BishopMacro() = Ray(-1,1) | Ray(1,-1) | Ray(1,1) | Ray(-1,-1);
+regex RookMacro() = Ray(0,1) | Ray(0,-1) | Ray(1,0) | Ray(-1,0);
+regex QueenMacro() = BishopMacro() | RookMacro();
+regex KingSteps() = Step(1,0) | Step(0,1) | Step(-1,0) | Step(0,-1) |
                 Step(1,1) | Step(-1,1) | Step(1,-1) | Step(-1,-1);
-macro T(dx, dy) = Step(dx*2,dy) | Step(dx,dy*2);
-macro KnightMacro() = T(1, 1) | T(-1, 1)| T(1, -1)| T(-1, -1);
+regex T(dx, dy) = Step(dx*2,dy) | Step(dx,dy*2);
+regex KnightMacro() = T(1, 1) | T(-1, 1)| T(1, -1)| T(-1, -1);
 
 variable blackLeftRookMoved = 0;
 variable blackRightRookMoved = 0;
@@ -43,19 +43,19 @@ function UnderAttack() =
     ;
 
 
-macro Castling(y) = [0,0,not UnderAttack()][1,0,empty and not UnderAttack()][1,0,empty][0,0,not whiteRightRookMoved and not whiteKingMoved]{Move(7, y, -2, 0)};
-macro KingMacro(y) = KingSteps() | Castling(y);
+regex Castling(y) = [0,0,not UnderAttack()][1,0,empty and not UnderAttack()][1,0,empty][0,0,not whiteRightRookMoved and not whiteKingMoved]{Move(7, y, -2, 0)};
+regex KingMacro(y) = KingSteps() | Castling(y);
 
 effect WKMoved() {whiteKingMoved = 1;};
-rule WhiteKing = KingMacro(0)[0,0,not UnderAttack()]{WKMoved()};
+regex WhiteKingRegex() = KingMacro(0)[0,0,not UnderAttack()]{WKMoved()};
 effect BKMoved() {blackKingMoved = 1;};
-rule BlackKing = KingMacro(7)[0,0,not UnderAttack()]{BKMoved()};
+regex BlackKingRegex() = KingMacro(7)[0,0,not UnderAttack()]{BKMoved()};
 
 
-rule WhiteQueen = QueenMacro(); rule BlackQueen = QueenMacro();
-rule WhiteRook = RookMacro(); rule BlackRook = RookMacro();
-rule WhiteBishop = BishopMacro(); rule BlackBishop = BishopMacro();
-rule WhiteKnight = KnightMacro(); rule BlackKnight = KnightMacro();
+regex QueenRegex() = QueenMacro();
+regex RookRegex() = RookMacro();
+regex BishopRegex = BishopMacro();
+regex KnightRegex() = KnightMacro();
 
 
 #--Pawn code--
@@ -70,7 +70,7 @@ effect PromoteToBlackKnight() {Board[this.x][this.y] = BlackKnight;};
 effect PromoteToBlackBishop() {Board[this.x][this.y] = BlackBishop;};
 
 
-macro WhitePromotePossibility() = 
+regex WhitePromotePossibility() = 
     (
         [0,0,this.y==7]{PromoteToWhiteKnight()} |
         [0,0,this.y==7]{PromoteToWhiteBishop()} |
@@ -80,7 +80,7 @@ macro WhitePromotePossibility() =
         [0,0,this.y!=7]
     ;
 
-macro BlackPromotePossibility() =
+regex BlackPromotePossibility() =
     (
         [0,0,this.y==0]{PromoteToBlackKnight()} |
         [0,0,this.y==0]{PromoteToBlackBishop()} |
@@ -90,7 +90,7 @@ macro BlackPromotePossibility() =
         [0,0,this.y!=0]
     ;
 
-rule WhitePawn = 
+regex WhitePawnRegex() = 
     (
         [0,1,empty] |
         [1,1, enemy] | 
@@ -99,13 +99,34 @@ rule WhitePawn =
     [0,0,this.y==1][0,1,empty][0,1,empty];
 
 
-rule BlackPawn = 
+regex BlackPawnRegex() = 
     (
         [0,-1, empty] |
         [1,-1, enemy] | 
         [-1,-1, enemy]
     )BlackPromotePossibility() |
     [0,0,this.y==6][0,-1,empty][0,-1,empty];
+
+turn black = 
+    (
+        BlackKing.BlackKingRegex() |
+        BlackQueen.QueenRegex() |
+        BlackRook.RookRegex()
+        BlackBishop.BishopRegex() |
+        BlackKnight.KnightRegex() |
+        BlackPawn.BlackPawnRegex()
+    )[0,0,not BlackKing.UnderAttack()];
+
+turn white = 
+    (
+        WhiteKing.WhiteKingRegex() |
+        WhiteQueen.QueenRegex() |
+        WhiteRook.RookRegex()
+        WhiteBishop.BishopRegex() |
+        WhiteKnight.KnightRegex() |
+        WhitePawn.WhitePawnRegex()
+    )[not WhitekKing.UnderAttack()];
+
 
 victory white {return 0;};
 victory black {return 0;};
