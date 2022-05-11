@@ -1,51 +1,65 @@
 from __future__ import annotations
-from .RegexParser.ASTType import *
+from .RegexParser.ASTType import RegexTree
+from .IntegerExpressionParser.ASTType import IntegerExpressionTree
 
-class AST:
+
+class MatchFailed(Exception):
+    pass
+
+
+class ProgramAST:
     def __init__(self, root: ASTNode) -> None:
         self.root: ASTNode = root
 
     def __str__(self):
-        return str(self.root)
+        return 'ProgramAST:\n' + indent(str(self.root))
 
+
+def indent(string: str) -> str:
+    return '\t' + '\n\t'.join(string.split('\n'))
+
+def strList(arr: list[any]) -> str:
+    return '\n'.join([str(item) for item in arr])
 
 class ASTNode:
-    def indent(self, string: str) -> str:
-        return '\t' + '\n\t'.join(string.split('\n'))
+    pass
 
 class Program(ASTNode):
-    def __init__(self, players: Players, pieces: Pieces, rules: Rules, board: Board) -> None:
-        self.players: Players = players
-        self.pieces: Pieces = pieces
-        self.rules: Rules = rules
+    def __init__(self,
+    players: list[Player],
+    pieces: list[Piece],
+    definitions: list[Definition],
+    turns: list[Turn],
+    victories: list[Victory],
+    board: Board) -> None:
+        self.players: list[Player] = players
+        self.pieces: list[Piece] = pieces
+        self.definitions: list[Definition] = definitions
+        self.turns: list[Turn] = turns
+        self.victories: list[Victory] = victories
         self.board: Board = board
 
     def __str__(self):
         returnStr = ''
-        returnStr += 'Players:' +'\n'
-        returnStr += '\t' + str(self.players)+'\n'
-        returnStr += 'Pieces:'+'\n'
-        returnStr += '\t' +str(self.pieces)+'\n'
-        returnStr += 'Rules:'+'\n'
-        returnStr += self.indent(str(self.rules)) + '\n'
-        returnStr += 'Board:'+'\n'
-        returnStr += str(self.board)
-        return returnStr
+        for name, obj in (
+        ('Players', strList(self.players)),
+        ('Pieces', strList(self.pieces)),
+        ('Definitions', strList(self.definitions)),
+        ('Turns', strList(self.turns)), 
+        ('Victories', strList(self.victories)), 
+        ('Board', self.board)):
+            returnStr += name + ':\n' + indent(str(obj)) + '\n\n'
         
-class Players(ASTNode):
-    def __init__(self, names: list[str]) -> None:
-        self.names: list[str] = names
+        return returnStr
+
+
+
+class Player(ASTNode):
+    def __init__(self, name: str) -> None:
+        self.name: str = name
 
     def __str__(self):
-        return str(self.names)
-
-
-class Pieces(ASTNode):
-    def __init__(self, pieceArr: list[Piece]) -> None:
-        self.pieceArr: list[Piece] = pieceArr
-
-    def __str__(self):
-        return ','.join([str(piece) for piece in self.pieceArr])
+        return 'Player: ' + str(self.name)
 
 class Piece(ASTNode):
     def __init__(self, pieceName: str, playerName: str) -> None:
@@ -55,19 +69,13 @@ class Piece(ASTNode):
     def __str__(self) -> str:
         return f"PIECE({self.pieceName},{self.playerName})"
 
-    
 
-class Rules(ASTNode):
-    def __init__(self, ruleArr: list[Rule]) -> None:
-        self.ruleArr: list[Rule] = ruleArr
 
-    def __str__(self):
-        return '\n'.join([str(rule) for rule in self.ruleArr])
 
-class Rule(ASTNode):
+class Definition(ASTNode):
     pass
 
-class Function(Rule):
+class Function(Definition):
     def __init__(self, name: str, arguments: list[str], logic: IntegerExpressionTree | RegexTree) -> None:
         self.name: str = name
         self.arguments: list[str] = arguments
@@ -75,21 +83,11 @@ class Function(Rule):
 
     def __str__(self) -> str:
         argumentStr = ",".join(self.arguments)
-        returnStr = f'FUNCTION {self.name}({argumentStr}):\n\t'
+        returnStr = f'Function {self.name}({argumentStr}):\n\t'
         returnStr += str(self.logic)
         return returnStr
 
-class Victory(Rule):
-    def __init__(self, name: str, expression: str) -> None:
-        self.name: str = name
-        self.expression: str = expression
-
-    def __str__(self) -> str:
-        returnStr = f'VICTORY {self.name}:\n\t'
-        returnStr += str(self.expression)
-        return returnStr
-
-class Effect(Rule):
+class EffectDefinition(Definition):
     def __init__(self, name: str, arguments: list[str], assignments: list[Assignment]) -> None:
         self.name: str = name
         self.arguments: list[str] = arguments
@@ -97,7 +95,7 @@ class Effect(Rule):
 
     def __str__(self) -> str:
         argumentStr = ",".join(self.arguments)
-        returnStr = f'EFFECT {self.name}({argumentStr}):\n'
+        returnStr = f'Effect {self.name}({argumentStr}):\n'
         for assignment in self.assignments:
             returnStr += '\t' + str(assignment) + '\n'
         return returnStr[:-1]
@@ -114,8 +112,7 @@ class Assignment(ASTNode):
         return returnStr
 
     
-
-class Macro(Rule):
+class RegexDefinition(Definition):
     def __init__(self, name: str, arguments: list[str], regex: RegexTree) -> None:
         self.name: str = name
         self.arguments: list[str] = arguments
@@ -123,23 +120,12 @@ class Macro(Rule):
 
     def __str__(self):
         argumentStr = ",".join(self.arguments)
-        returnStr = f'MACRO {self.name}({argumentStr}):\n'
+        returnStr = f'Regex {self.name}({argumentStr}):\n'
         returnStr += str(self.regex)
         return returnStr
 
-        
 
-class PieceRule(Rule):
-    def __init__(self, pieceName: str, regex: RegexTree) -> None:
-        self.pieceName: str = pieceName
-        self.regex: RegexTree = regex
-
-    def __str__(self):
-        returnStr = f'RULE {self.pieceName}:\n'
-        returnStr += str(self.regex)
-        return returnStr
-
-class VariableDeclaration(Rule):
+class VariableDefinition(Definition):
     def __init__(self, name:str, value: IntegerExpressionTree) -> None:
         self.name: str = name
         self.value: IntegerExpressionTree = value
@@ -147,8 +133,32 @@ class VariableDeclaration(Rule):
     def __str__(self):
         returnStr = f'VARIABLE {self.name} = {str(self.value)}'
         return returnStr
+
+
+
+
+class Turn(ASTNode):
+    def __init__(self, name: str, regex: RegexTree) -> None:
+        self.name: str = name
+        self.regex: RegexTree = regex
+
+    def __str__(self) -> str:
+        returnStr = f'Turn {self.name}:\n'
+        returnStr += str(self.regex)
+        return returnStr
+
+class Victory(ASTNode):
+    def __init__(self, name: str, expression: IntegerExpressionTree) -> None:
+        self.name: str = name
+        self.expression: IntegerExpressionTree = expression
+
+    def __str__(self) -> str:
+        returnStr = f'Victory {self.name}: '
+        returnStr += str(self.expression)
+        return returnStr
         
-        
+
+
 
 class Board(ASTNode):
     def __init__(self, x: int, y: int, board: list[str]) -> None:
@@ -166,9 +176,3 @@ class Board(ASTNode):
                 returnStr += str(self.board[i]) + ', '
             returnStr = returnStr[:-2] + '\n'
         return returnStr
-
-
-
-class Regex(ASTNode):
-    def __init__(self, regexSyntaxTree: RegexTree) -> None:
-        self.regexSyntaxTree: RegexTree = regexSyntaxTree

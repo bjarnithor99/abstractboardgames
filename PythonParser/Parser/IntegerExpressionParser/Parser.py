@@ -1,3 +1,6 @@
+from ru_final_project.PythonParser.Lexer.TokenTypes import Delimiter
+from ru_final_project.PythonParser.Parser.RegexParser.ASTType import FunctionCall
+from ..ParserType import MatchFailed, AbstractParser
 from .ASTType import *
 from ..ASTType import MatchFailed
 from ..RegexParser.ASTType import FunctionCall
@@ -5,11 +8,7 @@ from ...Lexer.TokenTypes import Delimiter
 from ...Lexer.Lexer import Lexer, EOI, TextPosition, Token, Operator, Word, Symbol
 from ...Lexer import Lexer as LexerAPI
 
-class Parser():
-    def __init__(self, text: str) -> None:
-        self.text = text
-        self.i = 0
-
+class Parser(AbstractParser):
     def next(self) -> Token:
         if self.i >= len(self.tokens):
             return EOI(None, TextPosition(-1,-1))
@@ -148,14 +147,6 @@ class Parser():
             self.i = bakcupI
         
         raise MatchFailed(self.peak(1).pos)
-
-
-    def matchToken(self, tokenType, value=None):
-        token: Token = self.peak(1)
-        if not(type(token) == tokenType and (token.value == value or value is None)):
-            raise MatchFailed(token.pos)
-        self.skip(1)
-        return token
             
 
 
