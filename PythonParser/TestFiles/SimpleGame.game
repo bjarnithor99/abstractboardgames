@@ -1,25 +1,25 @@
-Players = white, black;
-Pieces = WhitePawn(white), BlackPawn(black);
+players = white, black;
+pieces = WhitePawn(white), BlackPawn(black);
 
 #-- Piece rules --
 variable WhiteY = 0;
 variable BlackY = 2;
 
 effect WEnd() {WPawnAtEnd = 1;};
-macro WhiteCanWin() = (0,0,this.y==BlackY){WEnd()} | (0,0,this.y!=BlackY);
-rule WhitePawn = ((0,1,empty) | (0,0,true))WhiteCanWin();
+macro WhiteCanWin() = [0,0,this.y==BlackY]{WEnd()} | [0,0,this.y!=BlackY];
+rule WhitePawn = ([0,1,empty] | [0,0,true])WhiteCanWin();
 
 effect BEnd() {BPawnAtEnd = 1;};
-macro BlackCanWin() = (0,0,this.y==WhiteY){BEnd()} | (0,0,this.y!=WhiteY);
-rule BlackPawn = ((0,-1,empty) | (0,0,true))BlackCanWin();
+macro BlackCanWin() = [0,0,this.y==WhiteY]{BEnd()} | [0,0,this.y!=WhiteY];
+rule BlackPawn = ([0,-1,empty] | [0,0,true])BlackCanWin();
 
 #-- Victory variables --
 variable WPawnAtEnd = 0; variable BPawnAtEnd = 0;
 victory white {return WPawnAtEnd == 1;};
 victory black {return BPawnAtEnd == 1;};
 
-BoardSize = 2, 3;
-Board = 
+board_size = 2, 3;
+board = 
     BlackPawn, None,
     None, None,
     None, WhitePawn

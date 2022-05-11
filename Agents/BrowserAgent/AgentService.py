@@ -14,7 +14,6 @@ import threading
 from websockets import exceptions
 from websockets import server
 from typing import Dict, List, Tuple
-from ...GameEngine.GameEngineType import GameEngine, Move
 
 HOST_IP = "localhost"
 HOST_DOMAIN = "localhost"
@@ -74,11 +73,12 @@ class AgentService:
                 dataDict = json.loads(request.data)
                 moveIndex = int(dataDict["moveIndex"])
                 moves = self.gameEngine.getPlayerMoves()
-                self.move = moves[moveIndex]  # Storing the move
 
-                self.gameEngine.playMove(self.move)
+                self.gameEngine.playMove(moves[moveIndex])
                 response_body["gameState"] = json.loads(self.gameEngine.jsonify())
                 self.gameEngine.undo_move()
+
+                self.move = moves[moveIndex]  # Storing the move
                 return make_response(jsonify(response_body), 200)
 
         @self.app.route("/<path:filename>")
@@ -128,13 +128,13 @@ class AgentService:
             http_server = WSGIServer(("", self.port), self.app)
             http_server.start()
 
-    def getMove(self, gameEngine: GameEngine) -> Move:
-        self.gameEngine: GameEngine = gameEngine
+    def getMove(self, gameEngine):
+        self.gameEngine = gameEngine
         while self.websocketClient is None:  # Wait client to connect
             pass
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        self.move: Move = None
+        self.move = None
         tasks = [self.websocketClient.send(gameEngine.jsonify())]
         loop.run_until_complete(asyncio.wait(tasks))
         loop.close()

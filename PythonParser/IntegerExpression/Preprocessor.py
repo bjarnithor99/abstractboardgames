@@ -1,5 +1,6 @@
-from ru_final_project.PythonParser.Parser.RegexParser.ASTType import FunctionCall
 from ..Parser.IntegerExpressionParser.ASTType import *
+from ..Parser.RegexParser.ASTType import FunctionCall
+
 def writeVariablesToConstants(integerExpression: IntegerExpressionTree, env: dict[str: int]) -> IntegerExpressionTree:
     def visitor(node: SyntaxTreeNode, env: dict[str: int]):
         children = []

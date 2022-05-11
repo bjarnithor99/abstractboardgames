@@ -1,7 +1,7 @@
-from ru_final_project.PythonParser.Lexer.TokenTypes import Delimiter
-from ru_final_project.PythonParser.Parser.RegexParser.ASTType import FunctionCall
-from ..ASTType import MatchFailed
 from .ASTType import *
+from ..ASTType import MatchFailed
+from ..RegexParser.ASTType import FunctionCall
+from ...Lexer.TokenTypes import Delimiter
 from ...Lexer.Lexer import Lexer, EOI, TextPosition, Token, Operator, Word, Symbol
 from ...Lexer import Lexer as LexerAPI
 
