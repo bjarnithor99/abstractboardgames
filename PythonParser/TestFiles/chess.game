@@ -43,8 +43,13 @@ function UnderAttack() =
     ;
 
 
+<<<<<<< HEAD
 macro Castling(y) = [0,0,not UnderAttack()][1,0,empty][0,0,not UnderAttack()][1,0,empty][0,0,not whiteRightRookMoved and not whiteKingMoved]{Move(7, y, -2, 0)};
 macro KingMacro(y) = KingSteps() | Castling(y);
+=======
+regex Castling(y) = [0,0,not UnderAttack()][1,0,empty and not UnderAttack()][1,0,empty][0,0,not whiteRightRookMoved and not whiteKingMoved]{Move(7, y, -2, 0)};
+regex KingMacro(y) = KingSteps() | Castling(y);
+>>>>>>> c728a7e2408db98f775077870b0160a6d4da1edc
 
 effect WKMoved() {whiteKingMoved = 1;};
 regex WhiteKingRegex() = KingMacro(0)[0,0,not UnderAttack()]{WKMoved()};
