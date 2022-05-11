@@ -25,6 +25,14 @@ will call the compiled game description to provide the game-specific logic. This
 component will extend the students' knowledge of artificial intelligence,
 particularly of informed search methods.
 
+** How to run the python game engine
+Flask and Webscokets python libraries are needed for the following to run.
+Be located in the folder located above the ru_final_project and run python -m ru_final_project.GameEngine.PythonGameEngine. 
+This will run a chess demo on http://localhost:8080 that can be connect to with any browser.
+It will run a GUI against a random agent on the game defined at ru_final_project\PythonParser\TestFiles\chess.game.
+Else the class PythonGameEngine can be initiated from any python program with filenames from the ru_final_project\PythonParser\TestFiles folder.
+
+
 ** The learning module
 The third and last component allows the game agent to autonomously learn game
 strategies via self-play, using deep neural networks and reinforcement learning.
