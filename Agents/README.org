@@ -1,0 +1,7 @@
+Here are a few agents you can use with the game engines. All compatible agents
+must inherit the [[file:./agent.py][agent.py]] base class.
+
+The recommended agents are:
+- [[file:./browser_gui_agent.py][The Browser GUI agent]] to play a game in your browser.
+- [[file:./random_agent.py][The Random agent]] if you want to win easily.
+- [[file:./mcts_agent.py][The MCTS agent]] if you want to train your own agent for a bigger challenge.

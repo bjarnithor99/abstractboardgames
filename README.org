@@ -1,5 +1,23 @@
 #+TITLE: Project Description
 
+* Table of Contents :TOC:
+- [[#about][About]]
+- [[#a-framework-and-a-language-for-abstract-board-games][A Framework and a Language for Abstract Board Games]]
+  - [[#the-game-description-language][The Game Description Language]]
+  - [[#the-game-playing-agent][The Game-Playing Agent]]
+  - [[#the-learning-module][The learning module]]
+  - [[#deliverables][Deliverables]]
+- [[#requirements][Requirements]]
+
+* About
+This repo contains the source code for our BSc final project at Reykjavik
+University. The project is split into a few parts (described below). For more
+details, see the project's description below, the READMEs in relevant
+subfolders, our final report, or the code itself.
+
+The team consists of Bjarni Dagur Thor Kárason and Guðmundur Freyr Ellertsson.
+Professor Yngvi Björnsson is our instructor.
+
 * A Framework and a Language for Abstract Board Games
 
 As a part of ongoing research into general game-playing systems, this project
@@ -16,7 +34,15 @@ Chinese chess, yet, at the same time, simple enough to allow for a fast
 interpretation. The game descriptions compile into runnable Python/C++ code.
 This component will extend the students' knowledge of compiler techniques.
 
-For the current syntax of the language see [[file:./language_description.txt][language_description.txt]].
+There are two language implementations in this repo. The [[file:./cpp/][C++]] implementation
+supports the language described in [[file:./cpp/language_description.txt][cpp/language_description.txt]]. This is the
+implementation used to compare framework to similar existing frameworks. For
+instructions on how to use it see [[file:./cpp/README.org][cpp/README]].
+
+The [[file:./PythonParser/][Python]] implementation supports the language described in
+[[file:./PythonParser/language_description.txt][PythonParser/language_description.txt]]. This implementation aims to support a
+self-contained language. For instructions on how to run it see
+[[file:./GameEngine/README.org][GameEngine/README]].
 
 ** The Game-Playing Agent
 The game-playing agent will be Alpha-Zero-like, using a Monte-Carlo tree search
@@ -25,17 +51,16 @@ will call the compiled game description to provide the game-specific logic. This
 component will extend the students' knowledge of artificial intelligence,
 particularly of informed search methods.
 
-** How to run the python game engine
-Flask and Webscokets python libraries are needed for the following to run.
-Be located in the folder located above the ru_final_project and run python -m ru_final_project.GameEngine.PythonGameEngine. 
-This will run a chess demo on http://localhost:8080 that can be connect to with any browser.
-It will run a GUI against a random agent on the game defined at ru_final_project\PythonParser\TestFiles\chess.game.
-Else the class PythonGameEngine can be initiated from any python program with filenames from the ru_final_project\PythonParser\TestFiles folder.
-
+We implemented a few agents to (learn) and play games described in our language.
+The can be found in [[file:./Agents][Agents/]]. For instructions on how to train agents see
+[[file:./Learning/README.org][Learning/README]]. For instructions on how to play games againsts agents (or your
+friends) see [[file:./GameEngine/README.org][GameEngine/README]].
 
 ** The learning module
 The third and last component allows the game agent to autonomously learn game
 strategies via self-play, using deep neural networks and reinforcement learning.
+
+For instructions on how to use the learning mode see [[file:./Learning/README.org][Learning/README]].
 
 ** Deliverables
 The project will have three main deliverables:
@@ -43,3 +68,11 @@ The project will have three main deliverables:
 - a BSc thesis report,
 - a conference paper, describing the framework and comparing its effectiveness
   (e.g., expressibility and efficiency) with similar existing frameworks.
+
+* Requirements
+All the required dependencies for this project (except [[https://www.doxygen.nl/index.html][Doxygen]]) are listed in
+[[file:./requirements.txt][requirements.txt]]. You may want to install [[https://pytorch.org/][PyTorch]] differently depending on your
+CUDA version. The requirements can be installed by running
+#+begin_src bash
+pip install -r requirements.txt
+#+end_src

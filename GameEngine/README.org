@@ -1,0 +1,23 @@
+* Running
+The preferred way to play a game against an agent or your friends is by using a
+game engine. Examples of how to use the game engines are given at the bottom of
+[[file:./CPPGameEngine.py][CPPGameEngine.py]] and [[file:./PythonGameEngine.py][PythonGameEngine.py]]. All the agents in [[file:../Agents][Agents/]] can be used
+with the engines.
+
+Due to Python imports, the game engines need to be run as Python modules. For
+example, you can run
+#+begin_src bash
+python -m abstractboardgames.GameEngine.CPPGameEngine
+#+end_src
+or
+#+begin_src bash
+python -m abstractboardgames.GameEngine.PythonGameEngine
+#+end_src
+from the project's parent directory. By default, this will allow you to play
+chess in your browser ([[http://localhost:8080][localhost:8080]]) against a random agent. To play against
+intelligent agents, first take a look at training your own agent
+([[file:../Learning/README.org][Learning/README]]), then replace the =RandomAgent= with your new agent. Different
+agents can be found in [[file:../Agents][Agents/]].
+
+More C++ game files can be found in [[file:../cpp/games][cpp/games/]], and more Python game files can
+be found in [[file:../PythonParser/TestFiles][PythonParser/TestFiles/]].

@@ -1,0 +1,9 @@
+To train an agent, simply import the agent you want to train, and replace the
+=MCTSAgent= in line 55 in [[file:./train.py][train.py]]. Due to the speed difference, you must use
+the C++ game engine with the agents (train and play).
+
+Due to Python imports, the training routine must be run as a Python module. To
+run the training routine run the following from the project's parent directory
+#+begin_src bash
+python -m abstractboardgames.Learning.train
+#+end_src

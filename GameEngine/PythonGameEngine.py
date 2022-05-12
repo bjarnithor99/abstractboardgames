@@ -770,7 +770,6 @@ if __name__ == "__main__":
     agents = []
     agents.append(BrowserGUIAgent(8080))
     agents.append(RandomAgent())
-    # agents.append(TUIAgent())
     # agents.append(RandomAgent())
     result = ge.run(agents)
     print(result)

@@ -1,0 +1,66 @@
+game:                player_list ";"
+                     piece_list ";"
+                     variable* ";"
+                     (macro_def ";")*
+                     (function ";")*
+                     (effect ";")*
+                     (victory_condition ";")*
+                     (rule ";")*
+                     (post_condition ";")*
+                     board_size ";"
+                     board ";"
+
+player_list:         "players" "=" player ("," player)*
+player:              string
+
+piece_list:          "pieces" "=" piece ("," piece)*
+piece:               string ("(" piece_owners ")")?
+piece_owner:         player, ("," player)*
+
+board_size:          "board_size" "=" int "," int
+board:               "board" "=" board_piece ("," board_piece)*
+board_piece:         string
+
+variable:            "variable" variable_name "=" int_expression ";"
+variable_name:       string
+
+function:            "function" function_name "(" arguments? ")" function_body ";"
+function_name:       string
+function_body:       "{" "return" int_expression "}" | "=" sentence
+function_call:       function_name "(" function_arguments? ")"
+function_arguments:  int_expression ("," int_expression)*
+
+effect:              "effect" effect_name "(" arguments? ")" "{" effect_body "}" ";"
+effect_name:         string
+effect_body:         assignment*
+assignment:          variable_name ("[" int_expression "]")* "=" assignment_body";"
+assignment_body:     int_expression | variable_name ("[" int_expression "]")*
+effect_call:         effect_name "(" function_arguments? ")"
+
+victory_condition:   "victory" player "{" "return" int_expression "}"
+
+rule:                "rule" piece "=" sentence
+
+macro_def:           "macro" macro_name "(" arguments? ")" = sentence
+macro_call:          macro_name "(" arguments? ")"
+macro_name:          string
+
+post_condition:      "post" player piece "=" sentence
+
+sentence:            word ("|" word)*
+word:                (core_word unary_op | core_word | macro_call)+
+core_word:           "(" sentence ")" | letter | function_call | variable
+letter:              "[" int_expression "," int_expression "," function_call "]" ("{" effect_call "}")?
+
+int_expression:      unary_expression ( binary_exp_op unary_expression)*
+unary_expression:    unary_exp_op unary_expression | core_expression
+core_expression:     "(" int_expression ")" | int | function_call |
+                       variable_name (("." variable_name)? | ("[" int_expression "]")*)
+binary_exp_op:       "*" | "+" | "-" | "//" | "/" | "\%" | "and" | "or" | "!=" | "==" | "\&\&" | "||"
+unary_expr_op:       "-" | "not" | "!"
+
+arguments:           argument ("," argument)*
+argument:            int | string
+int:                 CLASS OF INTEGERS
+string:              CLASS OF STRINGS WITHOUT INTEGERS
+unary_op:            "*" | "?" | "+"

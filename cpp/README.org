@@ -1,19 +1,25 @@
-* About
-This is a C++ framework for the abstract board games language defined in
-[[file:../language_description.txt][language_description.txt]]. The framework includes a parser (see [[file:./src/parsing/][parsing/]]) for
-parsing game descriptions (see [[file:./games/][games/]] for examples), an interactive environment
-(see [[file:./src/environment/][environment/]]) built game descriptions, and facilities to extend the
-environment with user-defined concepts that are not supported by the language
-itself (see [[file:./src/actions/][actions/]]).
+* Table of Contents :TOC:
+- [[#about][About]]
+- [[#requirements][Requirements]]
+- [[#compiling][Compiling]]
+- [[#running][Running]]
 
-This framework is meant to be compiled as Python bindings and used to create a
-game playing agent.
+* About
+This is a C++ framework for the Abstract Board Games language defined in
+[[file:./language_description.txt][language_description.txt]]. The framework includes a parser (see [[file:./src/parsing/][parsing/]]) for
+parsing game descriptions (see [[file:./games/][games/]] for examples), an interactive environment
+(see [[file:./src/environment/][environment/]]) built from game descriptions, and facilities to extend the
+environment with user-defined concepts that are not supported by the language
+itself such as predicates, side effects and terminal conditions. (see [[file:./src/actions/][actions/]]).
+
+This implementation can either be benchmarked as is, or compiled as Python
+bindings to be used as a [[file:../GameEngine][GameEngine/]] with [[file:../Agents][Agents/]].
 
 * Requirements
-- [[https://github.com/pybind/pybind11][pybind11]] to compile the Python bindings.
+- [[https://github.com/pybind/pybind11][pybind11]] to compile the Python bindings. We recommend installing using pip.
 - (optional) [[https://github.com/doxygen/doxygen][Doxygen]] to compile the C++ framework's documentation.
 
-* Compiling and running
+* Compiling
 Before compiling the C++ framework and the Python bindings you first have to run
 #+begin_src bash
 cmake -Dpybind11_ROOT=$(pybind11-config --cmakedir) .
@@ -21,7 +27,7 @@ cmake -Dpybind11_ROOT=$(pybind11-config --cmakedir) .
 If you have [[https://github.com/doxygen/doxygen][Doxygen]] installed you enable compilation of the framework's
 documentation by running
 #+begin_src bash
-cmake -Dpybind11_ROOT=$(pybind11-config --cmakedir) -DBUILD_DOCS=IN .
+cmake -Dpybind11_ROOT=$(pybind11-config --cmakedir) -DBUILD_DOCS=ON .
 #+end_src
 
 To compile the C++ framework with the provided main file (meant for testing),
@@ -29,9 +35,17 @@ run
 #+begin_src bash
 make abstract-board-games
 #+end_src
+To compile to benchmarking tools run
+#+begin_src bash
+make flatmc-abstract-board-games
+#+end_src
+and
+#+begin_src bash
+make perft-abstract-board-games
+#+end_src
 To compile the Python bindings for the C++ framework, run
 #+begin_src bash
-make python-bindings
+make python_bindings
 #+end_src
 To compile the documentation, run
 #+begin_src bash
@@ -42,4 +56,29 @@ Note: running
 #+begin_src bash
 make
 #+end_src
-will compile both =abstract-board-games= and =python-bindings= but not =docs=.
+will compile =abstract-board-games=, =flatmc-abstract-board-games=,
+=perft-abstract-board-games=, and =python_bindings=, but not =docs=.
+
+* Running
+Before running the compiled tools, make sure you have compiled the correct
+predicates, side effects and terminal conditions. You can find the necessary
+game files in [[file:./games/][games/]]. A game description has a =.game= file ending. From a
+game's directory run
+#+begin_src bash
+cp *.hpp ../../src/actions/ && cp *.cpp ../../src/actions/
+#+end_src
+and compile again.
+
+To play a game in the terminal run
+#+begin_src bash
+./abstract-board-games <gamefile>
+#+end_src
+To run a benchmark run
+#+begin_src bash
+./flatmc-abstract-board-games <gamefile> <timelimit>
+#+end_src
+to run a flat Monte-Carlo benchmark for a given amount of milliseconds, or
+#+begin_src bash
+./perft-abstract-board-games <gamefile> <depth>
+#+end_src
+to run a perft benchmark up to a given depth.

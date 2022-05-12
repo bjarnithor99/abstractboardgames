@@ -60,7 +60,7 @@ if __name__ == "__main__":
     from ..Agents.browser_gui_agent import BrowserGUIAgent
     from ..Agents.random_agent import RandomAgent
     engine = CPPGameEngine("/home/bjarni/HR/T-404-LOKA/cpp/games/chess/chess.game")
-    players = [BrowserGUIAgent(port=8002), RandomAgent()]
+    players = [BrowserGUIAgent(port=8080), RandomAgent()]
     while True:
         print("New game")
         engine.reset()

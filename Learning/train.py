@@ -8,7 +8,6 @@ import coloredlogs
 import torch
 from tqdm import tqdm
 from ..Agents.alphabeta_agent import AlphaBetaAgent
-from ..Agents.browser_gui_agent import BrowserGUIAgent
 from ..Agents.mcts_agent import MCTSAgent
 from ..Agents.random_agent import RandomAgent
 from .coach import Coach
