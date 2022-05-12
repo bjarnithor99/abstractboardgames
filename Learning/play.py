@@ -44,6 +44,6 @@ if __name__ == "__main__":
         elif engine.get_white_score() == 0:
             log.info("Draw")
         elif engine.get_white_score() == -1:
-            log.info("Draw")
+            log.info("Black wins")
         else:
             log.info(f"Unexpected score {engine.get_white_score()}")
