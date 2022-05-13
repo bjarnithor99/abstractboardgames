@@ -13,7 +13,7 @@
 This repo contains the source code for our BSc final project at Reykjavik
 University. The project is split into a few parts (described below). For more
 details, see the project's description below, the READMEs in relevant
-subfolders, our final report, or the code itself.
+subfolders, our [[file:./Abstract_Board_Games_Final_Report.pdf][final report]], or the code itself.
 
 The team consists of Bjarni Dagur Thor Kárason and Guðmundur Freyr Ellertsson.
 Professor Yngvi Björnsson is our instructor.
