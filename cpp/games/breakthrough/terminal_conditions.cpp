@@ -10,8 +10,14 @@ bool NoMovesLeft::operator()(Environment *environment) {
     if (environment->variables.n_moves_found != 0)
         return false;
 
-    environment->variables.black_score = 0;
-    environment->variables.white_score = 0;
+    if (environment->current_player == "black") {
+        environment->variables.black_score = -1;
+        environment->variables.white_score = 1;
+    }
+    else {
+        environment->variables.black_score = 1;
+        environment->variables.white_score = -1;
+    }
     environment->variables.game_over = true;
     return true;
 }
