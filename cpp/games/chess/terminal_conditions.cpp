@@ -42,6 +42,22 @@ std::string NoMovesLeft::get_name() const {
     return "NoMovesLeft";
 }
 
+Stagnation::Stagnation() {}
+Stagnation::~Stagnation() {}
+bool Stagnation::operator()(Environment *environment) {
+    if (environment->move_count - environment->variables.stagnation >= 50) {
+        environment->variables.black_score = 0;
+        environment->variables.white_score = 0;
+        environment->variables.game_over = true;
+        return true;
+    }
+    return false;
+}
+std::string Stagnation::get_name() const {
+    return "Stagnation";
+}
+
 std::map<std::string, std::shared_ptr<TerminalCondition>> TerminalConditions::terminal_conditions = {
     {"NoMovesLeft", std::make_shared<NoMovesLeft>()},
+    {"Stagnation", std::make_shared<Stagnation>()},
 };

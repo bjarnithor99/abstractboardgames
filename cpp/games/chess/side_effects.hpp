@@ -64,6 +64,9 @@ class Default : public SideEffect
     void operator()(Environment *environment, int old_x, int old_y, int new_x, int new_y) override;
     void operator()(Environment *environment) override;
     std::string get_name() const override;
+
+  private:
+    std::stack<int> stagnation_stack;
 };
 
 /// @brief A side effect that promotes a Pawn to a Queen once it reaches the end

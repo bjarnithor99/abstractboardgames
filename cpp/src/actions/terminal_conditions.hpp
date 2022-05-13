@@ -53,6 +53,17 @@ class NoMovesLeft : public TerminalCondition
     std::string get_name() const override;
 };
 
+/// @brief A terminal condition that checks if the game has stagnated.
+/// @author Bjarni Dagur Thor Kárason
+class Stagnation : public TerminalCondition
+{
+  public:
+    Stagnation();
+    ~Stagnation();
+    bool operator()(Environment *environment) override;
+    std::string get_name() const override;
+};
+
 /// @brief Class to store all terminal conditions to use in game descriptions.
 /// @author Bjarni Dagur Thor Kárason
 class TerminalConditions

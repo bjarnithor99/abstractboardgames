@@ -11,9 +11,13 @@ void Default::operator()(Environment *environment, int old_x, int old_y, int new
     Cell &new_cell = environment->board[new_x][new_y];
     cell_stack.push({old_cell, old_x, old_y});
     cell_stack.push({new_cell, new_x, new_y});
+    stagnation_stack.push(environment->variables.stagnation);
 
     if (old_x == new_x && old_y == new_y)
         return;
+
+    if (old_cell.piece == "bPawn" || old_cell.piece == "wPawn" || !new_cell.owners.empty())
+        environment->variables.stagnation = environment->move_count;
 
     new_cell.piece = old_cell.piece;
     new_cell.owners = old_cell.owners;
@@ -30,6 +34,8 @@ void Default::operator()(Environment *environment) {
         environment->board[x][y] = std::get<0>(cell_stack.top());
         cell_stack.pop();
     }
+    environment->variables.stagnation = stagnation_stack.top();
+    stagnation_stack.pop();
 }
 std::string Default::get_name() const {
     return "Default";

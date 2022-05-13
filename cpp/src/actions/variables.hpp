@@ -65,4 +65,6 @@ class Variables
     bool white_rook_left_moved;
     /// @brief Keeps track whether the right white rook has moved;
     bool white_rook_right_moved;
+    /// @brief Keeps track of the number of moves without moving a pawn or capturing.
+    int stagnation;
 };
